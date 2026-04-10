@@ -2733,39 +2733,7 @@
   }
 
   // ── Client database ──
-  let CLIENTS = [
-    { id:1,  phone:'+48 512 345 678', name:'Jan Kowalski',         vehicles:[{ brand:'Volkswagen',   model:'Golf',      plate:'WA1234B', vin:'WVWZZZ1KZ4W123456' }] },
-    { id:2,  phone:'+48 501 234 567', name:'Anna Wiśniewska',      vehicles:[{ brand:'BMW',          model:'Seria 3',   plate:'KR5678C', vin:'WBA3A4G51FNS12345' }] },
-    { id:3,  phone:'+48 691 456 789', name:'Piotr Wójcik',         vehicles:[{ brand:'Mercedes-Benz',model:'C-Klasa',   plate:'GD9012D', vin:'WDD2040022F123456' }] },
-    { id:4,  phone:'+48 723 567 890', name:'Katarzyna Kowalczyk',  vehicles:[{ brand:'Audi',         model:'A4',        plate:'PO3456E', vin:'WAUZZZ8K4DA123456' }] },
-    { id:5,  phone:'+48 534 678 901', name:'Marek Kamiński',       vehicles:[{ brand:'Toyota',       model:'Corolla',   plate:'WR7890F', vin:'SB1ZS3JE20E123456' }] },
-    { id:6,  phone:'+48 601 789 012', name:'Agnieszka Lewandowska',vehicles:[{ brand:'Ford',         model:'Focus',     plate:'WA2345G', vin:'WF0EXXGCDEJ123456' }] },
-    { id:7,  phone:'+48 512 890 123', name:'Tomasz Zieliński',     vehicles:[{ brand:'Opel',         model:'Astra',     plate:'KR6789H', vin:'W0L000051T0123456' }] },
-    { id:8,  phone:'+48 697 901 234', name:'Barbara Szymańska',    vehicles:[{ brand:'Škoda',        model:'Octavia',   plate:'GD1234I', vin:'TMBEG41Z7G2123456' }] },
-    { id:9,  phone:'+48 732 012 345', name:'Krzysztof Woźniak',    vehicles:[{ brand:'Renault',      model:'Megane',    plate:'LU5678J', vin:'VF1BMDYB4EF123456' }] },
-    { id:10, phone:'+48 881 123 456', name:'Maria Dąbrowska',      vehicles:[{ brand:'Fiat',         model:'Tipo',      plate:'WA9012K', vin:'ZFA35600006123456' }] },
-    { id:11, phone:'+48 502 234 567', name:'Michał Kozłowski',     vehicles:[{ brand:'Hyundai',      model:'Tucson',    plate:'KA3456L', vin:'KMHJ341AAGU123456' }] },
-    { id:12, phone:'+48 515 345 678', name:'Joanna Jankowska',     vehicles:[{ brand:'Kia',          model:'Sportage',  plate:'WR7890M', vin:'U5YPB814ADL123456' }] },
-    { id:13, phone:'+48 694 456 789', name:'Andrzej Mazur',        vehicles:[{ brand:'Peugeot',      model:'308',       plate:'PO2345N', vin:'VF30E9HZ8HS123456' }] },
-    { id:14, phone:'+48 728 567 890', name:'Monika Kwiatkowska',   vehicles:[{ brand:'SEAT',         model:'Leon',      plate:'GD6789O', vin:'VSSZZZ5FZ4R123456' }] },
-    { id:15, phone:'+48 531 678 901', name:'Paweł Krawczyk',       vehicles:[{ brand:'Mazda',        model:'3',         plate:'WA1234P', vin:'JMZBK12Z021123456' }] },
-    { id:16, phone:'+48 604 789 012', name:'Magdalena Piotrowska', vehicles:[{ brand:'Volkswagen',   model:'Passat',    plate:'KR5678Q', vin:'WVWZZZ3CZ6E123456' }] },
-    { id:17, phone:'+48 512 890 234', name:'Grzegorz Grabowski',   vehicles:[{ brand:'BMW',          model:'Seria 5',   plate:'WR9012R', vin:'WBA5A4C51DD123456' },
-                                                                               { brand:'Jeep',        model:'Wrangler',  plate:'WR8899S', vin:'1C4HJWFG8GL123456' }] },
-    { id:18, phone:'+48 695 901 234', name:'Ewa Nowakowska',       vehicles:[{ brand:'Mercedes-Benz',model:'E-Klasa',   plate:'LU3456S', vin:'WDD2120112A123456' }] },
-    { id:19, phone:'+48 731 012 456', name:'Łukasz Pawłowski',     vehicles:[{ brand:'Audi',         model:'A6',        plate:'WA7890T', vin:'WAUZZZ4G4FN123456' }] },
-    { id:20, phone:'+48 880 123 567', name:'Małgorzata Michalska', vehicles:[{ brand:'Toyota',       model:'RAV4',      plate:'KA2345U', vin:'JTMRFREV1LJ123456' }] },
-    { id:21, phone:'+48 501 234 789', name:'Marcin Adamczyk',      vehicles:[{ brand:'Ford',         model:'Kuga',      plate:'PO6789V', vin:'WF0EXXTTGEF123456' }] },
-    { id:22, phone:'+48 516 345 890', name:'Kamil Wierzbicki',     vehicles:[{ brand:'Opel',         model:'Insignia',  plate:'GD1234W', vin:'W0L0TGF4AB0123456' }] },
-    { id:23, phone:'+48 693 456 901', name:'Rafał Jabłoński',      vehicles:[{ brand:'Škoda',        model:'Kodiaq',    plate:'WR5678X', vin:'TMBJJ9NS5H2123456' }] },
-    { id:24, phone:'+48 725 567 012', name:'Bartosz Zając',        vehicles:[{ brand:'Renault',      model:'Kadjar',    plate:'WA9012Y', vin:'VF1RFE00056123456' }] },
-    { id:25, phone:'+48 532 678 123', name:'Dawid Szulc',          vehicles:[{ brand:'Fiat',         model:'500',       plate:'KR3456Z', vin:'ZFA3120000J123456' }] },
-    { id:26, phone:'+48 602 789 234', name:'Szymon Wysocki',       vehicles:[{ brand:'Hyundai',      model:'i30',       plate:'LU7890A', vin:'TMAD381AAGJ123456' }] },
-    { id:27, phone:'+48 513 890 345', name:'Wojciech Rutkowski',   vehicles:[{ brand:'Volkswagen',   model:'Tiguan',    plate:'WA2345B', vin:'WVGZZZ5NZFW123456' }] },
-    { id:28, phone:'+48 698 901 456', name:'Natalia Ostrowska',    vehicles:[{ brand:'BMW',          model:'X5',        plate:'GD6789C', vin:'5UXKR0C50F0123456' }] },
-    { id:29, phone:'+48 729 012 567', name:'Robert Kaczmarek',     vehicles:[{ brand:'Audi',         model:'Q5',        plate:'PO1234D', vin:'WAUZZZ8R4FA123456' }] },
-    { id:30, phone:'+48 883 123 678', name:'Iwona Bąk',            vehicles:[{ brand:'Toyota',       model:'Yaris',     plate:'WR5678E', vin:'SB1KP3JE40E123456' }] },
-  ];
+  let CLIENTS = []; // loaded from Supabase on init
 
   // ── Search helpers ──
   function normalize(str) {
@@ -4086,7 +4054,7 @@
         sbLoadClients(),
         sbLoadVisits(`${y - 1}-01-01`, `${y + 1}-12-31`),
       ]);
-      if (clients.length) CLIENTS = clients;
+      CLIENTS = clients;
       APPOINTMENTS = visits;
       renderDayView();
     } catch (e) {
