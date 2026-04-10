@@ -7,6 +7,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="js/supabase.js"></script>
   <style>
     /* ── Tokens ── */
     :root {
@@ -2731,7 +2733,7 @@
   }
 
   // ── Client database ──
-  const CLIENTS = [
+  let CLIENTS = [
     { id:1,  phone:'+48 512 345 678', name:'Jan Kowalski',         vehicles:[{ brand:'Volkswagen',   model:'Golf',      plate:'WA1234B', vin:'WVWZZZ1KZ4W123456' }] },
     { id:2,  phone:'+48 501 234 567', name:'Anna Wiśniewska',      vehicles:[{ brand:'BMW',          model:'Seria 3',   plate:'KR5678C', vin:'WBA3A4G51FNS12345' }] },
     { id:3,  phone:'+48 691 456 789', name:'Piotr Wójcik',         vehicles:[{ brand:'Mercedes-Benz',model:'C-Klasa',   plate:'GD9012D', vin:'WDD2040022F123456' }] },
@@ -3245,7 +3247,7 @@
   if (subscreenBack) subscreenBack.addEventListener('click', closeSubscreen);
 
   if (btnZapiszDodaj) {
-    btnZapiszDodaj.addEventListener('click', () => {
+    btnZapiszDodaj.addEventListener('click', async () => {
 
       if (subscreenMode === 'edit-selected' && selectedClientData) {
         // ── Edit mode: save vehicle inputs then update client ──
@@ -3264,6 +3266,27 @@
           c.name     = selectedClientData.client.name;
           c.email    = selectedClientData.client.email;
           c.vehicles = selectedClientData.client.vehicles;
+        }
+        // Sync to Supabase
+        try {
+          await sbUpdateClient(
+            selectedClientData.client.id,
+            selectedClientData.client.phone,
+            selectedClientData.client.name,
+            selectedClientData.client.email,
+          );
+          const newVehs = await sbReplaceVehicles(
+            selectedClientData.client.id,
+            selectedClientData.client.vehicles,
+          );
+          // Update vehicle IDs in local state
+          if (newVehs.length) {
+            selectedClientData.client.vehicles = newVehs;
+            selectedClientData.vehicle = newVehs[subVehSelectedIdx] || newVehs[0];
+            if (c) c.vehicles = newVehs;
+          }
+        } catch (err) {
+          console.error('Błąd aktualizacji:', err);
         }
         refreshSelCard();
         subscreenMode = 'new';
@@ -3342,7 +3365,7 @@
   }
 
   // ── "Dodaj zlecenie" — main submit ──
-  document.getElementById('btn-dodaj-zlecenie').addEventListener('click', () => {
+  document.getElementById('btn-dodaj-zlecenie').addEventListener('click', async () => {
     const phone = qaPhone.value.trim();
     const brand = qaBrand.value.trim();
     const model = qaModel.value.trim();
@@ -3387,9 +3410,14 @@
 
     if (!valid) return;
 
-    // Only process quick-add if card is visible and has data
+    const serviceName = (document.getElementById('service-input')?.value || '').trim();
+    const timeFrom    = document.querySelector('.time-group .input-field:first-child .val')?.textContent || '8:00';
+    const timeTo      = document.querySelector('.time-group .input-field:last-child  .val')?.textContent || '9:00';
+    const colId       = STATION_COL[selectedStation] || 'cal-col-1';
+    const stanowiskoName = Object.keys(STATION_COL).find(k => STATION_COL[k] === colId) || 'Mechanika i usterki';
+
+    // ── New client (quick-add card) ──
     if (!quickAddCard.classList.contains('hidden') && (phone || brand || model)) {
-      // Validate required fields
       let ok = true;
       [['qa-f-phone', phone], ['qa-f-brand', brand], ['qa-f-model', model]]
         .forEach(([id, val]) => {
@@ -3398,34 +3426,39 @@
         });
       if (!ok) return;
 
-      // Format phone
-      const digits = phone.replace(/\D/g, '');
+      const digits    = phone.replace(/\D/g, '');
       const formatted = digits.length === 9
         ? `+48 ${digits.slice(0,3)} ${digits.slice(3,6)} ${digits.slice(6)}`
         : phone;
+      const vin   = (document.getElementById('qa-vin')?.value   || '').trim();
+      const plate = (document.getElementById('qa-plate')?.value || '').trim();
+      const email = (document.getElementById('qa-email')?.value || '').trim();
 
-      const vin   = (document.getElementById('qa-vin')?.value   || '').trim() || '—';
-      const plate = (document.getElementById('qa-plate')?.value || '').trim() || '—';
+      try {
+        const sbClient  = await sbCreateClient(formatted, '—', email);
+        const sbVehicle = await sbCreateVehicle(sbClient.id, brand, model, plate, vin);
+        await sbCreateVisit(sbVehicle.id, new Date(viewCurrent), timeFrom, timeTo, serviceName, stanowiskoName);
+        const vehicle   = { id: sbVehicle.id, brand, model, plate, vin };
+        const newClient = { id: sbClient.id, phone: formatted, name: '—', email, vehicles: [vehicle] };
+        CLIENTS.push(newClient);
+        addAppointmentToCalendar(newClient, vehicle, serviceName, timeFrom, timeTo, colId);
+      } catch (err) {
+        console.error('Błąd zapisu:', err);
+        alert('Błąd zapisu do bazy danych');
+        return;
+      }
 
-      const vehicle = { brand, model, plate, vin };
-      const newClient = {
-        id: CLIENTS.length + 1,
-        phone: formatted,
-        name: '—',
-        vehicles: [vehicle]
-      };
-      CLIENTS.push(newClient);
-
-      // Read service name and time from form
-      const serviceName = document.getElementById('service-input')?.value.trim() || '';
-      const timeFrom = document.querySelector('.time-group .input-field:first-child .val')?.textContent || '8:00';
-      const timeTo   = document.querySelector('.time-group .input-field:last-child  .val')?.textContent || '9:00';
-
-      // Pick column based on selected stanowisko
-      const colId = STATION_COL[selectedStation] || 'cal-col-1';
-
-      // Add to calendar
-      addAppointmentToCalendar(newClient, vehicle, serviceName, timeFrom, timeTo, colId);
+    // ── Existing client selected ──
+    } else if (selectedClientData) {
+      const { client, vehicle } = selectedClientData;
+      try {
+        await sbCreateVisit(vehicle.id, new Date(viewCurrent), timeFrom, timeTo, serviceName, stanowiskoName);
+        addAppointmentToCalendar(client, vehicle, serviceName, timeFrom, timeTo, colId);
+      } catch (err) {
+        console.error('Błąd zapisu:', err);
+        alert('Błąd zapisu do bazy danych');
+        return;
+      }
     }
 
     // Close panel and reset
@@ -4026,40 +4059,23 @@
   // ════════════════════════════
   //  CENTRAL APPOINTMENTS STORE
   // ════════════════════════════
-  const APPOINTMENTS = [
-    // May 14 (Tue) — today
-    { date: new Date(2025,4,14), start:'10:00', end:'11:00', name:'Volkswagen Golf',   phone:'+48 512 345 678', desc:'',                                    stanowisko:'Opony i wulkanizacja' },
-    { date: new Date(2025,4,14), start:'8:00',  end:'10:00', name:'Volkswagen Passat', phone:'+48 516 000 000', desc:'Wymiana rozrządu + płynu chłodniczego', stanowisko:'Mechanika i usterki' },
-    { date: new Date(2025,4,14), start:'9:00',  end:'10:30', name:'BMW Seria 3',       phone:'+48 501 234 567', desc:'Napełnianie klimatyzacji R134a',        stanowisko:'Klimatyzacja' },
-    // May 13 (Mon)
-    { date: new Date(2025,4,13), start:'9:00',  end:'10:00', name:'Honda Civic',       phone:'+48 601 111 222', desc:'Przegląd',     stanowisko:'Mechanika i usterki' },
-    { date: new Date(2025,4,13), start:'11:00', end:'12:30', name:'Peugeot 308',       phone:'+48 602 333 444', desc:'Wymiana opon', stanowisko:'Opony i wulkanizacja' },
-    // May 15 (Wed)
-    { date: new Date(2025,4,15), start:'9:00',  end:'10:00', name:'Audi A4',           phone:'+48 603 555 666', desc:'Hamulce',      stanowisko:'Hamulce' },
-    { date: new Date(2025,4,15), start:'13:00', end:'14:30', name:'Toyota Corolla',    phone:'+48 604 777 888', desc:'Wymiana opon', stanowisko:'Opony i wulkanizacja' },
-    // May 16 (Thu)
-    { date: new Date(2025,4,16), start:'8:00',  end:'9:30',  name:'Ford Focus',        phone:'+48 605 999 000', desc:'Diagnostyka',  stanowisko:'Mechanika i usterki' },
-    { date: new Date(2025,4,16), start:'10:00', end:'11:30', name:'Opel Astra',        phone:'+48 606 111 222', desc:'Klimatyzacja', stanowisko:'Klimatyzacja' },
-    // May 17 (Fri)
-    { date: new Date(2025,4,17), start:'8:00',  end:'9:00',  name:'Mercedes C200',     phone:'+48 606 111 333', desc:'',             stanowisko:'Opony i wulkanizacja' },
-    { date: new Date(2025,4,17), start:'11:00', end:'12:00', name:'Skoda Octavia',     phone:'+48 607 333 444', desc:'Serwis',       stanowisko:'Mechanika i usterki' },
-    // May 7
-    { date: new Date(2025,4,7),  start:'9:00',  end:'10:00', name:'Honda Civic',       phone:'+48 601 111 222', desc:'',             stanowisko:'Mechanika i usterki' },
-    // May 9
-    { date: new Date(2025,4,9),  start:'11:00', end:'12:00', name:'Peugeot 308',       phone:'+48 602 333 444', desc:'',             stanowisko:'Opony i wulkanizacja' },
-    // May 20
-    { date: new Date(2025,4,20), start:'10:00', end:'11:00', name:'Ford Focus',        phone:'+48 605 999 000', desc:'',             stanowisko:'Mechanika i usterki' },
-    // May 22
-    { date: new Date(2025,4,22), start:'14:00', end:'15:00', name:'Renault Megane',    phone:'+48 608 111 222', desc:'',             stanowisko:'Opony i wulkanizacja' },
-    { date: new Date(2025,4,22), start:'15:30', end:'16:30', name:'Fiat Punto',        phone:'+48 609 222 333', desc:'',             stanowisko:'Hamulce' },
-    // May 26
-    { date: new Date(2025,4,26), start:'9:00',  end:'10:00', name:'Opel Astra',        phone:'+48 606 111 222', desc:'',             stanowisko:'Klimatyzacja' },
-    { date: new Date(2025,4,26), start:'11:00', end:'12:00', name:'Seat Ibiza',        phone:'+48 610 111 222', desc:'',             stanowisko:'Hamulce' },
-    { date: new Date(2025,4,26), start:'14:00', end:'15:00', name:'Kia Ceed',          phone:'+48 611 111 222', desc:'',             stanowisko:'Mechanika i usterki' },
-    { date: new Date(2025,4,26), start:'16:00', end:'17:00', name:'Mazda 3',           phone:'+48 612 111 222', desc:'',             stanowisko:'Stanowisko Antykorozyjne' },
-    // May 28
-    { date: new Date(2025,4,28), start:'10:00', end:'11:30', name:'Citroen C3',        phone:'+48 613 111 222', desc:'',             stanowisko:'Opony i wulkanizacja' },
-  ];
+  let APPOINTMENTS = [];
+
+  async function initSupabase() {
+    try {
+      const y = new Date().getFullYear();
+      const [clients, visits] = await Promise.all([
+        sbLoadClients(),
+        sbLoadVisits(`${y - 1}-01-01`, `${y + 1}-12-31`),
+      ]);
+      CLIENTS = clients;
+      APPOINTMENTS = visits;
+    } catch (e) {
+      console.error('Supabase init error:', e);
+    }
+    renderDayView();
+  }
+  initSupabase();
 
   let activeFilter = 'all';
 
