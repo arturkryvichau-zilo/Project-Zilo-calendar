@@ -3,7 +3,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 const _sb = window.supabase.createClient(
-  'https://nmvlwwtovfookcpmtnmx.supabase.co',
+  'https://nmvlwwtovfoookpmtnmx.supabase.co',
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5tdmx3d3RvdmZvb29rcG10bm14Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU4MTcxNzcsImV4cCI6MjA5MTM5MzE3N30.4Ou0539banMOKTZmtAD8j_ZUo3kWpjzn49sDZpCrhuI'
 );
 
