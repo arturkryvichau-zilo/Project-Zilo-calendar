@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600&display=swap" rel="stylesheet" />
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <script src="js/supabase.js"></script>
   <style>
     /* ── Tokens ── */
@@ -4068,12 +4068,12 @@
         sbLoadClients(),
         sbLoadVisits(`${y - 1}-01-01`, `${y + 1}-12-31`),
       ]);
-      CLIENTS = clients;
+      if (clients.length) CLIENTS = clients;
       APPOINTMENTS = visits;
+      renderDayView();
     } catch (e) {
       console.error('Supabase init error:', e);
     }
-    renderDayView();
   }
   initSupabase();
 
