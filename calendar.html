@@ -3452,7 +3452,25 @@
     } else if (selectedClientData) {
       const { client, vehicle } = selectedClientData;
       try {
-        await sbCreateVisit(vehicle.id, new Date(viewCurrent), timeFrom, timeTo, serviceName, stanowiskoName);
+        let vehicleId = vehicle.id;
+
+        // If vehicle has no Supabase UUID — create client+vehicle in DB first
+        if (!vehicleId) {
+          let clientId = client.id;
+          // Check if client.id is a UUID (from Supabase) or a number (hardcoded)
+          if (typeof clientId === 'number' || !String(clientId).includes('-')) {
+            const sbClient = await sbCreateClient(client.phone, client.name, client.email || '');
+            clientId = sbClient.id;
+            client.id = clientId;
+            const c = CLIENTS.find(cl => cl.phone === client.phone);
+            if (c) c.id = clientId;
+          }
+          const sbVehicle = await sbCreateVehicle(clientId, vehicle.brand, vehicle.model, vehicle.plate, vehicle.vin);
+          vehicleId = sbVehicle.id;
+          vehicle.id = vehicleId;
+        }
+
+        await sbCreateVisit(vehicleId, new Date(viewCurrent), timeFrom, timeTo, serviceName, stanowiskoName);
         addAppointmentToCalendar(client, vehicle, serviceName, timeFrom, timeTo, colId);
       } catch (err) {
         console.error('Błąd zapisu:', err);
