@@ -2949,9 +2949,9 @@
   document.getElementById('dd-scroll').addEventListener('click', e => {
     const row = e.target.closest('.veh-row[data-cid]');
     if (!row) return;
-    const cid  = +row.dataset.cid;
+    const cid  = row.dataset.cid;  // keep as string (UUID)
     const vidx = +row.dataset.vidx;
-    const c    = CLIENTS.find(cl => cl.id === cid);
+    const c    = CLIENTS.find(cl => String(cl.id) === String(cid));
     if (!c) return;
     selectClientVehicle(c, c.vehicles[vidx]);
   });
