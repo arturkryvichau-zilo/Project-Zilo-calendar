@@ -488,34 +488,55 @@
     .qi-pop-manual:hover { color: var(--blue1); }
     .qi-pop-manual svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; flex-shrink: 0; }
 
-    /* ── Quick Input ── */
-    .qi-section {
-      background: #F3F3FF; border-radius: 12px; padding: 14px 16px;
-      display: flex; flex-direction: column; gap: 10px;
+    /* ── Quick Input (Figma design) ── */
+    .qi-banner {
+      background: linear-gradient(90deg, #7B61FF 0%, #222693 100%);
+      border-radius: 12px; padding: 13px 18px; color: #fff;
+      font-size: 15px; font-weight: 500; line-height: 1.4; text-align: center;
     }
-    .qi-header { display: flex; align-items: center; gap: 6px; }
-    .qi-icon { display: flex; align-items: center; }
-    .qi-icon svg { width: 15px; height: 15px; stroke: var(--blue1); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-    .qi-label { font-size: 13px; font-weight: 500; color: var(--black); }
-    .qi-hint  { font-size: 12px; color: var(--grey3); }
-    .qi-field-wrap { display: flex; gap: 8px; align-items: flex-start; }
-    .qi-textarea {
-      flex: 1; border: 1.5px solid #D5D7F8; border-radius: 8px;
-      padding: 10px 12px; font-family: 'Rubik', sans-serif; font-size: 14px;
-      color: var(--black); background: var(--white); resize: none;
-      overflow: hidden; min-height: 42px; line-height: 1.45; outline: none;
-      transition: border-color 150ms;
+    .qi-input-wrap {
+      border-radius: 12px; overflow: hidden;
+      background: linear-gradient(#fff, #fff) padding-box,
+                  linear-gradient(90deg, #7B61FF 0%, #222693 100%) border-box;
+      border: 1.5px solid transparent;
     }
-    .qi-textarea:focus { border-color: var(--blue1); }
-    .qi-textarea::placeholder { color: var(--grey3); font-size: 13px; }
-    .qi-submit {
-      width: 42px; height: 42px; flex-shrink: 0;
-      background: var(--blue1); border: none; border-radius: 8px;
-      cursor: pointer; display: flex; align-items: center; justify-content: center;
-      transition: background 150ms;
+    .qi-input-top { padding: 12px 14px 8px; }
+    .qi-label-sm { display: block; font-size: 12px; color: #979db0; margin-bottom: 4px; }
+    .qi-ta {
+      width: 100%; border: none; outline: none;
+      font-family: 'Rubik', sans-serif; font-size: 15px; line-height: 1.5;
+      color: #242629; resize: none; background: transparent; min-height: 68px;
     }
-    .qi-submit:hover { background: #1a1e7a; }
-    .qi-submit svg { width: 15px; height: 15px; stroke: #fff; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .qi-ta::placeholder { color: #bbbfcc; }
+    .qi-divider { height: 1px; background: #eef0f6; margin: 0 14px; }
+    .qi-toolbar { display: flex; align-items: center; padding: 8px 10px 10px; gap: 2px; }
+    .qi-tool-btn {
+      width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;
+      border: none; background: transparent; border-radius: 8px;
+      cursor: pointer; color: #6b707d; transition: background 150ms, color 150ms; flex-shrink: 0;
+    }
+    .qi-tool-btn:hover { background: #f0f1f5; color: #4f46e5; }
+    .qi-tool-btn svg { width: 22px; height: 22px; }
+    .qi-vsep { width: 1px; height: 20px; background: #dce0e6; margin: 0 4px; flex-shrink: 0; }
+    .qi-tool-btn.mic-active { color: #ea4335; background: #fde8e8; animation: qiPulse 1.2s ease-in-out infinite; }
+    @keyframes qiPulse {
+      0%,100% { box-shadow: 0 0 0 0 rgba(234,67,53,.3); }
+      50%      { box-shadow: 0 0 0 6px rgba(234,67,53,0); }
+    }
+    .qi-spacer { flex: 1; }
+    .qi-send-btn {
+      width: 38px; height: 38px; display: flex; align-items: center; justify-content: center;
+      border: none; background: #1a1a2e; border-radius: 50%;
+      cursor: pointer; color: #fff; flex-shrink: 0; transition: opacity 150ms;
+    }
+    .qi-send-btn:hover { opacity: .85; }
+    .qi-send-btn svg { width: 17px; height: 17px; }
+    .qi-voice-status { font-size: 13px; color: #ea4335; text-align: center; min-height: 16px; font-weight: 500; }
+    .qi-manual-link {
+      text-align: center; font-size: 14px; color: #6b707d; cursor: pointer;
+      text-decoration: underline; text-underline-offset: 2px; transition: color 150ms;
+    }
+    .qi-manual-link:hover { color: #4f46e5; }
     .qi-chips { display: flex; flex-wrap: wrap; gap: 5px; }
     .qi-chips.hidden { display: none; }
     .qi-chip {
@@ -1247,57 +1268,7 @@
     .ps-divider::before,.ps-divider::after { content:''; flex:1; height:1px; background: var(--grey5); }
     .ps-divider span { font-size: 12px; color: var(--grey3); white-space: nowrap; }
     /* ── QI screen ── */
-    .ps-qi-body { flex: 1; overflow-y: auto; padding: 24px 24px 16px; display: flex; flex-direction: column; gap: 16px; }
-    .sq-methods { display: flex; gap: 6px; }
-    .sq-method-btn {
-      display: flex; align-items: center; gap: 6px;
-      padding: 7px 14px; border-radius: 8px; border: 1.5px solid var(--grey4);
-      background: var(--white); font-family: 'Rubik', sans-serif; font-size: 13px;
-      font-weight: 500; color: var(--grey2); cursor: pointer; transition: all 150ms;
-    }
-    .sq-method-btn svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; }
-    .sq-method-btn.active { background: #F3F3FF; border-color: var(--blue1); color: var(--blue1); }
-    .sq-method-btn:not(.active):hover { background: var(--grey6); }
-    .sq-view { display: none; flex-direction: column; gap: 12px; }
-    .sq-view.sq-active { display: flex; }
-    .sq-textarea {
-      width: 100%; min-height: 120px; border: 1.5px solid var(--grey4); border-radius: 12px;
-      padding: 14px 16px; font-family: 'Rubik', sans-serif; font-size: 15px;
-      color: var(--black); background: var(--white); resize: none; overflow: hidden;
-      line-height: 1.5; outline: none; transition: border-color 150ms; box-sizing: border-box;
-    }
-    .sq-textarea:focus { border-color: var(--blue1); }
-    .sq-textarea::placeholder { color: var(--grey3); font-size: 14px; }
-    .sq-examples { font-size: 12px; color: var(--grey3); line-height: 1.55; }
-    .sq-examples b { color: var(--grey2); font-weight: 500; }
-    /* Voice view */
-    .sq-voice-wrap { display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 24px 0; }
-    .sq-mic-btn {
-      width: 80px; height: 80px; border-radius: 50%;
-      background: #F3F3FF; border: 2px solid #D5D7F8;
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer; transition: all 200ms;
-    }
-    .sq-mic-btn:hover { background: #e8e8ff; border-color: var(--blue1); }
-    .sq-mic-btn.listening { background: var(--blue1); border-color: var(--blue1); animation: micPulse 1.2s ease-in-out infinite; }
-    .sq-mic-btn svg { width: 32px; height: 32px; }
-    @keyframes micPulse { 0%,100%{box-shadow:0 0 0 0 rgba(34,38,147,.3)} 50%{box-shadow:0 0 0 14px rgba(34,38,147,.0)} }
-    .sq-mic-label { font-size: 14px; color: var(--grey3); text-align: center; }
-    .sq-voice-result { width: 100%; min-height: 60px; padding: 12px 14px; border: 1.5px solid var(--grey4); border-radius: 10px; font-size: 14px; color: var(--black); background: var(--grey6); border-style: dashed; }
-    /* Photo view */
-    .sq-photo-drop {
-      border: 2px dashed #D5D7F8; border-radius: 12px;
-      padding: 36px 20px; display: flex; flex-direction: column; align-items: center;
-      gap: 10px; cursor: pointer; transition: background 150ms;
-      background: #F9F9FF;
-    }
-    .sq-photo-drop:hover { background: #F3F3FF; border-color: var(--blue1); }
-    .sq-photo-drop svg { width: 40px; height: 40px; stroke: #b0b4f0; fill: none; stroke-width: 1.5; stroke-linecap: round; }
-    .sq-photo-title { font-size: 14px; font-weight: 500; color: var(--black); }
-    .sq-photo-sub   { font-size: 12px; color: var(--grey3); text-align: center; }
-    .sq-photo-input { display: none; }
-    .sq-photo-badge { font-size: 11px; background: var(--grey5); color: var(--grey2); padding: 2px 8px; border-radius: 10px; }
-    /* QI chips in form (small, after processing) */
+    .ps-qi-body { flex: 1; overflow-y: auto; padding: 20px 20px 16px; display: flex; flex-direction: column; gap: 12px; }
 
     .panel-subscreen {
       position: absolute; inset: 0; background: var(--white);
@@ -1929,63 +1900,59 @@
     </div>
 
     <div class="ps-qi-body">
-      <!-- Method switcher -->
-      <div class="sq-methods">
-        <button class="sq-method-btn active" id="sq-m-text" data-method="text">
-          <svg viewBox="0 0 14 14"><line x1="2" y1="4" x2="12" y2="4"/><line x1="2" y1="7" x2="12" y2="7"/><line x1="2" y1="10" x2="8" y2="10"/></svg>
-          Tekst
-        </button>
-        <button class="sq-method-btn" id="sq-m-voice" data-method="voice">
-          <svg viewBox="0 0 14 14"><rect x="4" y="1" width="6" height="9" rx="3"/><path d="M2 8c0 2.8 2.2 5 5 5s5-2.2 5-5"/><line x1="7" y1="13" x2="7" y2="14"/></svg>
-          Głos
-        </button>
-        <button class="sq-method-btn" id="sq-m-photo" data-method="photo">
-          <svg viewBox="0 0 14 14"><rect x="1" y="3" width="12" height="9" rx="1.5"/><circle cx="7" cy="7.5" r="2.5"/><path d="M5 3l1-2h2l1 2"/></svg>
-          Zdjęcie
-        </button>
-      </div>
+      <!-- Banner -->
+      <div class="qi-banner">Opisz co, kto i kiedy 👆 — Asysten zrobi resztę</div>
 
-      <!-- Text view -->
-      <div class="sq-view sq-active" id="sq-view-text">
-        <textarea id="sq-textarea" class="sq-textarea" rows="4"
-          placeholder="np. 516 000 000, Audi A1, wymiana oleju jutro 8:00&#10;&#10;lub: Jan Kowalski BMW Seria 3 diagnostyka środa 10:00"></textarea>
-        <p class="sq-examples">
-          <b>Wskazówki:</b> numer telefonu, marka i model auta, nazwa usługi, data i godzina, cena w zł
-        </p>
-      </div>
-
-      <!-- Voice view -->
-      <div class="sq-view" id="sq-view-voice">
-        <div class="sq-voice-wrap">
-          <button class="sq-mic-btn" id="sq-mic-btn" type="button">
-            <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="11" y="3" width="10" height="16" rx="5"/>
-              <path d="M6 16c0 5.5 4.5 10 10 10s10-4.5 10-10"/>
-              <line x1="16" y1="26" x2="16" y2="30"/>
+      <!-- Input box with gradient border -->
+      <div class="qi-input-wrap">
+        <div class="qi-input-top">
+          <span class="qi-label-sm">Opisz zlecenie</span>
+          <textarea
+            id="sq-textarea"
+            class="qi-ta"
+            placeholder="np. wymiana oleju, 516 000 000, Audi a1..."
+          ></textarea>
+        </div>
+        <div class="qi-divider"></div>
+        <div class="qi-toolbar">
+          <!-- Photo -->
+          <button class="qi-tool-btn" title="Dodaj zdjęcie" type="button" onclick="document.getElementById('qi-file-input').click()">
+            <svg fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+              <rect x="3" y="3" width="18" height="18" rx="3"/>
+              <circle cx="8.5" cy="8.5" r="1.5"/>
+              <polyline points="21,15 16,10 5,21"/>
+              <line x1="17" y1="4" x2="17" y2="8"/><line x1="15" y1="6" x2="19" y2="6"/>
             </svg>
           </button>
-          <p class="sq-mic-label" id="sq-mic-label">Naciśnij i mów</p>
-          <div class="sq-voice-result hidden" id="sq-voice-result">Tutaj pojawi się transkrypcja...</div>
+          <input type="file" id="qi-file-input" accept="image/*" style="display:none">
+
+          <div class="qi-vsep"></div>
+
+          <!-- Mic -->
+          <button class="qi-tool-btn" id="sq-mic-btn" title="Dyktuj głosem" type="button">
+            <svg fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+              <rect x="9" y="2" width="6" height="13" rx="3"/>
+              <path d="M5 10c0 3.9 3.1 7 7 7s7-3.1 7-7"/>
+              <line x1="12" y1="17" x2="12" y2="21"/>
+            </svg>
+          </button>
+
+          <div class="qi-spacer"></div>
+
+          <!-- Send -->
+          <button class="qi-send-btn" id="sq-submit" title="Wyślij" type="button">
+            <svg fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+              <line x1="5" y1="12" x2="19" y2="12"/>
+              <polyline points="13,6 19,12 13,18"/>
+            </svg>
+          </button>
         </div>
       </div>
 
-      <!-- Photo view -->
-      <div class="sq-view" id="sq-view-photo">
-        <label class="sq-photo-drop" for="sq-photo-input">
-          <svg viewBox="0 0 40 40"><rect x="3" y="8" width="34" height="26" rx="3"/><circle cx="14" cy="18" r="3"/><polyline points="3,30 13,20 20,27 26,22 37,30"/></svg>
-          <p class="sq-photo-title">Przeciągnij zdjęcie lub kliknij</p>
-          <p class="sq-photo-sub">Zdjęcie prawa jazdy, dokumentu lub dowodu rejestracyjnego</p>
-          <span class="sq-photo-badge">Wkrótce dostępne</span>
-        </label>
-        <input type="file" id="sq-photo-input" class="sq-photo-input" accept="image/*">
-      </div>
-    </div>
+      <div class="qi-voice-status" id="sq-voice-status"></div>
 
-    <div class="panel-sub-footer">
-      <button class="dm-btn dm-btn--primary" id="sq-submit" style="width:100%">
-        Wypełnij formularz
-        <svg viewBox="0 0 16 16" style="width:14px;height:14px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;margin-left:6px;display:inline-block;vertical-align:middle"><line x1="3" y1="8" x2="13" y2="8"/><polyline points="9,4 13,8 9,12"/></svg>
-      </button>
+      <!-- Manual link -->
+      <div class="qi-manual-link" id="sq-manual-link">lub wypełnij ręcznie</div>
     </div>
   </div>
 
@@ -3475,47 +3442,56 @@
   document.getElementById('sc-go-qi')?.addEventListener('click',  () => setPanelScreen('qi'));
   document.getElementById('sc-go-form')?.addEventListener('click',() => setPanelScreen('form'));
 
-  // Method switcher (Tekst / Głos / Zdjęcie)
-  document.querySelectorAll('.sq-method-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.sq-method-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      const method = btn.dataset.method;
-      document.querySelectorAll('.sq-view').forEach(v => v.classList.remove('sq-active'));
-      document.getElementById(`sq-view-${method}`)?.classList.add('sq-active');
-    });
-  });
+  // ── Quick Input Voice ──
+  {
+    const sqMicBtn      = document.getElementById('sq-mic-btn');
+    const sqVoiceStatus = document.getElementById('sq-voice-status');
+    const sqTaEl        = document.getElementById('sq-textarea');
+    const SRc = window.SpeechRecognition || window.webkitSpeechRecognition;
+    let sqRec = null, sqListening = false, sqFinal = '';
 
-  // Mic button (Voice stub — visual only, no Speech API yet)
-  const sqMicBtn   = document.getElementById('sq-mic-btn');
-  const sqMicLabel = document.getElementById('sq-mic-label');
-  let micActive = false;
-  if (sqMicBtn) {
-    sqMicBtn.addEventListener('click', () => {
-      micActive = !micActive;
-      sqMicBtn.classList.toggle('listening', micActive);
-      sqMicLabel.textContent = micActive ? 'Słucham… (kliknij aby zatrzymać)' : 'Naciśnij i mów';
-      if (!micActive) sqMicLabel.textContent = 'Naciśnij i mów';
-      // Stub: if browser supports SpeechRecognition
-      if (micActive && 'webkitSpeechRecognition' in window) {
-        const r = new window.webkitSpeechRecognition();
-        r.lang = 'pl-PL'; r.interimResults = false; r.maxAlternatives = 1;
-        r.onresult = e => {
-          const t = e.results[0][0].transcript;
-          const sqTa = document.getElementById('sq-textarea');
-          const tv = document.getElementById('sq-view-text');
-          // Switch to text view with recognized text
-          document.querySelectorAll('.sq-method-btn').forEach(b => b.classList.remove('active'));
-          document.getElementById('sq-m-text')?.classList.add('active');
-          document.querySelectorAll('.sq-view').forEach(v => v.classList.remove('sq-active'));
-          tv?.classList.add('sq-active');
-          if (sqTa) sqTa.value = t;
-        };
-        r.onend = () => { micActive = false; sqMicBtn.classList.remove('listening'); sqMicLabel.textContent = 'Naciśnij i mów'; };
-        r.start();
+    if (SRc && sqMicBtn) {
+      sqRec = new SRc();
+      sqRec.lang = 'pl-PL';
+      sqRec.continuous = true;
+      sqRec.interimResults = true;
+
+      sqRec.onstart = () => {
+        sqListening = true;
+        sqMicBtn.classList.add('mic-active');
+        if (sqVoiceStatus) sqVoiceStatus.textContent = '🎙 Słucham... mów teraz';
+      };
+      sqRec.onresult = (e) => {
+        let interim = '';
+        for (let i = e.resultIndex; i < e.results.length; i++) {
+          if (e.results[i].isFinal) sqFinal += e.results[i][0].transcript;
+          else interim += e.results[i][0].transcript;
+        }
+        if (sqTaEl) sqTaEl.value = sqFinal + interim;
+        if (sqVoiceStatus) sqVoiceStatus.textContent = interim ? `💬 ${interim}` : '🎙 Słucham...';
+      };
+      sqRec.onerror = (e) => {
+        if (sqVoiceStatus) sqVoiceStatus.textContent = 'Błąd: ' + e.error;
+        stopSqMic();
+      };
+      sqRec.onend = () => { if (sqListening) sqRec.start(); };
+
+      function stopSqMic() {
+        sqListening = false;
+        sqMicBtn.classList.remove('mic-active');
+        if (sqVoiceStatus) sqVoiceStatus.textContent = '';
+        sqRec.stop();
       }
-    });
+
+      sqMicBtn.addEventListener('click', () => {
+        if (sqListening) { stopSqMic(); }
+        else { sqFinal = sqTaEl ? sqTaEl.value : ''; sqRec.start(); }
+      });
+    }
   }
+
+  // "lub wypełnij ręcznie" → otwórz formularz ręczny
+  document.getElementById('sq-manual-link')?.addEventListener('click', () => setPanelScreen('form'));
 
   // ═══════════════════════════════════════════
   //  QUICK INPUT — Parser + Auto-fill
