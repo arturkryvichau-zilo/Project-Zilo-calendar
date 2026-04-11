@@ -489,35 +489,51 @@
     .qi-pop-manual svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; flex-shrink: 0; }
 
     /* ── Quick Input (Figma design) ── */
+    .qi-comp { display: flex; flex-direction: column; }
     .qi-banner {
-      background: linear-gradient(90deg, #7B61FF 0%, #222693 100%);
-      border-radius: 12px; padding: 13px 18px; color: #fff;
-      font-size: 15px; font-weight: 500; line-height: 1.4; text-align: center;
+      background: linear-gradient(145.404deg, #7B61FF 21.934%, #222693 85.233%);
+      border-radius: 16px 16px 0 0;
+      margin: 0 4px -24px;
+      padding: 8px 12px 12px;
+      color: #fff; font-size: 14px; font-weight: 400; line-height: 22px; text-align: center;
+      position: relative; z-index: 0;
+    }
+    .qi-outer-wrap {
+      background: #fff;
+      border: 1px solid #dce0e6;
+      border-radius: 16px;
+      padding: 4px;
+      box-shadow: 0px -4px 12px 0px rgba(140,142,170,.3), 10px 20px 35px 0px rgba(140,142,170,.4);
+      position: relative; z-index: 1;
+      display: flex; flex-direction: column; gap: 4px;
     }
     .qi-input-wrap {
-      border-radius: 12px; overflow: hidden;
-      background: linear-gradient(#fff, #fff) padding-box,
-                  linear-gradient(90deg, #7B61FF 0%, #222693 100%) border-box;
-      border: 1.5px solid transparent;
+      border: 2px solid #222693;
+      border-radius: 12px;
+      background: #fff;
+      overflow: hidden;
+      display: flex; flex-direction: column;
     }
-    .qi-input-top { padding: 12px 14px 8px; }
-    .qi-label-sm { display: block; font-size: 12px; color: #979db0; margin-bottom: 4px; }
+    .qi-input-top { padding: 9px 13px 8px; display: flex; flex-direction: column; gap: 2px; }
+    .qi-label-sm { font-size: 12px; color: #979db0; line-height: 16px; }
     .qi-ta {
       width: 100%; border: none; outline: none;
-      font-family: 'Rubik', sans-serif; font-size: 15px; line-height: 1.5;
-      color: #242629; resize: none; background: transparent; min-height: 68px;
+      font-family: 'Rubik', sans-serif; font-size: 14px; line-height: 22px;
+      color: #000; resize: none; background: transparent; min-height: 56px;
     }
-    .qi-ta::placeholder { color: #bbbfcc; }
-    .qi-divider { height: 1px; background: #eef0f6; margin: 0 14px; }
-    .qi-toolbar { display: flex; align-items: center; padding: 8px 10px 10px; gap: 2px; }
+    .qi-ta::placeholder { color: #979db0; }
+    .qi-toolbar {
+      display: flex; align-items: center;
+      background: #f6f6fc; padding: 4px 13px 8px; height: 38px;
+    }
     .qi-tool-btn {
-      width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;
-      border: none; background: transparent; border-radius: 8px;
-      cursor: pointer; color: #6b707d; transition: background 150ms, color 150ms; flex-shrink: 0;
+      width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;
+      border: none; background: transparent; border-radius: 4px;
+      cursor: pointer; color: #6b707d; transition: background 150ms; flex-shrink: 0;
     }
-    .qi-tool-btn:hover { background: #f0f1f5; color: #4f46e5; }
-    .qi-tool-btn svg { width: 22px; height: 22px; }
-    .qi-vsep { width: 1px; height: 20px; background: #dce0e6; margin: 0 4px; flex-shrink: 0; }
+    .qi-tool-btn:hover { background: rgba(0,0,0,.06); }
+    .qi-tool-btn svg { width: 20px; height: 20px; }
+    .qi-vsep { width: 1px; height: 16px; background: #d5d7f8; margin: 0 9px 0 0; flex-shrink: 0; }
     .qi-tool-btn.mic-active { color: #ea4335; background: #fde8e8; animation: qiPulse 1.2s ease-in-out infinite; }
     @keyframes qiPulse {
       0%,100% { box-shadow: 0 0 0 0 rgba(234,67,53,.3); }
@@ -525,18 +541,19 @@
     }
     .qi-spacer { flex: 1; }
     .qi-send-btn {
-      width: 38px; height: 38px; display: flex; align-items: center; justify-content: center;
-      border: none; background: #1a1a2e; border-radius: 50%;
+      width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;
+      border: none; background: #222693; border-radius: 50%;
       cursor: pointer; color: #fff; flex-shrink: 0; transition: opacity 150ms;
     }
     .qi-send-btn:hover { opacity: .85; }
-    .qi-send-btn svg { width: 17px; height: 17px; }
-    .qi-voice-status { font-size: 13px; color: #ea4335; text-align: center; min-height: 16px; font-weight: 500; }
+    .qi-send-btn svg { width: 15px; height: 15px; }
+    .qi-voice-status { font-size: 13px; color: #ea4335; text-align: center; min-height: 14px; font-weight: 500; padding: 0 10px; }
     .qi-manual-link {
       text-align: center; font-size: 14px; color: #6b707d; cursor: pointer;
-      text-decoration: underline; text-underline-offset: 2px; transition: color 150ms;
+      text-decoration: underline; text-underline-offset: 2px;
+      transition: color 150ms; padding: 4px 10px 2px;
     }
-    .qi-manual-link:hover { color: #4f46e5; }
+    .qi-manual-link:hover { color: #222693; }
     .qi-chips { display: flex; flex-wrap: wrap; gap: 5px; }
     .qi-chips.hidden { display: none; }
     .qi-chip {
@@ -1268,7 +1285,7 @@
     .ps-divider::before,.ps-divider::after { content:''; flex:1; height:1px; background: var(--grey5); }
     .ps-divider span { font-size: 12px; color: var(--grey3); white-space: nowrap; }
     /* ── QI screen ── */
-    .ps-qi-body { flex: 1; overflow-y: auto; padding: 20px 20px 16px; display: flex; flex-direction: column; gap: 12px; }
+    .ps-qi-body { flex: 1; overflow-y: auto; padding: 16px 12px 20px; display: flex; flex-direction: column; }
 
     .panel-subscreen {
       position: absolute; inset: 0; background: var(--white);
@@ -1900,59 +1917,63 @@
     </div>
 
     <div class="ps-qi-body">
-      <!-- Banner -->
-      <div class="qi-banner">Opisz co, kto i kiedy 👆 — Asysten zrobi resztę</div>
+      <div class="qi-comp">
+        <!-- Banner (overlaps white card by 24px) -->
+        <div class="qi-banner">Opisz co, kto i kiedy👇 - Asysten zrobi resztę</div>
 
-      <!-- Input box with gradient border -->
-      <div class="qi-input-wrap">
-        <div class="qi-input-top">
-          <span class="qi-label-sm">Opisz zlecenie</span>
-          <textarea
-            id="sq-textarea"
-            class="qi-ta"
-            placeholder="np. wymiana oleju, 516 000 000, Audi a1..."
-          ></textarea>
-        </div>
-        <div class="qi-divider"></div>
-        <div class="qi-toolbar">
-          <!-- Photo -->
-          <button class="qi-tool-btn" title="Dodaj zdjęcie" type="button" onclick="document.getElementById('qi-file-input').click()">
-            <svg fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
-              <rect x="3" y="3" width="18" height="18" rx="3"/>
-              <circle cx="8.5" cy="8.5" r="1.5"/>
-              <polyline points="21,15 16,10 5,21"/>
-              <line x1="17" y1="4" x2="17" y2="8"/><line x1="15" y1="6" x2="19" y2="6"/>
-            </svg>
-          </button>
-          <input type="file" id="qi-file-input" accept="image/*" style="display:none">
+        <!-- White card with shadow -->
+        <div class="qi-outer-wrap">
+          <!-- Input box with solid blue border -->
+          <div class="qi-input-wrap">
+            <div class="qi-input-top">
+              <span class="qi-label-sm">Opisz zlecenie</span>
+              <textarea
+                id="sq-textarea"
+                class="qi-ta"
+                placeholder="np. wymiana oleju, 516 000 000, Audi a1..."
+              ></textarea>
+            </div>
+            <div class="qi-toolbar">
+              <!-- Photo -->
+              <button class="qi-tool-btn" title="Dodaj zdjęcie" type="button" onclick="document.getElementById('qi-file-input').click()">
+                <svg fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                  <rect x="3" y="3" width="18" height="18" rx="3"/>
+                  <circle cx="8.5" cy="8.5" r="1.5"/>
+                  <polyline points="21,15 16,10 5,21"/>
+                  <line x1="17" y1="4" x2="17" y2="8"/><line x1="15" y1="6" x2="19" y2="6"/>
+                </svg>
+              </button>
+              <input type="file" id="qi-file-input" accept="image/*" style="display:none">
 
-          <div class="qi-vsep"></div>
+              <div class="qi-vsep"></div>
 
-          <!-- Mic -->
-          <button class="qi-tool-btn" id="sq-mic-btn" title="Dyktuj głosem" type="button">
-            <svg fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
-              <rect x="9" y="2" width="6" height="13" rx="3"/>
-              <path d="M5 10c0 3.9 3.1 7 7 7s7-3.1 7-7"/>
-              <line x1="12" y1="17" x2="12" y2="21"/>
-            </svg>
-          </button>
+              <!-- Mic -->
+              <button class="qi-tool-btn" id="sq-mic-btn" title="Dyktuj głosem" type="button">
+                <svg fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                  <rect x="9" y="2" width="6" height="13" rx="3"/>
+                  <path d="M5 10c0 3.9 3.1 7 7 7s7-3.1 7-7"/>
+                  <line x1="12" y1="17" x2="12" y2="21"/>
+                </svg>
+              </button>
 
-          <div class="qi-spacer"></div>
+              <div class="qi-spacer"></div>
 
-          <!-- Send -->
-          <button class="qi-send-btn" id="sq-submit" title="Wyślij" type="button">
-            <svg fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
-              <line x1="5" y1="12" x2="19" y2="12"/>
-              <polyline points="13,6 19,12 13,18"/>
-            </svg>
-          </button>
+              <!-- Send -->
+              <button class="qi-send-btn" id="sq-submit" title="Wyślij" type="button">
+                <svg fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                  <line x1="5" y1="12" x2="19" y2="12"/>
+                  <polyline points="13,6 19,12 13,18"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="qi-voice-status" id="sq-voice-status"></div>
+
+          <!-- Manual link -->
+          <div class="qi-manual-link" id="sq-manual-link">lub wypełnij ręcznie</div>
         </div>
       </div>
-
-      <div class="qi-voice-status" id="sq-voice-status"></div>
-
-      <!-- Manual link -->
-      <div class="qi-manual-link" id="sq-manual-link">lub wypełnij ręcznie</div>
     </div>
   </div>
 
