@@ -447,28 +447,31 @@
       position: fixed; z-index: 60;
       width: 360px;
       display: none; flex-direction: column;
+      align-items: center;
+      padding-bottom: 24px;
     }
     .qi-pop.qp-visible { display: flex; }
-    /* Single outer card — overflow:hidden clips banner corners cleanly */
+    /* Banner — narrower (352px), sits BEHIND white card */
+    .qi-pop-banner {
+      background: linear-gradient(145.404deg, #7B61FF 21.934%, #222693 85.233%);
+      border-radius: 16px 16px 0 0;
+      width: 352px; flex-shrink: 0;
+      padding: 8px 12px 12px;
+      margin-bottom: -24px;
+      color: #fff; font-family: 'Rubik', sans-serif; font-size: 14px; font-weight: 400;
+      line-height: 22px; text-align: center;
+      position: relative; z-index: 0;
+    }
+    /* White card — full width, sits OVER banner */
     .qi-pop-card {
       background: #fff; border: 1px solid #dce0e6; border-radius: 16px;
       box-shadow: 0px -4px 12px 0px rgba(140,142,170,.3), 10px 20px 35px 0px rgba(140,142,170,.4);
-      overflow: hidden;
+      padding: 4px; width: 100%;
+      position: relative; z-index: 1;
       display: flex; flex-direction: column;
     }
-    /* Banner sits at top of card */
-    .qi-pop-banner {
-      background: linear-gradient(145.404deg, #7B61FF 21.934%, #222693 85.233%);
-      padding: 8px 12px 34px;
-      color: #fff; font-family: 'Rubik', sans-serif; font-size: 14px; font-weight: 400;
-      line-height: 22px; text-align: center;
-      flex-shrink: 0;
-    }
-    /* Inner white area overlaps banner by 24px */
     .qi-pop-body {
-      background: #fff; border-radius: 12px 12px 0 0;
-      margin: -24px 4px 4px; position: relative; z-index: 1;
-      display: flex; flex-direction: column; gap: 0;
+      display: flex; flex-direction: column;
     }
     .qi-pop-input {
       border: 2px solid #222693; border-radius: 12px; background: #fff; overflow: hidden;
@@ -2486,8 +2489,8 @@
   qiPop.className = 'qi-pop';
   qiPop.id = 'qi-pop';
   qiPop.innerHTML = `
+    <div class="qi-pop-banner">Opisz co, kto i kiedy👇 - Asysten zrobi resztę</div>
     <div class="qi-pop-card">
-      <div class="qi-pop-banner">Opisz co, kto i kiedy👇 - Asysten zrobi resztę</div>
       <div class="qi-pop-body">
         <div class="qi-pop-input">
           <div class="qi-pop-top">
