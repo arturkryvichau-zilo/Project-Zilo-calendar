@@ -340,6 +340,11 @@
       display: none; z-index: 5; pointer-events: none;
     }
     .new-appt-preview.nap-visible { display: block; }
+    /* Quantity column preview — block flow, not absolute */
+    .new-appt-preview.nap-quantity {
+      position: relative; left: auto; right: auto;
+      min-height: 72px; margin: 0;
+    }
     .new-appt-preview__time { font-size: 11px; font-weight: 600; }
     .new-appt-preview__label { font-size: 12px; opacity: .72; margin-top: 2px; }
 
@@ -372,6 +377,28 @@
     .appt--mustard { background: var(--cal-mustard); color: #7a5a10; border-left-color: #f6ae2d; }
     /* keep old alias for JS compatibility */
     .appt--teal    { background: var(--cal-blue);    color: #1a3a6b; border-left-color: #2470e0; }
+
+    /* ── Live/radio indicator ── */
+    @keyframes live-pulse { 0%,100%{opacity:1} 50%{opacity:.35} }
+    .badge-live { display:inline-flex; align-items:center; color:#3bb08f; animation:live-pulse 2.2s ease-in-out infinite; flex-shrink:0; }
+    .badge-live svg { width:16px; height:11px; }
+
+    /* ── Quantity column ── */
+    .col--quantity { display:flex !important; flex-direction:column; overflow:hidden; }
+    .qty-body { overflow-y:visible; padding:10px 10px 4px; display:flex; flex-direction:column; gap:8px; }
+
+    .qty-appt { border-radius:6px; padding:10px 12px; border-left:3px solid transparent; cursor:pointer; transition:filter 150ms; flex-shrink:0; }
+    .qty-appt:hover { filter:brightness(.96); }
+    .qty-appt--mustard { background:var(--cal-mustard); border-left-color:#f6ae2d; color:#7a5a10; }
+    .qty-appt--teal    { background:var(--cal-blue);    border-left-color:#2470e0; color:#1a3a6b; }
+    .qty-appt__time  { font-size:11px; font-weight:500; margin-bottom:3px; }
+    .qty-appt__name  { font-size:13px; font-weight:600; line-height:1.3; }
+    .qty-appt__phone { font-size:11px; opacity:.8; margin-top:2px; }
+    .qty-appt__desc  { font-size:11px; opacity:.75; margin-top:2px; line-height:1.3; }
+    .qty-add-btn {
+      width: calc(100% - 20px); margin: 8px 10px 10px; flex-shrink: 0;
+    }
+    .qty-add-btn svg { width:16px; height:16px; stroke:#fff; stroke-width:2.5; fill:none; stroke-linecap:round; }
 
     /* "+ Dodaj wizytę" toolbar button */
     .btn-add-visit {
@@ -429,18 +456,44 @@
     .view-daily.v-active, .view-weekly.v-active, .view-monthly.v-active { display: flex; }
 
     /* ── Weekly view ── */
-    .week-header-row { display: flex; border-bottom: 1px solid var(--grey5); flex-shrink: 0; }
-    .week-gutter-head { width: 56px; flex-shrink: 0; }
-    .week-day-head {
-      flex: 1; min-width: 0; padding: 8px 4px 8px;
-      text-align: center; border-left: 1px solid var(--grey5);
+    .wk-grid {
+      flex: 1; display: flex; overflow: hidden;
     }
-    .week-day-head__dow { font-size: 11px; color: var(--grey3); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 3px; }
-    .week-day-head__num {
-      font-size: 18px; font-weight: 500; color: var(--black); line-height: 1;
-      width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%;
+    .wk-col {
+      flex: 1; min-width: 120px; display: flex; flex-direction: column;
+      border-right: 1px solid var(--grey5);
     }
-    .week-day-head.wk-today .week-day-head__num { background: var(--blue1); color: #fff; }
+    .wk-col:last-child { border-right: none; }
+    .wk-col.wk-weekend { background: #F3F4F8; }
+    .wk-col-head {
+      display: flex; align-items: center; gap: 6px;
+      padding: 10px 12px 10px;
+      border-bottom: 1px solid var(--grey5);
+      flex-shrink: 0;
+    }
+    .wk-col-head__label {
+      font-size: 13px; font-weight: 400; color: var(--grey1); white-space: nowrap;
+    }
+    .wk-col.wk-today .wk-col-head__label { font-weight: 600; }
+    .wk-col.wk-weekend .wk-col-head__label { color: #9497a8; }
+    .wk-col-head__badge {
+      font-size: 11px; font-weight: 500; color: var(--blue1);
+      background: var(--blue4); border-radius: 20px;
+      padding: 1px 7px; line-height: 18px; flex-shrink: 0;
+    }
+    .wk-col-body {
+      flex: 1; overflow-y: auto; padding: 8px 8px; display: flex; flex-direction: column; gap: 6px;
+    }
+    .wk-appt {
+      border-radius: 6px; padding: 8px 10px;
+      cursor: pointer; border-left: 3px solid transparent;
+    }
+    .wk-appt--teal    { background: var(--cal-blue);    border-left-color: #2470e0; color: #1a3a6b; }
+    .wk-appt--mustard { background: var(--cal-mustard); border-left-color: #f6ae2d; color: #7a5a10; }
+    .wk-appt__time  { font-size: 11px; font-weight: 500; margin-bottom: 3px; }
+    .wk-appt__name  { font-size: 12px; font-weight: 600; line-height: 1.3; }
+    .wk-appt__phone { font-size: 11px; opacity: .8; margin-top: 2px; }
+    .wk-appt__desc  { font-size: 11px; opacity: .75; margin-top: 2px; line-height: 1.3; }
 
     /* ── QI Popover (inline calendar popup) ── */
     .qi-pop {
@@ -515,6 +568,21 @@
     }
     .qi-pop-manual:hover { color: #222693; }
     .qi-pop-voice { font-size: 13px; color: #ea4335; text-align: center; min-height: 14px; font-weight: 500; padding: 2px 10px 0; font-family: 'Rubik', sans-serif; }
+
+    /* ── Photo strip (qi-pop + Szczegóły) ── */
+    .qp-photo-strip { display: none; flex-wrap: wrap; gap: 6px; padding: 8px 13px 0; }
+    .qp-photo-strip.has-photos { display: flex; }
+    .qp-thumb { position: relative; display: inline-block; flex-shrink: 0; }
+    .qp-thumb img { width: 64px; height: 64px; object-fit: cover; border-radius: 8px; border: 1px solid var(--grey5); display: block; }
+    .qp-thumb__del {
+      position: absolute; top: -5px; right: -5px; width: 18px; height: 18px; border-radius: 50%;
+      background: var(--grey2); color: #fff; border: none; cursor: pointer;
+      font-size: 11px; line-height: 1; display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 1px 3px rgba(0,0,0,.25);
+    }
+    /* Szczegóły photo strip reuses same classes, no extra padding */
+    .szcz-photo-strip { display: none; flex-wrap: wrap; gap: 6px; padding: 4px 0 2px; }
+    .szcz-photo-strip.has-photos { display: flex; }
 
     /* ── Quick Input (Figma design) ── */
     .qi-comp { display: flex; flex-direction: column; }
@@ -642,14 +710,8 @@
       transition: left 60ms ease, width 60ms ease;
     }
     .col-nav-thumb:active { cursor: grabbing; }
-    .week-scroll { flex: 1; overflow-y: auto; overflow-x: hidden; }
-    .week-body { display: flex; flex-shrink: 0; }
-    .week-time-gutter { width: 56px; flex-shrink: 0; position: sticky; left: 0; background: var(--white); z-index: 4; }
-    .week-cols { flex: 1; display: flex; }
-    .week-col { flex: 1; min-width: 0; border-left: 1px solid var(--grey5); position: relative; }
-    .week-col.wk-weekend { background: #F3F4F8; }
-    .week-day-head.wk-weekend .week-day-head__dow,
-    .week-day-head.wk-weekend .week-day-head__num { color: #9497a8; }
+    /* week-col kept for JS drag refs — hidden layout handled by wk-col */
+    .week-col { position: relative; }
 
     /* ── Monthly view ── */
     .month-dow-header { display: grid; grid-template-columns: repeat(7, 1fr); border-bottom: 1px solid var(--grey5); flex-shrink: 0; }
@@ -661,7 +723,8 @@
     .month-cell.mc-other { opacity: .45; }
     .month-day-num { font-size: 13px; font-weight: 500; color: var(--black); width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; border-radius: 50%; margin-bottom: 4px; }
     .month-cell.mc-today .month-day-num { background: var(--blue1); color: #fff; }
-    .month-appt-chip { font-size: 11px; padding: 2px 6px; border-radius: 3px; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; background: #fff3d4; color: #7a5a10; border-left: 2px solid #f6ae2d; }
+    .month-appt-chip          { font-size: 11px; padding: 2px 6px; border-radius: 3px; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; background: #fff3d4; color: #7a5a10; border-left: 2px solid #f6ae2d; }
+    .month-appt-chip--teal    { background: var(--cal-blue); color: #1a3a6b; border-left-color: #2470e0; }
     .month-more { font-size: 11px; color: var(--grey3); padding: 2px 0; }
 
     /* ════════════════════════════
@@ -766,15 +829,16 @@
     .section-label { display: flex; align-items: center; height: 34px; font-size: 16px; font-weight: 500; color: var(--black); }
     .section-label-opt { font-size: 14px; font-weight: 400; color: #979db0; margin-left: 5px; }
     .section-label-row { display: flex; align-items: center; justify-content: space-between; }
+    /* dm-btn--tertiary dm-btn--sm — Figma node 1083:298498 */
     .btn-add-client-inline {
-      display: inline-flex; align-items: center; gap: 5px;
-      padding: 4px 12px; border-radius: 8px;
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 4px 10px; border-radius: 4px;
       background: #F3F3FF; border: none; cursor: pointer;
-      font-family: 'Rubik', sans-serif; font-size: 13px; font-weight: 500;
-      color: var(--blue1); transition: background 120ms;
+      font-family: 'Rubik', sans-serif; font-size: 14px; font-weight: 400; line-height: 22px;
+      color: #222693; transition: background 120ms; white-space: nowrap;
     }
-    .btn-add-client-inline:hover { background: var(--blue4); }
-    .btn-add-client-inline svg { width: 12px; height: 12px; stroke: var(--blue1); stroke-width: 2.2; fill: none; stroke-linecap: round; flex-shrink: 0; }
+    .btn-add-client-inline:hover { background: #D5D7F8; }
+    .btn-add-client-inline svg { width: 20px; height: 20px; stroke: #222693; stroke-width: 2; fill: none; stroke-linecap: round; flex-shrink: 0; }
 
     /* ── Selected client card ── */
     .sel-client-card.hidden { display: none; }
@@ -789,20 +853,25 @@
     .st-wrap { position: relative; }
     .st-dropdown {
       position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 120;
-      background: var(--white); border: 1px solid var(--grey4); border-radius: 12px;
-      box-shadow: 10px 20px 35px 0px rgba(140,142,170,.30);
+      background: #fff;
+      border: 1px solid #DCE0E6;
+      border-radius: 10px;
+      box-shadow: 10px 20px 35px 0px rgba(140,142,170,.3);
       overflow: hidden;
     }
     .st-dropdown.hidden { display: none; }
     .st-option {
-      padding: 11px 16px; font-size: 14px; color: var(--black);
+      height: 40px; padding: 0 14px;
+      font-family: 'Rubik', sans-serif; font-size: 16px; color: #000;
       cursor: pointer; display: flex; align-items: center; justify-content: space-between;
-      transition: background 120ms;
+      border-bottom: 1px solid #F0F1F5;
+      transition: background 100ms;
     }
-    .st-option + .st-option { border-top: 1px solid var(--grey5); }
-    .st-option:hover { background: var(--grey6); }
-    .st-option.st-selected { color: var(--blue1); font-weight: 500; }
-    .st-check { width: 14px; height: 14px; stroke: var(--blue1); fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+    .st-option:last-child { border-bottom: none; }
+    .st-option:hover { background: #F3F3FF; color: #222693; }
+    .st-option.st-selected { color: #222693; font-weight: 500; }
+    .st-option.st-selected:hover { background: #F3F3FF; }
+    .st-check { width: 14px; height: 14px; stroke: #222693; fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
     .input-field .inner {
       position: absolute; left: 16px; top: 10px;
       display: flex; flex-direction: column; gap: 2px;
@@ -843,6 +912,99 @@
     .time-group .input-field { flex: 1; }
     .time-dash { width: 8px; height: 2px; background: var(--grey3); border-radius: 18px; flex-shrink: 0; margin: 0 4px; }
     .lbl-sfx { font-size: 13px; color: var(--grey3); }
+
+    /* ── Datepicker popup ── */
+    .dp-backdrop { position: fixed; inset: 0; z-index: 149; display: none; }
+    .dp-backdrop.dp-open { display: block; }
+    .dp-pop {
+      position: fixed; z-index: 150;
+      background: #fff;
+      border: 1px solid #DCE0E6;
+      border-radius: 10px;
+      box-shadow: 10px 20px 35px 0px rgba(140,142,170,.3);
+      padding: 12px;
+      width: 316px;
+      display: none;
+      box-sizing: border-box;
+    }
+    .dp-pop.dp-open { display: block; }
+    .dp-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 4px 0; margin-bottom: 8px;
+    }
+    .dp-nav {
+      width: 20px; height: 20px; border: none; background: transparent;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      color: #242629; padding: 0; flex-shrink: 0;
+    }
+    .dp-nav svg { width: 20px; height: 20px; stroke: currentColor; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+    .dp-title { font-family: 'Rubik',sans-serif; font-size: 14px; font-weight: 500; line-height: 16px; color: #000; }
+    /* calendar flex layout */
+    .dp-calendar { display: flex; flex-direction: column; gap: 4px; width: 292px; }
+    .dp-row { display: flex; gap: 2px; }
+    /* weekday header cells */
+    .dp-wd-cell {
+      width: 40px; height: 24px; flex-shrink: 0;
+      background: #F6F6FC; border-radius: 2px;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Rubik',sans-serif; font-size: 12px; color: #6B707D;
+    }
+    /* day cells */
+    .dp-cell {
+      width: 40px; height: 24px; flex-shrink: 0;
+      border-radius: 4px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Rubik',sans-serif; font-size: 12px; line-height: 18px;
+      color: #000; transition: background 120ms; user-select: none;
+    }
+    .dp-cell:hover { background: #F3F3FF; color: #222693; }
+    .dp-cell--weekend { color: #6B707D; }
+    .dp-cell--today { background: #222693 !important; color: #fff !important; }
+    .dp-cell--today:hover { background: #1D207C !important; }
+    .dp-cell--selected:not(.dp-cell--today) { background: #F3F3FF; color: #222693; }
+    .dp-cell--empty { opacity: 0; pointer-events: none; cursor: default; }
+
+    /* ── Time picker popup ── */
+    .tp-pop {
+      position: fixed; z-index: 150;
+      background: #fff;
+      border: 1px solid #DCE0E6;
+      border-radius: 10px;
+      box-shadow: 10px 20px 35px 0px rgba(140,142,170,.3);
+      width: 156px; height: 200px;
+      overflow-y: auto; overflow-x: hidden;
+      display: none;
+      /* hide native scrollbar */
+      scrollbar-width: none;
+    }
+    .tp-pop::-webkit-scrollbar { display: none; }
+    .tp-pop.dp-open { display: block; }
+    .tp-opt {
+      display: flex; align-items: center;
+      padding: 12px 14px; height: 40px; box-sizing: border-box;
+      font-family: 'Rubik',sans-serif; font-size: 16px; font-weight: 400;
+      line-height: 16px; color: #000;
+      cursor: pointer; white-space: nowrap;
+      border-bottom: 1px solid #F0F1F5;
+      transition: background 100ms;
+    }
+    .tp-opt:last-child { border-bottom: none; }
+    .tp-opt:hover { background: #F3F3FF; color: #222693; }
+    .tp-opt.tp-active { color: #222693; }
+    /* custom scrollbar track (decorative, matches Figma) */
+    .tp-pop-wrap {
+      position: fixed; z-index: 151; pointer-events: none;
+      display: none;
+    }
+    .tp-pop-wrap.dp-open { display: block; }
+    .tp-scrollbar {
+      position: absolute; right: 5px; top: 11px;
+      width: 4px; background: #DCE0E6; border-radius: 20px;
+    }
+
+    /* input-field hover/focus state */
+    .input-field.select-field:hover { border-color: #000; }
+    .input-field.select-field.dp-focused { border: 2px solid #222693; }
 
     /* Divider */
     .divider { height: 1px; background: var(--grey5); }
@@ -924,7 +1086,8 @@
     .notif-label { font-size: 16px; font-weight: 400; color: var(--black); line-height: 1.4; }
 
     /* Panel footer */
-    .panel-footer { flex-shrink: 0; border-top: 1px solid #e9ecf1; padding: 17px 28px; background: var(--white); }
+    .panel-footer { flex-shrink: 0; border-top: 1px solid #e9ecf1; padding: 17px 28px; background: var(--white); display: flex; justify-content: flex-end; }
+    .panel-footer .dm-btn { width: 50%; }
 
     /* ═══════════════════════════════════
        DS BUTTON  (Figma: Button/Main/Desktop)
@@ -1065,13 +1228,14 @@
     }
     .btn-add-client {
       display: flex; align-items: center; justify-content: center; gap: 8px;
-      width: 100%; height: 46px; padding: 0;
-      background: #ffffff; border: none; border-radius: 10px;
-      font-family: 'Rubik', sans-serif; font-size: 16px; color: #222693;
-      cursor: pointer; transition: background 120ms;
+      width: 100%; height: 46px; padding: 12px 18px;
+      background: #ffffff; border: none; border-radius: 8px;
+      font-family: 'Rubik', sans-serif; font-size: 16px; font-weight: 400;
+      line-height: 22px; color: #222693;
+      cursor: pointer; transition: background 120ms; white-space: nowrap; box-sizing: border-box;
     }
     .btn-add-client:hover { background: #D5D7F8; }
-    .btn-add-client svg { width: 18px; height: 18px; stroke: #222693; stroke-width: 2; fill: none; stroke-linecap: round; }
+    .btn-add-client svg { width: 20px; height: 20px; stroke: #222693; stroke-width: 2; fill: none; stroke-linecap: round; flex-shrink: 0; }
 
     /* Not found */
     .dd-not-found { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 28px 20px 20px; text-align: center; }
@@ -1098,8 +1262,11 @@
       border-radius: 10px;
       transition: border-color 150ms;
     }
+    .dm-input-wrap:hover        { border-color: #000000; }
     .dm-input-wrap:focus-within { border: 2px solid #222693; box-shadow: 2px 2px 10px 0px rgba(224,230,240,0.5); }
+    .dm-input-wrap:focus-within:hover { border-color: #222693; }
     .dm-input-wrap.is-error     { border-color: var(--ds-error); }
+    .dm-input-wrap.is-error:hover { border-color: var(--ds-error); }
     .dm-input-wrap.is-disabled  { border-color: #e9ecf1; pointer-events: none; }
     .dm-input {
       flex: 1; height: 100%; border: none; outline: none; background: transparent;
@@ -1111,9 +1278,10 @@
     /* icon slot */
     .dm-input-icon {
       display: flex; align-items: center; justify-content: center;
-      width: 44px; flex-shrink: 0; color: #979db0;
+      width: 42px; flex-shrink: 0; color: #979db0;
     }
-    .dm-input-icon svg { width: 18px; height: 18px; stroke: currentColor; stroke-width: 1.8; fill: none; }
+    .dm-input-wrap:focus-within .dm-input-icon { color: #222693; }
+    .dm-input-icon svg { width: 20px; height: 20px; stroke: currentColor; stroke-width: 1.8; fill: none; }
     .dm-error-msg { font-size: 12px; color: var(--ds-error); margin-top: 2px; }
 
     /* ═══════════════════════════════════
@@ -1128,7 +1296,9 @@
       overflow: hidden;
       transition: border-color 150ms;
     }
+    .dm-phone-wrap:hover        { border-color: #000000; }
     .dm-phone-wrap:focus-within { border: 2px solid #222693; box-shadow: 2px 2px 10px 0px rgba(224,230,240,0.5); }
+    .dm-phone-wrap:focus-within:hover { border-color: #222693; }
     .dm-phone-wrap.is-error     { border-color: var(--ds-error); }
     .dm-phone__country {
       display: flex; align-items: center; gap: 5px;
@@ -1154,18 +1324,20 @@
     .dm-phone__input::placeholder { color: #979db0; }
 
     /* ═══════════════════════════════════
-       DS TEXTAREA  (Figma: Textarea/Desktop)
-       min-h=120 | radius=8 | border 2px #979db0
-       focus 2px #2470e0 | content font 18px | label 14px
+       DS TEXTAREA  (Figma: Design System)
+       radius=12 | border 1px #979db0 | font 16px
+       focus 2px #222693 | disabled #E9ECF1
     ═══════════════════════════════════ */
     .dm-textarea-wrap {
       background: #ffffff;
-      border: 2px solid #979db0;
-      border-radius: 8px;
+      border: 1px solid #979db0;
+      border-radius: 12px;
       overflow: hidden;
       transition: border-color 150ms;
     }
+    .dm-textarea-wrap:hover        { border-color: #000000; }
     .dm-textarea-wrap:focus-within { border: 2px solid #222693; box-shadow: 2px 2px 10px 0px rgba(224,230,240,0.5); }
+    .dm-textarea-wrap:focus-within:hover { border-color: #222693; }
     .dm-textarea-toolbar {
       display: flex; align-items: center; gap: 2px;
       padding: 6px 10px; border-bottom: 1px solid var(--grey4);
@@ -1183,15 +1355,13 @@
     .dm-tbtn-u { text-decoration: underline; }
     .dm-tbtn-sep { width: 1px; height: 18px; background: var(--grey4); margin: 0 4px; flex-shrink: 0; }
     .dm-textarea {
-      width: 100%; min-height: 100px;
+      width: 100%; min-height: 88px;
       border: none; outline: none; background: transparent; resize: none;
-      font-family: 'Rubik', sans-serif; font-size: 18px; line-height: 1.55;
-      color: #000000; padding: 10px 14px;
+      font-family: 'Rubik', sans-serif; font-size: 16px; line-height: 1.375;
+      color: #242629; padding: 12px 14px;
       display: block;
     }
-    .dm-textarea::placeholder { color: #979db0; font-size: 18px; }
-    .opt-fields .dm-textarea::placeholder,
-    .form-section .dm-textarea::placeholder { font-size: 16px; }
+    .dm-textarea::placeholder { color: #979db0; font-size: 16px; }
 
     /* ── Inline quick-add card ── */
     .quick-add-card {
@@ -1357,19 +1527,20 @@
     /* Consent toggles */
     .consent-row { display: flex; align-items: flex-start; gap: 12px; }
     .consent-text { font-size: 13px; color: var(--grey2); line-height: 1.45; }
-    .dm-toggle { position: relative; flex-shrink: 0; width: 36px; height: 20px; cursor: pointer; display: inline-block; }
+    .dm-toggle { position: relative; flex-shrink: 0; width: 40px; height: 24px; cursor: pointer; display: inline-block; }
     .dm-toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
     .dm-toggle__track {
       position: absolute; inset: 0;
-      background: var(--grey4); border-radius: 10px; transition: background 200ms;
+      background: #DCE0E6; border-radius: 12px; transition: background 200ms;
     }
     .dm-toggle__track::after {
-      content: ''; position: absolute; top: 2px; left: 2px;
-      width: 16px; height: 16px; border-radius: 50%; background: var(--white);
-      transition: transform 200ms; box-shadow: 0 1px 3px rgba(0,0,0,.2);
+      content: ''; position: absolute; top: 3px; left: 3px;
+      width: 18px; height: 18px; border-radius: 50%; background: var(--white);
+      transition: transform 200ms; box-shadow: 0px 2px 4px rgba(0,0,0,.2);
     }
     .dm-toggle input:checked + .dm-toggle__track { background: var(--blue1); }
     .dm-toggle input:checked + .dm-toggle__track::after { transform: translateX(16px); }
+    .dm-toggle input:disabled + .dm-toggle__track { background: #E9ECF1; pointer-events: none; }
     /* Vehicle card */
     /* ── Multi-vehicle sub-screen ── */
     .sub-vehicles-header {
@@ -1425,18 +1596,26 @@
     /* Nazwa usługi autocomplete */
     .service-wrap { position: relative; }
     .service-dropdown {
-      position: absolute; top: calc(100% + 6px); left: 0; right: 0; z-index: 200;
-      background: var(--white); border: 1px solid var(--grey4); border-radius: 12px;
-      box-shadow: 10px 20px 35px 0px rgba(140,142,170,.30);
-      overflow: hidden; max-height: 220px; overflow-y: auto;
+      position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 200;
+      background: #fff;
+      border: 1px solid #DCE0E6;
+      border-radius: 10px;
+      box-shadow: 10px 20px 35px 0px rgba(140,142,170,.3);
+      overflow: hidden; max-height: 200px; overflow-y: auto;
+      scrollbar-width: none;
     }
+    .service-dropdown::-webkit-scrollbar { display: none; }
     .service-dropdown.hidden { display: none; }
     .service-opt {
-      padding: 10px 14px; font-size: 14px; color: var(--black);
-      cursor: pointer; transition: background 100ms;
+      height: 40px; padding: 0 14px;
+      font-family: 'Rubik', sans-serif; font-size: 16px; color: #000;
+      cursor: pointer; display: flex; align-items: center;
+      border-bottom: 1px solid #F0F1F5;
+      transition: background 100ms;
     }
-    .service-opt:hover, .service-opt.active { background: var(--grey6); }
-    .service-opt strong { color: var(--blue1); font-weight: 500; }
+    .service-opt:last-child { border-bottom: none; }
+    .service-opt:hover, .service-opt.active { background: #F3F3FF; color: #222693; }
+    .service-opt strong { color: #222693; font-weight: 500; }
 
     .hidden { display: none !important; }
 
@@ -1634,51 +1813,44 @@
         <!-- Headers row -->
         <div class="cal-col-headers">
           <div class="time-gutter-head"></div>
+          <!-- Temporal: Opony i wulkanizacja -->
           <div class="col-header">
             <div class="col-header__name">Opony i wulkanizacja</div>
             <div class="col-header__meta">
-              <span class="badge-hours">
-                <svg viewBox="0 0 14 14"><circle cx="7" cy="7" r="5.5"/><path d="M7 4v3.5l2 1.5"/></svg>
-                8:00 – 16:30
-              </span>
-              <span class="badge-count">2/6</span>
+              <span class="badge-live"><svg viewBox="0 0 16 11" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="8" cy="5.5" r="1.5" fill="#3bb08f"/><path d="M5.2 2.7a4 4 0 0 0 0 5.6" stroke="#3bb08f" stroke-width="1.4" stroke-linecap="round"/><path d="M10.8 2.7a4 4 0 0 1 0 5.6" stroke="#3bb08f" stroke-width="1.4" stroke-linecap="round"/><path d="M2.4.5a8 8 0 0 0 0 10" stroke="#3bb08f" stroke-width="1.4" stroke-linecap="round"/><path d="M13.6.5a8 8 0 0 1 0 10" stroke="#3bb08f" stroke-width="1.4" stroke-linecap="round"/></svg></span>
+              <span class="badge-hours">8:00 – 16:30</span>
             </div>
           </div>
-          <div class="col-header">
+          <!-- Quantity: Mechanika i usterki -->
+          <div class="col-header" id="col-hdr-2">
             <div class="col-header__name">Mechanika i usterki</div>
             <div class="col-header__meta">
-              <span class="badge-hours">
-                <svg viewBox="0 0 14 14"><circle cx="7" cy="7" r="5.5"/><path d="M7 4v3.5l2 1.5"/></svg>
-                8:00 – 17:00
-              </span>
-              <span class="badge-count">1/6</span>
+              <span class="badge-live"><svg viewBox="0 0 16 11" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="8" cy="5.5" r="1.5" fill="#3bb08f"/><path d="M5.2 2.7a4 4 0 0 0 0 5.6" stroke="#3bb08f" stroke-width="1.4" stroke-linecap="round"/><path d="M10.8 2.7a4 4 0 0 1 0 5.6" stroke="#3bb08f" stroke-width="1.4" stroke-linecap="round"/><path d="M2.4.5a8 8 0 0 0 0 10" stroke="#3bb08f" stroke-width="1.4" stroke-linecap="round"/><path d="M13.6.5a8 8 0 0 1 0 10" stroke="#3bb08f" stroke-width="1.4" stroke-linecap="round"/></svg></span>
+              <span class="badge-count" id="qty-badge-2">0/6</span>
             </div>
           </div>
+          <!-- Temporal: Klimatyzacja -->
           <div class="col-header">
             <div class="col-header__name">Klimatyzacja</div>
             <div class="col-header__meta">
-              <span class="badge-hours">
-                <svg viewBox="0 0 14 14"><circle cx="7" cy="7" r="5.5"/><path d="M7 4v3.5l2 1.5"/></svg>
-                8:00 – 16:00
-              </span>
+              <span class="badge-live"><svg viewBox="0 0 16 11" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="8" cy="5.5" r="1.5" fill="#3bb08f"/><path d="M5.2 2.7a4 4 0 0 0 0 5.6" stroke="#3bb08f" stroke-width="1.4" stroke-linecap="round"/><path d="M10.8 2.7a4 4 0 0 1 0 5.6" stroke="#3bb08f" stroke-width="1.4" stroke-linecap="round"/><path d="M2.4.5a8 8 0 0 0 0 10" stroke="#3bb08f" stroke-width="1.4" stroke-linecap="round"/><path d="M13.6.5a8 8 0 0 1 0 10" stroke="#3bb08f" stroke-width="1.4" stroke-linecap="round"/></svg></span>
+              <span class="badge-hours">8:00 – 16:00</span>
             </div>
           </div>
+          <!-- Quantity: Hamulce -->
           <div class="col-header">
             <div class="col-header__name">Hamulce</div>
             <div class="col-header__meta">
-              <span class="badge-hours">
-                <svg viewBox="0 0 14 14"><circle cx="7" cy="7" r="5.5"/><path d="M7 4v3.5l2 1.5"/></svg>
-                8:00 – 16:30
-              </span>
+              <span class="badge-live"><svg viewBox="0 0 16 11" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="8" cy="5.5" r="1.5" fill="#3bb08f"/><path d="M5.2 2.7a4 4 0 0 0 0 5.6" stroke="#3bb08f" stroke-width="1.4" stroke-linecap="round"/><path d="M10.8 2.7a4 4 0 0 1 0 5.6" stroke="#3bb08f" stroke-width="1.4" stroke-linecap="round"/><path d="M2.4.5a8 8 0 0 0 0 10" stroke="#3bb08f" stroke-width="1.4" stroke-linecap="round"/><path d="M13.6.5a8 8 0 0 1 0 10" stroke="#3bb08f" stroke-width="1.4" stroke-linecap="round"/></svg></span>
+              <span class="badge-count" id="qty-badge-4">0/6</span>
             </div>
           </div>
-          <div class="col-header">
+          <!-- Quantity: Stanowisko Antykorozyjne -->
+          <div class="col-header" id="col-hdr-5">
             <div class="col-header__name">Stanowisko Antykorozyjne</div>
             <div class="col-header__meta">
-              <span class="badge-hours">
-                <svg viewBox="0 0 14 14"><circle cx="7" cy="7" r="5.5"/><path d="M7 4v3.5l2 1.5"/></svg>
-                9:00 – 17:00
-              </span>
+              <span class="badge-live"><svg viewBox="0 0 16 11" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="8" cy="5.5" r="1.5" fill="#3bb08f"/><path d="M5.2 2.7a4 4 0 0 0 0 5.6" stroke="#3bb08f" stroke-width="1.4" stroke-linecap="round"/><path d="M10.8 2.7a4 4 0 0 1 0 5.6" stroke="#3bb08f" stroke-width="1.4" stroke-linecap="round"/><path d="M2.4.5a8 8 0 0 0 0 10" stroke="#3bb08f" stroke-width="1.4" stroke-linecap="round"/><path d="M13.6.5a8 8 0 0 1 0 10" stroke="#3bb08f" stroke-width="1.4" stroke-linecap="round"/></svg></span>
+              <span class="badge-count" id="qty-badge-5">0/6</span>
             </div>
           </div>
         </div>
@@ -1733,8 +1905,8 @@
           </div>
 
           <div class="cal-columns">
-            <!-- Col 1: Opony i wulkanizacja -->
-            <div class="cal-col" id="cal-col-1">
+            <!-- Col 1: Opony i wulkanizacja (temporal) -->
+            <div class="cal-col col--temporal" id="cal-col-1">
               <div class="col-line col-line--major"></div><div class="col-line"></div>
               <div class="col-line col-line--major"></div><div class="col-line"></div>
               <div class="col-line col-line--major"></div><div class="col-line"></div>
@@ -1760,8 +1932,10 @@
 
 
             </div>
-            <!-- Col 2: Mechanika i usterki -->
-            <div class="cal-col" id="cal-col-2">
+            <!-- Col 2: Mechanika i usterki (quantity) -->
+            <div class="cal-col col--quantity" id="cal-col-2"></div>
+            <!-- Col 3: Klimatyzacja (temporal) -->
+            <div class="cal-col col--temporal" id="cal-col-3">
               <div class="col-line col-line--major"></div><div class="col-line"></div>
               <div class="col-line col-line--major"></div><div class="col-line"></div>
               <div class="col-line col-line--major"></div><div class="col-line"></div>
@@ -1786,37 +1960,8 @@
               <div class="col-line col-line--major"></div><div class="col-line"></div>
 
             </div>
-            <!-- Col 3: Klimatyzacja -->
-            <div class="cal-col" id="cal-col-3">
-              <div class="col-line col-line--major"></div><div class="col-line"></div>
-              <div class="col-line col-line--major"></div><div class="col-line"></div>
-              <div class="col-line col-line--major"></div><div class="col-line"></div>
-              <div class="col-line col-line--major"></div><div class="col-line"></div>
-              <div class="col-line col-line--major"></div><div class="col-line"></div>
-              <div class="col-line col-line--major"></div><div class="col-line"></div>
-              <div class="col-line col-line--major"></div><div class="col-line"></div>
-              <div class="col-line col-line--major"></div><div class="col-line"></div>
-              <div class="col-line col-line--major"></div><div class="col-line"></div>
-              <div class="col-line col-line--major"></div><div class="col-line"></div>
-              <div class="col-line col-line--major"></div><div class="col-line"></div>
-              <div class="col-line col-line--major"></div><div class="col-line"></div>
-              <div class="col-line col-line--major"></div><div class="col-line"></div>
-              <div class="col-line col-line--major"></div><div class="col-line"></div>
-              <div class="col-line col-line--major"></div><div class="col-line"></div>
-              <div class="col-line col-line--major"></div><div class="col-line"></div>
-              <div class="col-line col-line--major"></div><div class="col-line"></div>
-              <div class="col-line col-line--major"></div><div class="col-line"></div>
-              <div class="col-line col-line--major"></div><div class="col-line"></div>
-              <div class="col-line col-line--major"></div><div class="col-line"></div>
-              <div class="col-line col-line--major"></div><div class="col-line"></div>
-              <div class="col-line col-line--major"></div><div class="col-line"></div>
-
-            </div>
-            <!-- Col 4: Hamulce -->
-            <div class="cal-col" id="cal-col-4">
-              <div class="col-line col-line--major"></div><div class="col-line"></div>
-              <div class="col-line col-line--major"></div><div class="col-line"></div>
-              <div class="col-line col-line--major"></div><div class="col-line"></div>
+            <!-- Col 4: Hamulce (quantity) -->
+            <div class="cal-col col--quantity" id="cal-col-4">
               <div class="col-line col-line--major"></div><div class="col-line"></div>
               <div class="col-line col-line--major"></div><div class="col-line"></div>
               <div class="col-line col-line--major"></div><div class="col-line"></div>
@@ -1837,31 +1982,8 @@
               <div class="col-line col-line--major"></div><div class="col-line"></div>
               <div class="col-line col-line--major"></div><div class="col-line"></div>
             </div>
-            <!-- Col 5: Stanowisko Antykorozyjne -->
-            <div class="cal-col" id="cal-col-5">
-              <div class="col-line col-line--major"></div><div class="col-line"></div>
-              <div class="col-line col-line--major"></div><div class="col-line"></div>
-              <div class="col-line col-line--major"></div><div class="col-line"></div>
-              <div class="col-line col-line--major"></div><div class="col-line"></div>
-              <div class="col-line col-line--major"></div><div class="col-line"></div>
-              <div class="col-line col-line--major"></div><div class="col-line"></div>
-              <div class="col-line col-line--major"></div><div class="col-line"></div>
-              <div class="col-line col-line--major"></div><div class="col-line"></div>
-              <div class="col-line col-line--major"></div><div class="col-line"></div>
-              <div class="col-line col-line--major"></div><div class="col-line"></div>
-              <div class="col-line col-line--major"></div><div class="col-line"></div>
-              <div class="col-line col-line--major"></div><div class="col-line"></div>
-              <div class="col-line col-line--major"></div><div class="col-line"></div>
-              <div class="col-line col-line--major"></div><div class="col-line"></div>
-              <div class="col-line col-line--major"></div><div class="col-line"></div>
-              <div class="col-line col-line--major"></div><div class="col-line"></div>
-              <div class="col-line col-line--major"></div><div class="col-line"></div>
-              <div class="col-line col-line--major"></div><div class="col-line"></div>
-              <div class="col-line col-line--major"></div><div class="col-line"></div>
-              <div class="col-line col-line--major"></div><div class="col-line"></div>
-              <div class="col-line col-line--major"></div><div class="col-line"></div>
-              <div class="col-line col-line--major"></div><div class="col-line"></div>
-            </div>
+            <!-- Col 5: Stanowisko Antykorozyjne (quantity) -->
+            <div class="cal-col col--quantity" id="cal-col-5"></div>
           </div>
         </div>
       </div>
@@ -2034,7 +2156,7 @@
       <div class="section-label-row">
         <span class="section-label">Pojazd i klient</span>
         <button class="btn-add-client-inline" id="btn-add-client-inline" type="button">
-          <svg viewBox="0 0 12 12"><line x1="6" y1="1" x2="6" y2="11"/><line x1="1" y1="6" x2="11" y2="6"/></svg>
+          <svg viewBox="0 0 20 20"><line x1="10" y1="4" x2="10" y2="16"/><line x1="4" y1="10" x2="16" y2="10"/></svg>
           Dodaj nowego klienta
         </button>
       </div>
@@ -2054,7 +2176,7 @@
           </div>
           <div class="dd-footer">
             <button class="btn-add-client" id="btn-add-client">
-              <svg viewBox="0 0 18 18" fill="none" stroke="#222693" stroke-width="2" stroke-linecap="round"><line x1="9" y1="2" x2="9" y2="16"/><line x1="2" y1="9" x2="16" y2="9"/></svg>
+              <svg viewBox="0 0 20 20"><line x1="10" y1="4" x2="10" y2="16"/><line x1="4" y1="10" x2="16" y2="10"/></svg>
               Dodaj nowego klienta
             </button>
           </div>
@@ -2151,6 +2273,7 @@
           </button>
         </div>
         <textarea id="szcz-textarea" class="dm-textarea dm-textarea--opt" placeholder="np. Klient prosi o olej marki XYZ"></textarea>
+        <div id="szcz-photo-strip" class="szcz-photo-strip"></div>
       </div>
     </div>
 
@@ -2424,6 +2547,9 @@
     ['sub-f-phone'].forEach(id => {
       const el = document.getElementById(id); if (el) el.classList.remove('is-error');
     });
+    // Clear Szczegóły photo strip
+    const szczStrip = document.getElementById('szcz-photo-strip');
+    if (szczStrip) { szczStrip.innerHTML = ''; szczStrip.classList.remove('has-photos'); }
   }
 
   // ── Confirm overlay ──
@@ -2501,10 +2627,10 @@
     <div class="qi-pop-card">
       <div class="qi-pop-body">
         <div class="qi-pop-input">
+          <div id="qp-photo-strip" class="qp-photo-strip"></div>
           <div class="qi-pop-top">
             <span class="qi-pop-lbl">Opisz zlecenie</span>
-            <textarea id="qi-pop-ta" class="qi-pop-ta" rows="2"
-              placeholder="np. wymiana oleju, 516 000 000, Audi a1..."></textarea>
+            <textarea id="qi-pop-ta" class="qi-pop-ta" rows="2" placeholder=""></textarea>
           </div>
           <div class="qi-pop-toolbar">
             <button class="qi-pop-meth" id="qp-photo" title="Dodaj zdjęcie" type="button">
@@ -2528,29 +2654,60 @@
   document.body.appendChild(qiPop);
 
   // Position popover near a given rect
-  function showQiPop(anchorRect) {
+  let _qiAnchorEl = null;
+  function showQiPop(anchorRect, anchorEl, forceAbove) {
+    _qiAnchorEl = anchorEl || null;
     qiPop.classList.add('qp-visible');
-    const pw = 380, ph = 220, margin = 10;
+    const pw = 360, ph = 220, margin = 10;
     const vw = window.innerWidth, vh = window.innerHeight;
-    // Center horizontally below the anchor button
+    // Center horizontally relative to anchor
     let left = anchorRect.left + anchorRect.width / 2 - pw / 2;
-    let top  = anchorRect.bottom + margin;
     // Clamp to viewport
     if (left + pw > vw - margin) left = vw - pw - margin;
     if (left < margin) left = margin;
-    // If not enough space below → show above
-    if (top + ph > vh - margin) top = anchorRect.top - ph - margin;
+    // Vertical: forceAbove → always above; otherwise below with fallback above
+    let top;
+    if (forceAbove) {
+      top = anchorRect.top - ph - margin;
+      if (top < margin) top = anchorRect.bottom + margin; // not enough space above → fall back below
+    } else {
+      top = anchorRect.bottom + margin;
+      if (top + ph > vh - margin) top = anchorRect.top - ph - margin;
+    }
     qiPop.style.left = left + 'px';
     qiPop.style.top  = top  + 'px';
     document.getElementById('qi-pop-ta')?.focus();
+    window._startQiAnim?.();
   }
 
+  // Follow slot on horizontal scroll only (vertical stays fixed like Google Calendar)
+  const _calScrollArea = document.querySelector('.cal-scroll-area');
+  let _lastScrollLeft = _calScrollArea ? _calScrollArea.scrollLeft : 0;
+  _calScrollArea?.addEventListener('scroll', () => {
+    if (!qiPop.classList.contains('qp-visible') || !_qiAnchorEl) return;
+    const newScrollLeft = _calScrollArea.scrollLeft;
+    if (newScrollLeft === _lastScrollLeft) return;
+    _lastScrollLeft = newScrollLeft;
+    const r = _qiAnchorEl.getBoundingClientRect();
+    const pw = 360, margin = 10, vw = window.innerWidth;
+    let left = r.left + r.width / 2 - pw / 2;
+    if (left + pw > vw - margin) left = vw - pw - margin;
+    if (left < margin) left = margin;
+    qiPop.style.left = left + 'px';
+  });
+
   function hideQiPop() {
+    _qiAnchorEl = null;
     qiPop.classList.remove('qp-visible');
+    window._stopQiAnim?.();
     const ta = document.getElementById('qi-pop-ta');
-    if (ta) { ta.value = ''; ta.style.height = 'auto'; }
+    if (ta) { ta.value = ''; ta.style.height = 'auto'; ta.placeholder = ''; }
+    // Clear photos
+    _qiPhotos.forEach(p => URL.revokeObjectURL(p.url));
+    _qiPhotos = [];
+    _qpRenderStrip();
     // Remove preview slot
-    newApptPreview.classList.remove('nap-visible');
+    newApptPreview.classList.remove('nap-visible', 'nap-quantity');
     if (newApptPreview.parentNode) newApptPreview.parentNode.removeChild(newApptPreview);
   }
 
@@ -2565,13 +2722,23 @@
     const ta = document.getElementById('qi-pop-ta');
     if (_hoveredLine) prefillPanelFromSlot(_hoveredLine);
     if (ta?.value.trim()) {
-      // Store text so initQuickInput parser can use it
       const sqTa = document.getElementById('sq-textarea');
       if (sqTa) sqTa.value = ta.value;
-      // Trigger parse via sq-submit click (initQuickInput handles it)
       document.getElementById('sq-submit')?.click();
     } else {
       openPanel('form');
+    }
+    // Copy photos to Szczegóły strip
+    const szczStrip = document.getElementById('szcz-photo-strip');
+    if (szczStrip) {
+      szczStrip.innerHTML = '';
+      _qiPhotos.forEach(p => {
+        const wrap = document.createElement('div');
+        wrap.className = 'qp-thumb';
+        wrap.innerHTML = `<img src="${p.url}" alt="${p.name}">`;
+        szczStrip.appendChild(wrap);
+      });
+      szczStrip.classList.toggle('has-photos', _qiPhotos.length > 0);
     }
     hideQiPop();
   });
@@ -2612,17 +2779,106 @@
     }
   }
 
-  // Photo — open file picker
+  // ── Photo thumbnails ──
+  let _qiPhotos = []; // [{url, name}]
+
+  function _qpRenderStrip() {
+    const strip = document.getElementById('qp-photo-strip');
+    if (!strip) return;
+    strip.innerHTML = '';
+    _qiPhotos.forEach((p, idx) => {
+      const wrap = document.createElement('div');
+      wrap.className = 'qp-thumb';
+      wrap.innerHTML = `<img src="${p.url}" alt="${p.name}">
+        <button class="qp-thumb__del" type="button" title="Usuń zdjęcie">×</button>`;
+      wrap.querySelector('.qp-thumb__del').addEventListener('click', () => {
+        URL.revokeObjectURL(_qiPhotos[idx].url);
+        _qiPhotos.splice(idx, 1);
+        _qpRenderStrip();
+      });
+      strip.appendChild(wrap);
+    });
+    strip.classList.toggle('has-photos', _qiPhotos.length > 0);
+  }
+
   document.getElementById('qp-photo')?.addEventListener('click', () => {
     document.getElementById('qp-file-input')?.click();
   });
   document.getElementById('qp-file-input')?.addEventListener('change', (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const ta = document.getElementById('qi-pop-ta');
-    if (ta && !ta.value) ta.placeholder = `📎 ${file.name}`;
-    else if (ta) ta.value = (ta.value ? ta.value + '\n' : '') + `📎 ${file.name}`;
+    e.target.value = ''; // allow re-selecting same file
+    _qiPhotos.push({ url: URL.createObjectURL(file), name: file.name });
+    _qpRenderStrip();
   });
+
+  // ── Animated placeholder ──
+  {
+    const _examples = [
+      'np. Passat B7 wymiana oleju, klient jutro rano, tel. 516 000 000',
+      'np. 604 123 456, BMW, klient prosi o wycenę rozrządu',
+      'np. Marek, Audi A4, klimatyzacja nie działa, środa 9:00',
+      'np. 789 000 111, Golf VII, hamulce + przegląd, piątek',
+      'np. Anna Kowalska, Skoda Octavia, wymiana opon, 500 100 200',
+      'np. Toyota Corolla, diagnostyka check engine, dziś po 14:00',
+    ];
+    let _eIdx = 0, _eChar = 0, _ePhase = 'typing', _eTimer = null, _eRunning = false;
+
+    function _ePlaceholderStep() {
+      if (!_eRunning) return;
+      const ta = document.getElementById('qi-pop-ta');
+      if (!ta) return;
+      const txt = _examples[_eIdx];
+      if (_ePhase === 'typing') {
+        _eChar++;
+        ta.placeholder = txt.slice(0, _eChar);
+        if (_eChar < txt.length) {
+          _eTimer = setTimeout(_ePlaceholderStep, 40);
+        } else {
+          _ePhase = 'pausing';
+          _eTimer = setTimeout(_ePlaceholderStep, 2000);
+        }
+      } else if (_ePhase === 'pausing') {
+        _ePhase = 'deleting';
+        _ePlaceholderStep();
+      } else {
+        _eChar--;
+        ta.placeholder = txt.slice(0, _eChar);
+        if (_eChar > 0) {
+          _eTimer = setTimeout(_ePlaceholderStep, 20);
+        } else {
+          _eIdx = (_eIdx + 1) % _examples.length;
+          _ePhase = 'typing';
+          _eTimer = setTimeout(_ePlaceholderStep, 300);
+        }
+      }
+    }
+
+    window._startQiAnim = function() {
+      const ta = document.getElementById('qi-pop-ta');
+      if (!ta || ta.value) return;
+      if (_eRunning) return;
+      _eRunning = true;
+      // Show first example immediately, then pause before deleting
+      _eChar = _examples[_eIdx].length;
+      ta.placeholder = _examples[_eIdx];
+      _ePhase = 'pausing';
+      _eTimer = setTimeout(_ePlaceholderStep, 2000);
+    };
+    window._stopQiAnim = function() {
+      _eRunning = false;
+      clearTimeout(_eTimer);
+      const ta = document.getElementById('qi-pop-ta');
+      if (ta) ta.placeholder = '';
+    };
+
+    // Stop only when user starts typing; restart when field cleared
+    document.addEventListener('input', e => {
+      if (e.target?.id !== 'qi-pop-ta') return;
+      if (e.target.value) _stopQiAnim();
+      else _startQiAnim();
+    });
+  }
 
   // Close on outside click / Escape
   document.addEventListener('click', e => {
@@ -2696,7 +2952,7 @@
           width:  colRect.width - 8,
           height: height
         };
-        showQiPop(previewRect);
+        showQiPop(previewRect, newApptPreview);
         return;
       }
     }
@@ -3995,6 +4251,15 @@
     if (!e.target.closest('.service-wrap')) serviceDropdown.classList.add('hidden');
   });
 
+  // ── Station metadata ──
+  const STATION_META = {
+    'Opony i wulkanizacja':    { type:'temporal',  hours:'8:00 – 16:30', capacity: null },
+    'Mechanika i usterki':     { type:'quantity',  hours:'8:00 – 17:00', capacity: 6 },
+    'Klimatyzacja':            { type:'temporal',  hours:'8:00 – 16:00', capacity: null },
+    'Hamulce':                 { type:'quantity',  hours:'8:00 – 16:30', capacity: 6 },
+    'Stanowisko Antykorozyjne':{ type:'quantity',  hours:'9:00 – 17:00', capacity: 6 },
+  };
+
   // ── Stanowisko selector ──
   const STANOWISKA = [
     'Opony i wulkanizacja',
@@ -4095,7 +4360,23 @@
   // ════════════════════════════
   //  CENTRAL APPOINTMENTS STORE
   // ════════════════════════════
-  let APPOINTMENTS = [];
+
+  // Demo seed — shown when Supabase has no data for this week
+  const DEMO_APPOINTMENTS = [
+    { id:'d1', date: new Date(2025,4,12), start:'8:00',  end:'9:00',  name:'Audi A4',            phone:'+48 516 000 001', desc:'Wymiana klocków hamulcowych',          stanowisko:'Hamulce' },
+    { id:'d9', date: new Date(2025,4,12), start:'9:00',  end:'10:00', name:'BMW 520i',            phone:'+48 516 000 009', desc:'Diagnostyka komputerowa silnika',       stanowisko:'Mechanika i usterki' },
+    { id:'d10',date: new Date(2025,4,12), start:'11:30', end:'12:30', name:'Mazda CX-5',          phone:'+48 516 000 010', desc:'Wymiana opon – felga aluminiowa 18″',   stanowisko:'Opony i wulkanizacja' },
+    { id:'d2', date: new Date(2025,4,13), start:'10:00', end:'11:30', name:'Toyota Corolla',      phone:'+48 516 000 002', desc:'Wymiana oleju silnikowego i filtrów',   stanowisko:'Mechanika i usterki' },
+    { id:'d11',date: new Date(2025,4,13), start:'13:00', end:'14:00', name:'Hyundai Tucson',      phone:'+48 516 000 011', desc:'Serwis klimatyzacji R1234yf',           stanowisko:'Klimatyzacja' },
+    { id:'d3', date: new Date(2025,4,14), start:'8:00',  end:'9:30',  name:'Volkswagen Passat',   phone:'+48 516 000 003', desc:'Wymiana opon – felga aluminiowa 17″',   stanowisko:'Opony i wulkanizacja' },
+    { id:'d4', date: new Date(2025,4,14), start:'11:00', end:'12:00', name:'Skoda Octavia',       phone:'+48 516 000 004', desc:'Serwis klimatyzacji R134a',             stanowisko:'Klimatyzacja' },
+    { id:'d5', date: new Date(2025,4,15), start:'9:00',  end:'10:30', name:'BMW 320d',            phone:'+48 516 000 005', desc:'Zabezpieczenie antykorozyjne podwozia', stanowisko:'Stanowisko Antykorozyjne' },
+    { id:'d6', date: new Date(2025,4,15), start:'13:00', end:'14:00', name:'Ford Focus',          phone:'+48 516 000 006', desc:'Naprawa układu kierowniczego',          stanowisko:'Mechanika i usterki' },
+    { id:'d7', date: new Date(2025,4,16), start:'8:30',  end:'9:30',  name:'Opel Astra',          phone:'+48 516 000 007', desc:'Wymiana opon – felga stalowa 15″',      stanowisko:'Opony i wulkanizacja' },
+    { id:'d8', date: new Date(2025,4,17), start:'10:00', end:'11:00', name:'Renault Megane',      phone:'+48 516 000 008', desc:'Uzupełnienie czynnika chłodniczego',    stanowisko:'Klimatyzacja' },
+  ];
+
+  let APPOINTMENTS = [...DEMO_APPOINTMENTS];
 
   async function initSupabase() {
     try {
@@ -4105,10 +4386,13 @@
         sbLoadVisits(`${y - 1}-01-01`, `${y + 1}-12-31`),
       ]);
       CLIENTS = clients;
-      APPOINTMENTS = visits;
+      // Merge: keep demo entries, add real Supabase visits
+      const realIds = new Set(visits.map(v => v.id));
+      APPOINTMENTS = [...DEMO_APPOINTMENTS.filter(d => !realIds.has(d.id)), ...visits];
       renderDayView();
     } catch (e) {
       console.error('Supabase init error:', e);
+      renderDayView();
     }
   }
   initSupabase();
@@ -4202,10 +4486,10 @@
   }
 
   function _getScrollEl(viewType) {
-    return viewType === 'day' ? document.querySelector('.cal-scroll-area') : document.querySelector('.week-scroll');
+    return viewType === 'day' ? document.querySelector('.cal-scroll-area') : document.querySelector('#view-week .wk-grid');
   }
   function _getColsEl(viewType) {
-    return viewType === 'day' ? document.querySelector('.cal-columns') : document.querySelector('#view-week .week-cols');
+    return viewType === 'day' ? document.querySelector('.cal-columns') : document.querySelector('#view-week .wk-grid');
   }
 
   function _onDragMove(e) {
@@ -4278,31 +4562,104 @@
 
   // ── Day view renderer ──
   function renderDayView() {
-    document.querySelectorAll('.cal-col .appt').forEach(el => el.remove());
-    // Group by cal-col
+    // Clear temporal appointments
+    document.querySelectorAll('.cal-col.col--temporal .appt').forEach(el => el.remove());
+    // Rebuild quantity columns
+    document.querySelectorAll('.cal-col.col--quantity').forEach(col => {
+      col.innerHTML = '<div class="qty-body"></div>';
+    });
+
+    const dayAppts = getApptsForDay(viewCurrent);
     const byCol = {};
-    getApptsForDay(viewCurrent).forEach(a => {
+    dayAppts.forEach(a => {
       const colId = STATION_COL[a.stanowisko];
       if (!colId) return;
       (byCol[colId] = byCol[colId] || []).push(a);
     });
+
     Object.entries(byCol).forEach(([colId, colAppts]) => {
       const colEl = document.getElementById(colId);
       if (!colEl) return;
-      layoutAppts(colAppts).forEach(a => {
-        const top    = (timeToMin(a.start) - GRID_START_MIN) * PX_PER_MIN;
-        const height = Math.max((timeToMin(a.end) - timeToMin(a.start)) * PX_PER_MIN, 48);
-        const div = document.createElement('div');
-        div.className = 'appt appt--mustard' + (a._isNew ? ' appt-new' : '');
-        div.style.cssText = apptStyle(top, height, a._col, a._totalCols);
-        div.innerHTML = `<div class="appt__time">${a.start}–${a.end}</div>
-          <div class="appt__name">${a.name}</div>
-          ${a.phone ? `<div class="appt__phone">${a.phone}</div>` : ''}
-          ${a.desc  ? `<div class="appt__desc">${a.desc}</div>`   : ''}`;
-        div.addEventListener('mousedown', e => startApptDrag(e, a, 'day', div));
-        colEl.appendChild(div);
-      });
+
+      if (colEl.classList.contains('col--quantity')) {
+        // ── Quantity column: stacked cards ──
+        const body = colEl.querySelector('.qty-body');
+        colAppts.forEach(a => {
+          const colorCls = apptIsTeal(a.date) ? 'qty-appt--teal' : 'qty-appt--mustard';
+          const card = document.createElement('div');
+          card.className = `qty-appt ${colorCls}${a._isNew ? ' appt-new' : ''}`;
+          card.innerHTML = `
+            <div class="qty-appt__time">${a.start}</div>
+            <div class="qty-appt__name">${a.name}</div>
+            ${a.phone ? `<div class="qty-appt__phone">${a.phone}</div>` : ''}
+            ${a.desc  ? `<div class="qty-appt__desc">${a.desc}</div>`   : ''}`;
+          card.addEventListener('mousedown', e => startApptDrag(e, a, 'day', card));
+          body.appendChild(card);
+        });
+      } else {
+        // ── Temporal column: absolute positioning ──
+        layoutAppts(colAppts).forEach(a => {
+          const top    = (timeToMin(a.start) - GRID_START_MIN) * PX_PER_MIN;
+          const height = Math.max((timeToMin(a.end) - timeToMin(a.start)) * PX_PER_MIN, 48);
+          const div = document.createElement('div');
+          div.className = 'appt ' + (apptIsTeal(a.date) ? 'appt--teal' : 'appt--mustard') + (a._isNew ? ' appt-new' : '');
+          div.style.cssText = apptStyle(top, height, a._col, a._totalCols);
+          div.innerHTML = `<div class="appt__time">${a.start}–${a.end}</div>
+            <div class="appt__name">${a.name}</div>
+            ${a.phone ? `<div class="appt__phone">${a.phone}</div>` : ''}
+            ${a.desc  ? `<div class="appt__desc">${a.desc}</div>`   : ''}`;
+          div.addEventListener('mousedown', e => startApptDrag(e, a, 'day', div));
+          colEl.appendChild(div);
+        });
+      }
     });
+
+    // Add "+ Dodaj wizytę" button to each quantity column + update badge
+    STANOWISKA.forEach((st, i) => {
+      const meta = STATION_META[st];
+      if (meta?.type !== 'quantity') return;
+      const colEl = document.getElementById(`cal-col-${i + 1}`);
+      if (!colEl) return;
+      // Do NOT skip col-hidden columns here — updateDayColumns() runs after
+      // and handles visibility. Skipping would cause missing button when
+      // switching from a temporal filter (which hides quantity columns).
+
+      // Update count badge
+      const count = (byCol[`cal-col-${i + 1}`] || []).length;
+      const badge = document.getElementById(`qty-badge-${i + 1}`);
+      if (badge) badge.textContent = `${count}/${meta.capacity}`;
+
+      // Add button
+      const btn = document.createElement('button');
+      btn.className = 'dm-btn dm-btn--primary qty-add-btn';
+      btn.innerHTML = `<svg viewBox="0 0 16 16"><line x1="8" y1="2" x2="8" y2="14"/><line x1="2" y1="8" x2="14" y2="8"/></svg> Dodaj wizytę`;
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (qiPop.classList.contains('qp-visible')) { hideQiPop(); return; }
+        selectedStation = st;
+
+        // Insert Nowe zlecenie preview into qty-body
+        const body = colEl.querySelector('.qty-body');
+        if (body) {
+          newApptPreview.querySelector('.new-appt-preview__time').textContent = '';
+          newApptPreview.classList.add('nap-visible', 'nap-quantity');
+          if (newApptPreview.parentNode !== body) body.appendChild(newApptPreview);
+        }
+
+        // Wait one frame so preview card is painted, then anchor qi-pop below it.
+        // Center horizontally over the column, vertical from preview card bottom.
+        requestAnimationFrame(() => {
+          const previewRect = newApptPreview.getBoundingClientRect();
+          const colRect     = colEl.getBoundingClientRect();
+          const vRef        = previewRect.width > 0 ? previewRect : btn.getBoundingClientRect();
+          // Composite rect: column width for centering, preview bottom for vertical
+          const anchorRect  = { left: colRect.left, width: colRect.width, top: vRef.top, bottom: vRef.bottom };
+          showQiPop(anchorRect, newApptPreview);
+        });
+      });
+      colEl.appendChild(btn);
+    });
+
     updateDayColumns();
   }
 
@@ -4425,59 +4782,68 @@
     return h;
   }
 
+  // Mon(1) & Tue(2) → teal/blue; all other days → mustard
+  function apptIsTeal(date) {
+    const dow = (date instanceof Date ? date : new Date(date)).getDay();
+    return dow === 1 || dow === 2;
+  }
+
   function renderWeekView() {
     const container = document.getElementById('view-week');
     const mon = getWeekStart(viewCurrent);
-    let header = `<div class="week-header-row"><div class="week-gutter-head"></div>`;
+    const PL_DOW_ABBR = ['Nd.','Pon.','Wt.','Śr.','Cz.','Pt.','Sob.'];
+    const PL_MON_NUM  = d => `${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}`;
+
+    let colsHTML = '';
     for (let d = 0; d < 7; d++) {
       const day = new Date(mon); day.setDate(mon.getDate() + d);
-      const isToday = isSameDay(day, VIEW_TODAY);
+      const isToday   = isSameDay(day, VIEW_TODAY);
       const isWeekend = day.getDay() === 0 || day.getDay() === 6;
-      header += `<div class="week-day-head${isToday?' wk-today':''}${isWeekend?' wk-weekend':''}" data-ts="${day.getTime()}" style="cursor:pointer;">
-        <div class="week-day-head__dow">${PL_DOW_SHORT[day.getDay()]}</div>
-        <div class="week-day-head__num">${day.getDate()}</div>
-      </div>`;
-    }
-    header += `</div>`;
-    let cols = '';
-    for (let d = 0; d < 7; d++) {
-      const day = new Date(mon); day.setDate(mon.getDate() + d);
-      const laid = layoutAppts(getApptsForDay(day));
-      let apptsHTML = '';
-      laid.forEach(a => {
-        const top    = (timeToMin(a.start) - GRID_START_MIN) * PX_PER_MIN;
-        const height = Math.max((timeToMin(a.end) - timeToMin(a.start)) * PX_PER_MIN, 24);
+      const appts     = getApptsForDay(day);
+      const count     = appts.length;
+
+      const badge = count > 0
+        ? `<span class="wk-col-head__badge">${count}</span>`
+        : '';
+
+      let cardsHTML = '';
+      appts.forEach((a, i) => {
+        const colorCls = apptIsTeal(a.date) ? 'wk-appt--teal' : 'wk-appt--mustard';
         const idx = APPOINTMENTS.indexOf(a);
-        apptsHTML += `<div class="appt appt--mustard${a._isNew?' appt-new':''}" data-appt-idx="${idx}" style="${apptStyle(top, height, a._col, a._totalCols)}">
-          <div class="appt__time">${a.start}–${a.end}</div>
-          <div class="appt__name">${a.name}</div>
-          ${a.desc ? `<div class="appt__desc">${a.desc}</div>` : ''}
+        cardsHTML += `<div class="wk-appt ${colorCls}${a._isNew?' appt-new':''}" data-appt-idx="${idx}">
+          <div class="wk-appt__time">${a.start}–${a.end}</div>
+          <div class="wk-appt__name">${a.name}</div>
+          ${a.phone ? `<div class="wk-appt__phone">${a.phone}</div>` : ''}
+          ${a.desc  ? `<div class="wk-appt__desc">${a.desc}</div>`   : ''}
         </div>`;
       });
-      const isWknd = day.getDay() === 0 || day.getDay() === 6;
-      cols += `<div class="week-col${isWknd?' wk-weekend':''}">${buildColLines()}${apptsHTML}</div>`;
+
+      colsHTML += `<div class="wk-col week-col${isWeekend?' wk-weekend':''}${isToday?' wk-today':''}" data-ts="${day.getTime()}">
+        <div class="wk-col-head" style="cursor:pointer;" data-ts="${day.getTime()}">
+          <span class="wk-col-head__label">${PL_DOW_ABBR[day.getDay()]} ${PL_MON_NUM(day)}</span>
+          ${badge}
+        </div>
+        <div class="wk-col-body">${cardsHTML}</div>
+      </div>`;
     }
-    container.innerHTML = header + `<div class="week-scroll"><div class="week-body">
-      <div class="week-time-gutter">${buildWkTimeGutter()}</div>
-      <div class="week-cols">${cols}</div>
-    </div></div>`;
-    // Click on day header → switch to day view
-    container.querySelectorAll('.week-day-head[data-ts]').forEach(el => {
+
+    container.innerHTML = `<div class="wk-grid">${colsHTML}</div>`;
+
+    // Click on column header → switch to day view
+    container.querySelectorAll('.wk-col-head[data-ts]').forEach(el => {
       el.addEventListener('click', () => {
         viewCurrent = new Date(+el.dataset.ts);
         setViewMode('day');
       });
     });
-    // Drag & drop delegation for week appointments
-    const weekColsEl = container.querySelector('.week-cols');
-    if (weekColsEl) {
-      weekColsEl.addEventListener('mousedown', e => {
-        const apptEl = e.target.closest('[data-appt-idx]');
-        if (!apptEl) return;
-        const appt = APPOINTMENTS[+apptEl.dataset.apptIdx];
-        if (appt) startApptDrag(e, appt, 'week', apptEl);
+
+    // Drag & drop for week appointment cards
+    container.querySelectorAll('.wk-appt[data-appt-idx]').forEach(el => {
+      el.addEventListener('mousedown', e => {
+        const appt = APPOINTMENTS[+el.dataset.apptIdx];
+        if (appt) startApptDrag(e, appt, 'week', el);
       });
-    }
+    });
   }
 
   // ── Monthly renderer ──
@@ -4496,7 +4862,7 @@
       const isToday  = isSameDay(cellDate, VIEW_TODAY);
       const appts = getApptsForDay(cellDate);
       let cls = 'month-cell' + (isOther?' mc-other':'') + (isToday?' mc-today':'');
-      let chips = appts.slice(0,3).map(a=>`<div class="month-appt-chip">${a.start} ${a.name}</div>`).join('');
+      let chips = appts.slice(0,3).map(a=>`<div class="month-appt-chip${apptIsTeal(a.date)?' month-appt-chip--teal':''}">${a.start} ${a.name}</div>`).join('');
       if (appts.length > 3) chips += `<div class="month-more">+${appts.length-3} więcej</div>`;
       html += `<div class="${cls}" data-ts="${cellDate.getTime()}"><div class="month-day-num">${cellDate.getDate()}</div>${chips}</div>`;
     }
@@ -4587,6 +4953,312 @@
 
   // Initialize day view on load
   renderDayView();
+</script>
+
+<!-- ══════════════════════════════════════
+     DATEPICKER POPUP
+══════════════════════════════════════ -->
+<div class="dp-backdrop" id="dp-backdrop"></div>
+<div class="dp-pop" id="dp-pop">
+  <div class="dp-header">
+    <button class="dp-nav" id="dp-prev" type="button">
+      <svg viewBox="0 0 20 20"><polyline points="13,4 7,10 13,16"/></svg>
+    </button>
+    <span class="dp-title" id="dp-title"></span>
+    <button class="dp-nav" id="dp-next" type="button">
+      <svg viewBox="0 0 20 20"><polyline points="7,4 13,10 7,16"/></svg>
+    </button>
+  </div>
+  <div class="dp-calendar" id="dp-calendar"></div>
+</div>
+
+<!-- ══════════════════════════════════════
+     TIME PICKER POPUP
+══════════════════════════════════════ -->
+<div class="dp-backdrop" id="tp-backdrop"></div>
+<div class="tp-pop" id="tp-pop"></div>
+<div class="tp-pop-wrap" id="tp-scrollbar-wrap">
+  <div class="tp-scrollbar" id="tp-scrollbar"></div>
+</div>
+
+<script>
+/* ══════════════════════════════════════
+   DATEPICKER
+══════════════════════════════════════ */
+(function() {
+  const PL_MONTHS  = ['Styczeń','Luty','Marzec','Kwiecień','Maj','Czerwiec',
+                      'Lipiec','Sierpień','Wrzesień','Październik','Listopad','Grudzień'];
+  const PL_DOW_FMT = ['Niedziela','Poniedziałek','Wtorek','Środa','Czwartek','Piątek','Sobota'];
+  const PL_MON_FMT = ['stycznia','lutego','marca','kwietnia','maja','czerwca',
+                      'lipca','sierpnia','września','października','listopada','grudnia'];
+  // Mon=0 … Sun=6  →  col index
+  // weekday col 5=Sat, 6=Sun → weekend
+  const WD_LABELS = ['P','W','Ś','C','P','S','N'];
+
+  const pop      = document.getElementById('dp-pop');
+  const backdrop = document.getElementById('dp-backdrop');
+  const titleEl  = document.getElementById('dp-title');
+  const calendar = document.getElementById('dp-calendar');
+  const btnPrev  = document.getElementById('dp-prev');
+  const btnNext  = document.getElementById('dp-next');
+
+  let activeField  = null;
+  let viewMonth    = new Date();
+  let selectedDate = null;
+
+  function isSameDay(a, b) {
+    return a && b &&
+      a.getFullYear() === b.getFullYear() &&
+      a.getMonth()    === b.getMonth()    &&
+      a.getDate()     === b.getDate();
+  }
+
+  function renderCalendar() {
+    const today = new Date();
+    const year  = viewMonth.getFullYear();
+    const month = viewMonth.getMonth();
+    titleEl.textContent = `${PL_MONTHS[month]} ${year}`;
+    calendar.innerHTML  = '';
+
+    // ── Weekday header row ──
+    const wdRow = document.createElement('div');
+    wdRow.className = 'dp-row';
+    WD_LABELS.forEach(lbl => {
+      const c = document.createElement('div');
+      c.className = 'dp-wd-cell';
+      c.textContent = lbl;
+      wdRow.appendChild(c);
+    });
+    calendar.appendChild(wdRow);
+
+    // ── Day rows ──
+    // Mon-start offset (Mon=0 … Sun=6)
+    const firstDow   = new Date(year, month, 1).getDay();
+    const startOffset = (firstDow + 6) % 7;
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+    // Build flat array: empty slots + days
+    const cells = [];
+    for (let i = 0; i < startOffset; i++) cells.push(null);
+    for (let d = 1; d <= daysInMonth; d++) cells.push(d);
+
+    // Pad to full weeks
+    while (cells.length % 7 !== 0) cells.push(null);
+
+    for (let row = 0; row < cells.length / 7; row++) {
+      const rowEl = document.createElement('div');
+      rowEl.className = 'dp-row';
+
+      for (let col = 0; col < 7; col++) {
+        const day = cells[row * 7 + col];
+        const el  = document.createElement('div');
+        el.className = 'dp-cell';
+
+        if (day === null) {
+          el.classList.add('dp-cell--empty');
+        } else {
+          el.textContent = day;
+          const date = new Date(year, month, day);
+          const dow  = (date.getDay() + 6) % 7; // Mon=0
+
+          if (dow === 5 || dow === 6) el.classList.add('dp-cell--weekend'); // Sat/Sun
+          if (isSameDay(date, today))        el.classList.add('dp-cell--today');
+          if (isSameDay(date, selectedDate)) el.classList.add('dp-cell--selected');
+
+          el.addEventListener('click', () => selectDate(date));
+        }
+        rowEl.appendChild(el);
+      }
+      calendar.appendChild(rowEl);
+    }
+  }
+
+  function selectDate(date) {
+    selectedDate = new Date(date);
+    if (typeof viewCurrent !== 'undefined') viewCurrent = new Date(date);
+
+    const text = `${PL_DOW_FMT[date.getDay()]}, ${date.getDate()} ${PL_MON_FMT[date.getMonth()]}`;
+    document.querySelectorAll('.input-field.input-date .val').forEach(el => {
+      el.textContent = text;
+    });
+    close();
+  }
+
+  function open(fieldEl) {
+    activeField  = fieldEl;
+    const base   = (typeof viewCurrent !== 'undefined' && viewCurrent)
+                   ? new Date(viewCurrent) : new Date();
+    selectedDate = new Date(base);
+    viewMonth    = new Date(base.getFullYear(), base.getMonth(), 1);
+
+    renderCalendar();
+
+    const rect = fieldEl.getBoundingClientRect();
+    const popW = 316;
+    let left   = rect.left;
+    if (left + popW > window.innerWidth - 8) left = window.innerWidth - popW - 8;
+    if (left < 8) left = 8;
+    pop.style.left = left + 'px';
+    pop.style.top  = (rect.bottom + 6) + 'px';
+
+    pop.classList.add('dp-open');
+    backdrop.classList.add('dp-open');
+    fieldEl.classList.add('dp-focused');
+  }
+
+  function close() {
+    pop.classList.remove('dp-open');
+    backdrop.classList.remove('dp-open');
+    if (activeField) activeField.classList.remove('dp-focused');
+    activeField = null;
+  }
+
+  btnPrev.addEventListener('click', e => {
+    e.stopPropagation();
+    viewMonth.setMonth(viewMonth.getMonth() - 1);
+    renderCalendar();
+  });
+  btnNext.addEventListener('click', e => {
+    e.stopPropagation();
+    viewMonth.setMonth(viewMonth.getMonth() + 1);
+    renderCalendar();
+  });
+  backdrop.addEventListener('click', close);
+
+  document.addEventListener('click', e => {
+    const field = e.target.closest('.input-field.input-date.select-field');
+    if (field) { e.stopPropagation(); open(field); }
+  });
+})();
+
+/* ══════════════════════════════════════
+   TIME PICKER
+══════════════════════════════════════ */
+(function() {
+  const pop         = document.getElementById('tp-pop');
+  const backdrop    = document.getElementById('tp-backdrop');
+  const sbWrap      = document.getElementById('tp-scrollbar-wrap');
+  const sb          = document.getElementById('tp-scrollbar');
+
+  let activeField = null;
+  let mode = 'from';
+
+  // 15-min slots 6:00 – 21:00
+  const SLOTS = [];
+  for (let h = 6; h <= 21; h++) {
+    for (let m = 0; m < 60; m += 15) {
+      if (h === 21 && m > 0) break;
+      SLOTS.push(`${h}:${String(m).padStart(2,'0')}`);
+    }
+  }
+
+  function getCurrentVal(field) {
+    return field.querySelector('.val')?.textContent?.replace(/\s*\(.*\)/, '').trim() || '';
+  }
+
+  function updateScrollbar() {
+    const slotH     = 40;
+    const visH      = 200;
+    const totalH    = SLOTS.length * slotH;
+    const scrollTop = pop.scrollTop;
+    const ratio     = visH / totalH;
+    const sbH       = Math.max(30, Math.round(ratio * visH));
+    const sbTop     = Math.round((scrollTop / (totalH - visH)) * (visH - sbH));
+    sb.style.height = sbH + 'px';
+    sb.style.top    = (11 + sbTop) + 'px';
+  }
+
+  function open(field, isFrom) {
+    activeField = field;
+    mode = isFrom ? 'from' : 'to';
+    const curVal = getCurrentVal(field);
+
+    pop.innerHTML = '';
+    SLOTS.forEach(t => {
+      const el = document.createElement('div');
+      el.className = 'tp-opt' + (t === curVal ? ' tp-active' : '');
+      el.textContent = t;
+      el.addEventListener('click', e => { e.stopPropagation(); selectTime(t); });
+      pop.appendChild(el);
+    });
+
+    const rect = field.getBoundingClientRect();
+    const popW = 156;
+    let left   = rect.left;
+    if (left + popW > window.innerWidth - 8) left = rect.right - popW;
+    if (left < 8) left = 8;
+    const top = rect.bottom + 4;
+
+    pop.style.left    = left + 'px';
+    pop.style.top     = top  + 'px';
+    sbWrap.style.left = left + 'px';
+    sbWrap.style.top  = top  + 'px';
+    sbWrap.style.width  = popW + 'px';
+    sbWrap.style.height = '200px';
+
+    pop.classList.add('dp-open');
+    backdrop.classList.add('dp-open');
+    sbWrap.classList.add('dp-open');
+    field.classList.add('dp-focused');
+
+    // Scroll active slot to center
+    requestAnimationFrame(() => {
+      const active = pop.querySelector('.tp-active');
+      if (active) {
+        const idx   = SLOTS.indexOf(curVal);
+        const slotH = 40;
+        const center = idx * slotH - 200 / 2 + slotH / 2;
+        pop.scrollTop = Math.max(0, center);
+      }
+      updateScrollbar();
+    });
+
+    pop.addEventListener('scroll', updateScrollbar);
+  }
+
+  function selectTime(t) {
+    if (!activeField) return;
+    const tg = activeField.closest('.time-group');
+
+    if (mode === 'from') {
+      const fromVal = activeField.querySelector('.val');
+      if (fromVal) fromVal.textContent = t;
+
+      // Auto-set Do = Od + 1h
+      const [h, m] = t.split(':').map(Number);
+      const toMin  = h * 60 + m + 60;
+      const toStr  = `${Math.floor(toMin / 60)}:${String(toMin % 60).padStart(2,'0')}`;
+      const fields = tg?.querySelectorAll('.input-field.select-field');
+      if (fields && fields.length >= 2) {
+        const toVal = fields[1].querySelector('.val');
+        if (toVal) toVal.innerHTML = `${toStr} <span class="lbl-sfx">(1h)</span>`;
+      }
+    } else {
+      const toVal = activeField.querySelector('.val');
+      if (toVal) toVal.innerHTML = `${t} <span class="lbl-sfx"></span>`;
+    }
+    close();
+  }
+
+  function close() {
+    pop.classList.remove('dp-open');
+    backdrop.classList.remove('dp-open');
+    sbWrap.classList.remove('dp-open');
+    if (activeField) activeField.classList.remove('dp-focused');
+    activeField = null;
+  }
+
+  backdrop.addEventListener('click', close);
+
+  document.addEventListener('click', e => {
+    const field = e.target.closest('.time-group .input-field.select-field');
+    if (!field) return;
+    e.stopPropagation();
+    const fields = field.closest('.time-group')?.querySelectorAll('.input-field.select-field');
+    const isFrom = fields && field === fields[0];
+    open(field, isFrom);
+  });
+})();
 </script>
 
 </body>

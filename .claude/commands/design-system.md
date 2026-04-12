@@ -14,6 +14,11 @@
 ## Компоненты
 
 - [Quick Input](design-system/components/quick-input.md) — попап быстрого ввода (`qi-pop`, `screen-qi`)
+- [Button](design-system/components/button.md) — кнопки (Primary, Secondary, Tertiary, Delite), размеры L/S
+- [Input](design-system/components/input.md) — текстовые поля, поиск, floating label (Figma 7665:13616)
+- [Select](design-system/components/select.md) — выпадающий список, dropdown
+- [Textarea](design-system/components/textarea.md) — многострочный ввод, счётчик символов
+- [Switch](design-system/components/switch.md) — переключатель on/off/null
 
 ## Токены
 

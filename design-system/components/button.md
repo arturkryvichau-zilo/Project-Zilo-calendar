@@ -35,6 +35,22 @@
 |------|--------|---------|-----------|---------------|
 | L | `46px` | `12px 18px` | `16px` | `8px` |
 | S | `36px` | `7px 14px` | `14px` | `8px` |
+| XS (chip) | `auto` | `4px 10px` | `14px` | `4px` |
+
+### XS (chip) — Figma `1083:298498`
+
+Используется для inline-действий внутри форм ("Dodaj nowego klienta").
+
+| Токен | Значение |
+|-------|----------|
+| bg default | `#F3F3FF` |
+| bg hover | `#D5D7F8` |
+| text | `#222693` |
+| border-radius | `4px` |
+| padding | `4px 10px` |
+| gap (icon + text) | `4px` |
+| icon | `20×20px`, `stroke: #222693` |
+| font | `14px / 22px Regular` |
 
 ## CSS классы (в проекте)
 
@@ -44,8 +60,23 @@
 .dm-btn--secondary       — Secondary
 .dm-btn--tertiary        — Tertiary
 .dm-btn--delite          — Tertiary Delite
-.dm-btn--sm              — Size S
+.dm-btn--sm              — Size S (36px)
 .dm-btn--disabled        — Disabled state
+
+Inline / chip variant (Tertiary XS):
+.btn-add-client-inline   — tertiary chip (4px 10px, radius 4px, 14px)
+```
+
+## Пример XS кнопки
+
+```html
+<button class="btn-add-client-inline" type="button">
+  <svg viewBox="0 0 20 20">
+    <line x1="10" y1="4" x2="10" y2="16"/>
+    <line x1="4" y1="10" x2="16" y2="10"/>
+  </svg>
+  Dodaj nowego klienta
+</button>
 ```
 
 ## Типографика
