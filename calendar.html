@@ -930,36 +930,42 @@
        DS BUTTON  (Figma: Button/Main/Desktop)
        h=56 | radius=10 | padding=14 26 | font=18px Rubik 400
     ═══════════════════════════════════ */
+    /* ── Buttons (Zilo Design System) ── */
     .dm-btn {
       display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-      height: 46px; padding: 12px 26px;
-      border-radius: 8px;
-      font-family: 'Rubik', sans-serif; font-size: 16px; font-weight: 400;
-      cursor: pointer; border: none; outline: none;
-      transition: background 140ms, color 140ms;
-      text-decoration: none; white-space: nowrap;
+      height: 46px; padding: 12px 18px;
+      border-radius: 8px; border: none; outline: none;
+      font-family: 'Rubik', sans-serif; font-size: 16px; font-weight: 400; line-height: 22px;
+      cursor: pointer; text-decoration: none; white-space: nowrap;
+      transition: background 140ms, color 140ms, border-color 140ms, opacity 140ms;
     }
-    /* Primary: #222693 | hover darker | disabled #d3e2f9 */
-    .dm-btn--primary {
-      background: #222693; color: #ffffff; width: 100%;
+    .dm-btn--sm {
+      height: 36px; padding: 7px 14px; font-size: 14px;
     }
-    .dm-btn--primary:hover  { background: #1a1e7a; }
-    .dm-btn--primary:active { background: #1a1e7a; }
-    .dm-btn--primary:disabled { background: #d3e2f9; color: #ffffff; pointer-events: none; }
-    /* Secondary: bg white, text #2470e0, border | hover text #1458bc */
-    .dm-btn--secondary {
-      background: #ffffff; color: #222693;
-      border: 1.5px solid #222693;
-    }
-    .dm-btn--secondary:hover  { color: #1a1e7a; border-color: #1a1e7a; }
-    .dm-btn--secondary:disabled { color: #d3e2f9; border-color: #d3e2f9; pointer-events: none; }
-    /* Secondary2 / ghost: bg #f0f1f5, text #222693 | hover bg #e9ecf1 text #1a1e7a */
-    .dm-btn--ghost {
-      background: #f0f1f5; color: #222693;
-      border: none;
-    }
-    .dm-btn--ghost:hover { background: #e9ecf1; color: #1a1e7a; }
-    .dm-btn--ghost:disabled { background: #fafafa; color: #d3e2f9; pointer-events: none; }
+    /* Primary */
+    .dm-btn--primary { background: #222693; color: #fff; }
+    .dm-btn--primary:hover   { background: #1D207C; }
+    .dm-btn--primary:active  { background: #1D207C; }
+    .dm-btn--primary:disabled, .dm-btn--primary.dm-btn--disabled { background: #D5D7F8; color: #fff; pointer-events: none; }
+    /* Secondary */
+    .dm-btn--secondary { background: transparent; color: #222693; border: 1.5px solid #222693; }
+    .dm-btn--secondary:hover  { color: #1D207C; border-color: #1D207C; }
+    .dm-btn--secondary:active { color: #1D207C; border-color: #1D207C; }
+    .dm-btn--secondary:disabled, .dm-btn--secondary.dm-btn--disabled { color: #D5D7F8; border-color: #D5D7F8; pointer-events: none; }
+    /* Tertiary */
+    .dm-btn--tertiary { background: #F3F3FF; color: #222693; }
+    .dm-btn--tertiary:hover  { background: #D5D7F8; color: #1D207C; }
+    .dm-btn--tertiary:active { background: #D5D7F8; color: #1D207C; }
+    .dm-btn--tertiary:disabled, .dm-btn--tertiary.dm-btn--disabled { background: #F6F6FC; color: #D5D7F8; pointer-events: none; }
+    /* Tertiary Delite (destructive) */
+    .dm-btn--delite { background: #FEE9E5; color: #EA4335; }
+    .dm-btn--delite:hover  { background: #FFDED7; color: #EA4335; }
+    .dm-btn--delite:active { background: #FFDED7; color: #EA4335; }
+    .dm-btn--delite:disabled, .dm-btn--delite.dm-btn--disabled { background: #FFF3F3; color: #F9C0BB; pointer-events: none; }
+    /* Ghost (back-compat alias for Tertiary) */
+    .dm-btn--ghost { background: #F3F3FF; color: #222693; }
+    .dm-btn--ghost:hover  { background: #D5D7F8; color: #1D207C; }
+    .dm-btn--ghost:disabled { background: #F6F6FC; color: #D5D7F8; pointer-events: none; }
 
     /* back-compat */
     .btn-primary { width: 100%; }
