@@ -570,19 +570,39 @@
     .qi-pop-voice { font-size: 13px; color: #ea4335; text-align: center; min-height: 14px; font-weight: 500; padding: 2px 10px 0; font-family: 'Rubik', sans-serif; }
 
     /* ── Photo strip (qi-pop + Szczegóły) ── */
-    .qp-photo-strip { display: none; flex-wrap: wrap; gap: 6px; padding: 8px 13px 0; }
+    .qp-photo-strip { display: none; flex-wrap: wrap; gap: 6px; padding: 8px 8px 0; }
     .qp-photo-strip.has-photos { display: flex; }
-    .qp-thumb { position: relative; display: inline-block; flex-shrink: 0; }
-    .qp-thumb img { width: 64px; height: 64px; object-fit: cover; border-radius: 8px; border: 1px solid var(--grey5); display: block; }
-    .qp-thumb__del {
-      position: absolute; top: -5px; right: -5px; width: 18px; height: 18px; border-radius: 50%;
-      background: var(--grey2); color: #fff; border: none; cursor: pointer;
-      font-size: 11px; line-height: 1; display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 1px 3px rgba(0,0,0,.25);
+
+    /* Horizontal chip: [thumbnail | filename | ×] */
+    .qp-photo-chip {
+      display: flex; align-items: center; flex: 1; min-width: 140px;
+      border: 1px solid var(--grey5); border-radius: 8px;
+      overflow: hidden; background: #fff; height: 44px;
     }
-    /* Szczegóły photo strip reuses same classes, no extra padding */
-    .szcz-photo-strip { display: none; flex-wrap: wrap; gap: 6px; padding: 4px 0 2px; }
+    .qp-photo-chip__thumb {
+      width: 44px; height: 44px; flex-shrink: 0; object-fit: cover;
+    }
+    .qp-photo-chip__name {
+      flex: 1; padding: 0 8px;
+      font-size: 13px; color: var(--grey2); font-family: 'Rubik', sans-serif;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .qp-photo-chip__del {
+      width: 32px; height: 44px; border: none; background: none;
+      cursor: pointer; color: var(--grey3); font-size: 16px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      transition: color 150ms;
+    }
+    .qp-photo-chip__del:hover { color: var(--ds-error); }
+
+    /* Szczegóły photo strip — between toolbar and textarea */
+    .szcz-photo-strip {
+      display: none; flex-wrap: wrap; gap: 6px;
+      padding: 6px 10px 6px; border-top: 1px solid var(--grey4); order: 1;
+    }
     .szcz-photo-strip.has-photos { display: flex; }
+    /* ensure textarea always stays below the strip */
+    #szcz-textarea { order: 2; }
 
     /* ── Quick Input (Figma design) ── */
     .qi-comp { display: flex; flex-direction: column; }
@@ -1329,6 +1349,7 @@
        focus 2px #222693 | disabled #E9ECF1
     ═══════════════════════════════════ */
     .dm-textarea-wrap {
+      display: flex; flex-direction: column;
       background: #ffffff;
       border: 1px solid #979db0;
       border-radius: 12px;
@@ -2272,8 +2293,8 @@
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="9" y1="6" x2="20" y2="6"/><line x1="9" y1="12" x2="20" y2="12"/><line x1="9" y1="18" x2="20" y2="18"/><circle cx="4" cy="6" r="1.5" fill="currentColor" stroke="none"/><circle cx="4" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="4" cy="18" r="1.5" fill="currentColor" stroke="none"/></svg>
           </button>
         </div>
-        <textarea id="szcz-textarea" class="dm-textarea dm-textarea--opt" placeholder="np. Klient prosi o olej marki XYZ"></textarea>
         <div id="szcz-photo-strip" class="szcz-photo-strip"></div>
+        <textarea id="szcz-textarea" class="dm-textarea dm-textarea--opt" placeholder="np. Klient prosi o olej marki XYZ"></textarea>
       </div>
     </div>
 
@@ -2728,17 +2749,30 @@
     } else {
       openPanel('form');
     }
-    // Copy photos to Szczegóły strip
+    // Copy photos to Szczegóły strip with delete buttons
     const szczStrip = document.getElementById('szcz-photo-strip');
     if (szczStrip) {
       szczStrip.innerHTML = '';
-      _qiPhotos.forEach(p => {
-        const wrap = document.createElement('div');
-        wrap.className = 'qp-thumb';
-        wrap.innerHTML = `<img src="${p.url}" alt="${p.name}">`;
-        szczStrip.appendChild(wrap);
-      });
-      szczStrip.classList.toggle('has-photos', _qiPhotos.length > 0);
+      // Work from a local copy so deletions only affect the strip
+      const stripPhotos = _qiPhotos.map(p => ({ url: p.url, name: p.name }));
+      function renderSzczStrip() {
+        szczStrip.innerHTML = '';
+        stripPhotos.forEach((p, idx) => {
+          const chip = document.createElement('div');
+          chip.className = 'qp-photo-chip';
+          chip.innerHTML = `
+            <img class="qp-photo-chip__thumb" src="${p.url}" alt="${p.name}">
+            <span class="qp-photo-chip__name">${p.name}</span>
+            <button class="qp-photo-chip__del" type="button" title="Usuń zdjęcie">×</button>`;
+          chip.querySelector('.qp-photo-chip__del').addEventListener('click', () => {
+            stripPhotos.splice(idx, 1);
+            renderSzczStrip();
+          });
+          szczStrip.appendChild(chip);
+        });
+        szczStrip.classList.toggle('has-photos', stripPhotos.length > 0);
+      }
+      renderSzczStrip();
     }
     hideQiPop();
   });
@@ -2787,16 +2821,18 @@
     if (!strip) return;
     strip.innerHTML = '';
     _qiPhotos.forEach((p, idx) => {
-      const wrap = document.createElement('div');
-      wrap.className = 'qp-thumb';
-      wrap.innerHTML = `<img src="${p.url}" alt="${p.name}">
-        <button class="qp-thumb__del" type="button" title="Usuń zdjęcie">×</button>`;
-      wrap.querySelector('.qp-thumb__del').addEventListener('click', () => {
+      const chip = document.createElement('div');
+      chip.className = 'qp-photo-chip';
+      chip.innerHTML = `
+        <img class="qp-photo-chip__thumb" src="${p.url}" alt="${p.name}">
+        <span class="qp-photo-chip__name">${p.name}</span>
+        <button class="qp-photo-chip__del" type="button" title="Usuń zdjęcie">×</button>`;
+      chip.querySelector('.qp-photo-chip__del').addEventListener('click', () => {
         URL.revokeObjectURL(_qiPhotos[idx].url);
         _qiPhotos.splice(idx, 1);
         _qpRenderStrip();
       });
-      strip.appendChild(wrap);
+      strip.appendChild(chip);
     });
     strip.classList.toggle('has-photos', _qiPhotos.length > 0);
   }
