@@ -2580,22 +2580,6 @@
   });
 
   // ── Slot hover button ──
-          else interim += e.results[i][0].transcript;
-        }
-        const ta = document.getElementById('qi-pop-ta');
-        if (ta) ta.value = qpFinal + interim;
-        if (qpVoiceStatus) qpVoiceStatus.textContent = interim ? `💬 ${interim}` : '🎙 Słucham...';
-      };
-      qpRec.onerror = () => { if (qpVoiceStatus) qpVoiceStatus.textContent = ''; qpListening = false; qpMicBtn.classList.remove('mic-active'); };
-      qpRec.onend = () => { if (qpListening) qpRec.start(); };
-      qpMicBtn.addEventListener('click', () => {
-        if (qpListening) { qpListening = false; qpMicBtn.classList.remove('mic-active'); if (qpVoiceStatus) qpVoiceStatus.textContent = ''; qpRec.stop(); }
-        else { const ta = document.getElementById('qi-pop-ta'); qpFinal = ta ? ta.value : ''; qpRec.start(); }
-      });
-    }
-  }
-
-  // ── Slot hover button ──
   const slotHoverBtn = document.createElement('button');
   slotHoverBtn.className = 'slot-hover-btn';
   slotHoverBtn.innerHTML = `<svg viewBox="0 0 16 16"><line x1="8" y1="2" x2="8" y2="14"/><line x1="2" y1="8" x2="14" y2="8"/></svg> Dodaj wizytę`;
