@@ -5328,5 +5328,83 @@
 })();
 </script>
 
+<!-- ── Useberry field tracking — Version A (Supabase) ── -->
+<script>
+(function () {
+  const SB_URL = 'https://nmvlwwtovfoookpmtnmx.supabase.co/rest/v1/field_tracking';
+  const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5tdmx3d3RvdmZvb29rcG10bm14Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU4MTcxNzcsImV4cCI6MjA5MTM5MzE3N30.4Ou0539banMOKTZmtAD8j_ZUo3kWpjzn49sDZpCrhuI';
+
+  // session_id — prefiks A_ żeby odróżnić od wersji B
+  let sid = sessionStorage.getItem('zilo_sid_a');
+  if (!sid) {
+    sid = 'A_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
+    sessionStorage.setItem('zilo_sid_a', sid);
+  }
+
+  function track(fieldName, fieldValue) {
+    if (!fieldValue || !fieldValue.trim()) return;
+    try {
+      fetch(SB_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type':  'application/json',
+          'apikey':        SB_KEY,
+          'Authorization': 'Bearer ' + SB_KEY,
+          'Prefer':        'return=minimal'
+        },
+        body: JSON.stringify({
+          session_id:  sid,
+          field_name:  fieldName,
+          field_value: fieldValue.trim()
+        })
+      });
+    } catch (_) { /* silent fail */ }
+  }
+
+  // Pola blur
+  const BLUR_FIELDS = {
+    'qi-pop-ta':     'quick_input',      // Quick Input (wersja A)
+    'service-input': 'service_name',
+    'szcz-textarea': 'szczegoly',
+    'qa-phone':      'pojazd_telefon',
+    'qa-brand':      'pojazd_marka',
+    'qa-model':      'pojazd_model',
+    'qa-vin':        'pojazd_vin',
+    'qa-plate':      'pojazd_rejestracja',
+    'qa-year':       'pojazd_rocznik',
+    'qa-email':      'pojazd_email',
+  };
+
+  // search-input: pole czyszczone przed blur → zapamiętaj ostatnią wartość
+  let _lastSearch = '';
+
+  function attachSearchTracking() {
+    const el = document.getElementById('search-input');
+    if (!el || el.dataset.tracked) return;
+    el.dataset.tracked = '1';
+    el.addEventListener('input', () => {
+      if (el.value.trim()) _lastSearch = el.value.trim();
+    });
+    el.addEventListener('blur', () => {
+      if (_lastSearch) { track('search_client', _lastSearch); _lastSearch = ''; }
+    });
+  }
+
+  // Obserwuj DOM — qi-pop i panel są tworzone dynamicznie
+  const observer = new MutationObserver(() => {
+    Object.entries(BLUR_FIELDS).forEach(([id, name]) => {
+      const el = document.getElementById(id);
+      if (el && !el.dataset.tracked) {
+        el.addEventListener('blur', () => track(name, el.value));
+        el.dataset.tracked = '1';
+      }
+    });
+    attachSearchTracking();
+  });
+  observer.observe(document.body, { childList: true, subtree: true });
+  attachSearchTracking();
+})();
+</script>
+
 </body>
 </html>

@@ -4895,10 +4895,10 @@
   const SB_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5tdmx3d3RvdmZvb29rcG10bm14Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU4MTcxNzcsImV4cCI6MjA5MTM5MzE3N30.4Ou0539banMOKTZmtAD8j_ZUo3kWpjzn49sDZpCrhuI';
 
   // session_id — unikalny per karta przeglądarki
-  let sid = sessionStorage.getItem('zilo_sid');
+  let sid = sessionStorage.getItem('zilo_sid_b');
   if (!sid) {
-    sid = Date.now() + '_' + Math.random().toString(36).slice(2, 8);
-    sessionStorage.setItem('zilo_sid', sid);
+    sid = 'B_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
+    sessionStorage.setItem('zilo_sid_b', sid);
   }
 
   function track(fieldName, fieldValue) {
