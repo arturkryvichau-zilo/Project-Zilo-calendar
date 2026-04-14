@@ -1823,6 +1823,7 @@
     <div class="cal-filter-bar" id="cal-filter-bar">
       <button class="filter-chip active" data-station="all">Wszystkie</button>
       <button class="filter-chip" data-station="Opony i wulkanizacja">Opony i wulkanizacja</button>
+      <button class="filter-chip" data-station="Olej">Olej</button>
       <button class="filter-chip" data-station="Mechanika i usterki">Mechanika i usterki</button>
       <button class="filter-chip" data-station="Klimatyzacja">Klimatyzacja</button>
       <button class="filter-chip" data-station="Hamulce">Hamulce</button>
@@ -1842,12 +1843,20 @@
               <span class="badge-hours">8:00 – 16:30</span>
             </div>
           </div>
+          <!-- Temporal: Olej -->
+          <div class="col-header">
+            <div class="col-header__name">Olej</div>
+            <div class="col-header__meta">
+              <span class="badge-live"><svg viewBox="0 0 16 11" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="8" cy="5.5" r="1.5" fill="#3bb08f"/><path d="M5.2 2.7a4 4 0 0 0 0 5.6" stroke="#3bb08f" stroke-width="1.4" stroke-linecap="round"/><path d="M10.8 2.7a4 4 0 0 1 0 5.6" stroke="#3bb08f" stroke-width="1.4" stroke-linecap="round"/><path d="M2.4.5a8 8 0 0 0 0 10" stroke="#3bb08f" stroke-width="1.4" stroke-linecap="round"/><path d="M13.6.5a8 8 0 0 1 0 10" stroke="#3bb08f" stroke-width="1.4" stroke-linecap="round"/></svg></span>
+              <span class="badge-hours">8:00 – 17:00</span>
+            </div>
+          </div>
           <!-- Quantity: Mechanika i usterki -->
-          <div class="col-header" id="col-hdr-2">
+          <div class="col-header" id="col-hdr-3">
             <div class="col-header__name">Mechanika i usterki</div>
             <div class="col-header__meta">
               <span class="badge-live"><svg viewBox="0 0 16 11" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="8" cy="5.5" r="1.5" fill="#3bb08f"/><path d="M5.2 2.7a4 4 0 0 0 0 5.6" stroke="#3bb08f" stroke-width="1.4" stroke-linecap="round"/><path d="M10.8 2.7a4 4 0 0 1 0 5.6" stroke="#3bb08f" stroke-width="1.4" stroke-linecap="round"/><path d="M2.4.5a8 8 0 0 0 0 10" stroke="#3bb08f" stroke-width="1.4" stroke-linecap="round"/><path d="M13.6.5a8 8 0 0 1 0 10" stroke="#3bb08f" stroke-width="1.4" stroke-linecap="round"/></svg></span>
-              <span class="badge-count" id="qty-badge-2">0/6</span>
+              <span class="badge-count" id="qty-badge-3">0/6</span>
             </div>
           </div>
           <!-- Temporal: Klimatyzacja -->
@@ -1863,15 +1872,15 @@
             <div class="col-header__name">Hamulce</div>
             <div class="col-header__meta">
               <span class="badge-live"><svg viewBox="0 0 16 11" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="8" cy="5.5" r="1.5" fill="#3bb08f"/><path d="M5.2 2.7a4 4 0 0 0 0 5.6" stroke="#3bb08f" stroke-width="1.4" stroke-linecap="round"/><path d="M10.8 2.7a4 4 0 0 1 0 5.6" stroke="#3bb08f" stroke-width="1.4" stroke-linecap="round"/><path d="M2.4.5a8 8 0 0 0 0 10" stroke="#3bb08f" stroke-width="1.4" stroke-linecap="round"/><path d="M13.6.5a8 8 0 0 1 0 10" stroke="#3bb08f" stroke-width="1.4" stroke-linecap="round"/></svg></span>
-              <span class="badge-count" id="qty-badge-4">0/6</span>
+              <span class="badge-count" id="qty-badge-5">0/6</span>
             </div>
           </div>
           <!-- Quantity: Stanowisko Antykorozyjne -->
-          <div class="col-header" id="col-hdr-5">
+          <div class="col-header" id="col-hdr-6">
             <div class="col-header__name">Stanowisko Antykorozyjne</div>
             <div class="col-header__meta">
               <span class="badge-live"><svg viewBox="0 0 16 11" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="8" cy="5.5" r="1.5" fill="#3bb08f"/><path d="M5.2 2.7a4 4 0 0 0 0 5.6" stroke="#3bb08f" stroke-width="1.4" stroke-linecap="round"/><path d="M10.8 2.7a4 4 0 0 1 0 5.6" stroke="#3bb08f" stroke-width="1.4" stroke-linecap="round"/><path d="M2.4.5a8 8 0 0 0 0 10" stroke="#3bb08f" stroke-width="1.4" stroke-linecap="round"/><path d="M13.6.5a8 8 0 0 1 0 10" stroke="#3bb08f" stroke-width="1.4" stroke-linecap="round"/></svg></span>
-              <span class="badge-count" id="qty-badge-5">0/6</span>
+              <span class="badge-count" id="qty-badge-6">0/6</span>
             </div>
           </div>
         </div>
@@ -1953,36 +1962,11 @@
 
 
             </div>
-            <!-- Col 2: Mechanika i usterki (quantity) -->
-            <div class="cal-col col--quantity" id="cal-col-2"></div>
-            <!-- Col 3: Klimatyzacja (temporal) -->
-            <div class="cal-col col--temporal" id="cal-col-3">
+            <!-- Col 2: Olej (temporal) -->
+            <div class="cal-col col--temporal" id="cal-col-2">
               <div class="col-line col-line--major"></div><div class="col-line"></div>
               <div class="col-line col-line--major"></div><div class="col-line"></div>
               <div class="col-line col-line--major"></div><div class="col-line"></div>
-              <div class="col-line col-line--major"></div><div class="col-line"></div>
-              <div class="col-line col-line--major"></div><div class="col-line"></div>
-              <div class="col-line col-line--major"></div><div class="col-line"></div>
-              <div class="col-line col-line--major"></div><div class="col-line"></div>
-              <div class="col-line col-line--major"></div><div class="col-line"></div>
-              <div class="col-line col-line--major"></div><div class="col-line"></div>
-              <div class="col-line col-line--major"></div><div class="col-line"></div>
-              <div class="col-line col-line--major"></div><div class="col-line"></div>
-              <div class="col-line col-line--major"></div><div class="col-line"></div>
-              <div class="col-line col-line--major"></div><div class="col-line"></div>
-              <div class="col-line col-line--major"></div><div class="col-line"></div>
-              <div class="col-line col-line--major"></div><div class="col-line"></div>
-              <div class="col-line col-line--major"></div><div class="col-line"></div>
-              <div class="col-line col-line--major"></div><div class="col-line"></div>
-              <div class="col-line col-line--major"></div><div class="col-line"></div>
-              <div class="col-line col-line--major"></div><div class="col-line"></div>
-              <div class="col-line col-line--major"></div><div class="col-line"></div>
-              <div class="col-line col-line--major"></div><div class="col-line"></div>
-              <div class="col-line col-line--major"></div><div class="col-line"></div>
-
-            </div>
-            <!-- Col 4: Hamulce (quantity) -->
-            <div class="cal-col col--quantity" id="cal-col-4">
               <div class="col-line col-line--major"></div><div class="col-line"></div>
               <div class="col-line col-line--major"></div><div class="col-line"></div>
               <div class="col-line col-line--major"></div><div class="col-line"></div>
@@ -2003,8 +1987,37 @@
               <div class="col-line col-line--major"></div><div class="col-line"></div>
               <div class="col-line col-line--major"></div><div class="col-line"></div>
             </div>
-            <!-- Col 5: Stanowisko Antykorozyjne (quantity) -->
+            <!-- Col 3: Mechanika i usterki (quantity) -->
+            <div class="cal-col col--quantity" id="cal-col-3"></div>
+            <!-- Col 4: Klimatyzacja (temporal) -->
+            <div class="cal-col col--temporal" id="cal-col-4">
+              <div class="col-line col-line--major"></div><div class="col-line"></div>
+              <div class="col-line col-line--major"></div><div class="col-line"></div>
+              <div class="col-line col-line--major"></div><div class="col-line"></div>
+              <div class="col-line col-line--major"></div><div class="col-line"></div>
+              <div class="col-line col-line--major"></div><div class="col-line"></div>
+              <div class="col-line col-line--major"></div><div class="col-line"></div>
+              <div class="col-line col-line--major"></div><div class="col-line"></div>
+              <div class="col-line col-line--major"></div><div class="col-line"></div>
+              <div class="col-line col-line--major"></div><div class="col-line"></div>
+              <div class="col-line col-line--major"></div><div class="col-line"></div>
+              <div class="col-line col-line--major"></div><div class="col-line"></div>
+              <div class="col-line col-line--major"></div><div class="col-line"></div>
+              <div class="col-line col-line--major"></div><div class="col-line"></div>
+              <div class="col-line col-line--major"></div><div class="col-line"></div>
+              <div class="col-line col-line--major"></div><div class="col-line"></div>
+              <div class="col-line col-line--major"></div><div class="col-line"></div>
+              <div class="col-line col-line--major"></div><div class="col-line"></div>
+              <div class="col-line col-line--major"></div><div class="col-line"></div>
+              <div class="col-line col-line--major"></div><div class="col-line"></div>
+              <div class="col-line col-line--major"></div><div class="col-line"></div>
+              <div class="col-line col-line--major"></div><div class="col-line"></div>
+              <div class="col-line col-line--major"></div><div class="col-line"></div>
+            </div>
+            <!-- Col 5: Hamulce (quantity) -->
             <div class="cal-col col--quantity" id="cal-col-5"></div>
+            <!-- Col 6: Stanowisko Antykorozyjne (quantity) -->
+            <div class="cal-col col--quantity" id="cal-col-6"></div>
           </div>
         </div>
       </div>
@@ -4185,6 +4198,14 @@
         const svcEl = document.getElementById('service-input');
         if (svcEl) { svcEl.value = p.service; flash(svcEl); }
         chips.push({ type:'service', text: p.service });
+
+        // Auto-select stanowisko "Olej" for oil-related services
+        const olejKeywords = /olej|oil|wymiana oleju|serwis oleju|filtr oleju|oil change/i;
+        if (olejKeywords.test(p.service) || olejKeywords.test(text)) {
+          const stanVal = document.querySelector('.select-stanowisko .val');
+          if (stanVal) { stanVal.textContent = 'Olej'; flash(stanVal.closest('.input-field')); }
+          selectedStation = 'Olej';
+        }
       }
 
       // 3. Date + time
@@ -4290,6 +4311,7 @@
   // ── Station metadata ──
   const STATION_META = {
     'Opony i wulkanizacja':    { type:'temporal',  hours:'8:00 – 16:30', capacity: null },
+    'Olej':                    { type:'temporal',  hours:'8:00 – 17:00', capacity: null },
     'Mechanika i usterki':     { type:'quantity',  hours:'8:00 – 17:00', capacity: 6 },
     'Klimatyzacja':            { type:'temporal',  hours:'8:00 – 16:00', capacity: null },
     'Hamulce':                 { type:'quantity',  hours:'8:00 – 16:30', capacity: 6 },
@@ -4299,6 +4321,7 @@
   // ── Stanowisko selector ──
   const STANOWISKA = [
     'Opony i wulkanizacja',
+    'Olej',
     'Mechanika i usterki',
     'Klimatyzacja',
     'Hamulce',
@@ -4309,12 +4332,13 @@
   // column map: station name → element id
   const STATION_COL = {
     'Opony i wulkanizacja':       'cal-col-1',
-    'Mechanika i usterki':        'cal-col-2',
-    'Klimatyzacja':               'cal-col-3',
-    'Hamulce':                    'cal-col-4',
-    'Stanowisko Antykorozyjne':   'cal-col-5',
+    'Olej':                       'cal-col-2',
+    'Mechanika i usterki':        'cal-col-3',
+    'Klimatyzacja':               'cal-col-4',
+    'Hamulce':                    'cal-col-5',
+    'Stanowisko Antykorozyjne':   'cal-col-6',
     // legacy aliases
-    'Mechanika ogólna':           'cal-col-2',
+    'Mechanika ogólna':           'cal-col-3',
   };
 
   // ── Stanowisko dropdown helper ──
