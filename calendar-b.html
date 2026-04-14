@@ -2548,6 +2548,9 @@
 
   document.getElementById('open-panel').addEventListener('click', e => {
     e.stopPropagation();
+    selectedStation = STANOWISKA[0];
+    const noweStanValEl = document.getElementById('nowe-stan-val');
+    if (noweStanValEl) noweStanValEl.textContent = selectedStation;
     openPanel('form');
   });
   document.getElementById('close-panel').addEventListener('click', closePanel);
