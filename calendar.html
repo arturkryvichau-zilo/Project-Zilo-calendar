@@ -5390,8 +5390,7 @@
     });
   }
 
-  // Obserwuj DOM — qi-pop i panel są tworzone dynamicznie
-  const observer = new MutationObserver(() => {
+  function attachAllTracking() {
     Object.entries(BLUR_FIELDS).forEach(([id, name]) => {
       const el = document.getElementById(id);
       if (el && !el.dataset.tracked) {
@@ -5400,9 +5399,12 @@
       }
     });
     attachSearchTracking();
-  });
+  }
+
+  // Uruchom od razu + obserwuj nowe elementy (np. qi-pop-ta dodane dynamicznie)
+  attachAllTracking();
+  const observer = new MutationObserver(attachAllTracking);
   observer.observe(document.body, { childList: true, subtree: true });
-  attachSearchTracking();
 })();
 </script>
 

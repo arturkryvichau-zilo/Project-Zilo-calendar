@@ -4954,8 +4954,7 @@
     });
   }
 
-  // Obserwuj DOM — pola mogą pojawić się po otwarciu panelu
-  const observer = new MutationObserver(() => {
+  function attachAllTracking() {
     Object.entries(BLUR_FIELDS).forEach(([id, name]) => {
       const el = document.getElementById(id);
       if (el && !el.dataset.tracked) {
@@ -4964,9 +4963,11 @@
       }
     });
     attachSearchTracking();
-  });
+  }
+
+  attachAllTracking();
+  const observer = new MutationObserver(attachAllTracking);
   observer.observe(document.body, { childList: true, subtree: true });
-  attachSearchTracking(); // też od razu, jeśli element już jest w DOM
 })();
 </script>
 
