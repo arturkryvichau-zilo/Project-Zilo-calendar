@@ -320,7 +320,7 @@
       border-radius: 8px;
       font-family: 'Rubik', sans-serif;
       font-size: 16px;
-      font-weight: 500;
+      font-weight: 400;
       cursor: pointer;
       z-index: 25;
       white-space: nowrap;
@@ -2966,7 +2966,7 @@
   // ── Slot hover button ──
   const slotHoverBtn = document.createElement('button');
   slotHoverBtn.className = 'slot-hover-btn';
-  slotHoverBtn.innerHTML = `<svg viewBox="0 0 14 14"><line x1="7" y1="1" x2="7" y2="13"/><line x1="1" y1="7" x2="13" y2="7"/></svg> Dodaj wizytę`;
+  slotHoverBtn.innerHTML = `<svg viewBox="0 0 16 16"><line x1="8" y1="2" x2="8" y2="14"/><line x1="2" y1="8" x2="14" y2="8"/></svg> Dodaj wizytę`;
   slotHoverBtn.addEventListener('click', e => {
     e.stopPropagation();
     const rect = slotHoverBtn.getBoundingClientRect(); // get BEFORE hiding
