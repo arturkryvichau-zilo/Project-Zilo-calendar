@@ -4921,10 +4921,9 @@
     } catch (_) { /* silent fail */ }
   }
 
-  // Pola do śledzenia: { id elementu → nazwa w tabeli }
-  const FIELDS = {
+  // Pola blur: { id elementu → nazwa w tabeli }
+  const BLUR_FIELDS = {
     'sq-textarea':   'quick_input',
-    'search-input':  'search_client',
     'service-input': 'service_name',
     'szcz-textarea': 'szczegoly',
     'qa-phone':      'pojazd_telefon',
@@ -4936,17 +4935,38 @@
     'qa-email':      'pojazd_email',
   };
 
+  // search-input: pole jest czyszczone przed blur przy wyborze klienta —
+  // zapamiętujemy ostatnią niepustą wartość i wysyłamy ją przy blur
+  let _lastSearch = '';
+
+  function attachSearchTracking() {
+    const el = document.getElementById('search-input');
+    if (!el || el.dataset.tracked) return;
+    el.dataset.tracked = '1';
+    el.addEventListener('input', () => {
+      if (el.value.trim()) _lastSearch = el.value.trim();
+    });
+    el.addEventListener('blur', () => {
+      if (_lastSearch) {
+        track('search_client', _lastSearch);
+        _lastSearch = '';
+      }
+    });
+  }
+
   // Obserwuj DOM — pola mogą pojawić się po otwarciu panelu
   const observer = new MutationObserver(() => {
-    Object.entries(FIELDS).forEach(([id, name]) => {
+    Object.entries(BLUR_FIELDS).forEach(([id, name]) => {
       const el = document.getElementById(id);
       if (el && !el.dataset.tracked) {
         el.addEventListener('blur', () => track(name, el.value));
         el.dataset.tracked = '1';
       }
     });
+    attachSearchTracking();
   });
   observer.observe(document.body, { childList: true, subtree: true });
+  attachSearchTracking(); // też od razu, jeśli element już jest w DOM
 })();
 </script>
 
