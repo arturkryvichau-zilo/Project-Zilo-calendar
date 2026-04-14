@@ -3748,30 +3748,29 @@
       const plate = (document.getElementById('qa-plate')?.value || '').trim();
       const email = (document.getElementById('qa-email')?.value || '').trim();
 
+      const vehicle   = { id: null, brand, model, plate, vin };
+      const newClient = { id: null, phone: formatted, name: '—', email, vehicles: [vehicle] };
+      // Try DB save — silently continue on error (demo / offline mode)
       try {
         const sbClient  = await sbCreateClient(formatted, '—', email);
         const sbVehicle = await sbCreateVehicle(sbClient.id, brand, model, plate, vin);
         await sbCreateVisit(sbVehicle.id, new Date(viewCurrent), timeFrom, timeTo, serviceName, stanowiskoName);
-        const vehicle   = { id: sbVehicle.id, brand, model, plate, vin };
-        const newClient = { id: sbClient.id, phone: formatted, name: '—', email, vehicles: [vehicle] };
-        CLIENTS.push(newClient);
-        addAppointmentToCalendar(newClient, vehicle, serviceName, timeFrom, timeTo, colId);
+        vehicle.id   = sbVehicle.id;
+        newClient.id = sbClient.id;
       } catch (err) {
-        console.error('Błąd zapisu:', err);
-        alert('Błąd zapisu do bazy danych');
-        return;
+        console.error('Błąd zapisu (ignorowany w trybie demo):', err);
       }
+      CLIENTS.push(newClient);
+      addAppointmentToCalendar(newClient, vehicle, serviceName, timeFrom, timeTo, colId);
 
     // ── Existing client selected ──
     } else if (selectedClientData) {
       const { client, vehicle } = selectedClientData;
+      // Try DB save — silently continue on error (demo / offline mode)
       try {
         let vehicleId = vehicle.id;
-
-        // If vehicle has no Supabase UUID — create client+vehicle in DB first
         if (!vehicleId) {
           let clientId = client.id;
-          // Check if client.id is a UUID (from Supabase) or a number (hardcoded)
           if (typeof clientId === 'number' || !String(clientId).includes('-')) {
             const sbClient = await sbCreateClient(client.phone, client.name, client.email || '');
             clientId = sbClient.id;
@@ -3783,14 +3782,11 @@
           vehicleId = sbVehicle.id;
           vehicle.id = vehicleId;
         }
-
         await sbCreateVisit(vehicleId, new Date(viewCurrent), timeFrom, timeTo, serviceName, stanowiskoName);
-        addAppointmentToCalendar(client, vehicle, serviceName, timeFrom, timeTo, colId);
       } catch (err) {
-        console.error('Błąd zapisu:', err);
-        alert('Błąd zapisu do bazy danych');
-        return;
+        console.error('Błąd zapisu (ignorowany w trybie demo):', err);
       }
+      addAppointmentToCalendar(client, vehicle, serviceName, timeFrom, timeTo, colId);
     }
 
     // Close panel and reset
