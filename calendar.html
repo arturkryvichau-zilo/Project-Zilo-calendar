@@ -325,7 +325,7 @@
       z-index: 25;
       white-space: nowrap;
       box-shadow: 0 2px 12px rgba(34,38,147,0.30);
-      transform: translate(-50%, -50%);
+      transform: translateY(-50%);
       pointer-events: auto;
       transition: background 140ms;
     }
@@ -2978,7 +2978,7 @@
       if (col) {
         const lines = Array.from(col.querySelectorAll('.col-line'));
         const lineIdx = lines.indexOf(_hoveredLine);
-        const SLOT_H = 36; // px per 15-min slot
+        const SLOT_H = 52; // px per 15-min slot
         const top = lineIdx * SLOT_H;
         const height = SLOT_H * 4; // 1 hour
 
@@ -3023,8 +3023,11 @@
       clearTimeout(_hoverTimeout);
       _hoveredLine = line;
       const rect = line.getBoundingClientRect();
-      slotHoverBtn.style.top  = (rect.top + rect.height / 2) + 'px';
-      slotHoverBtn.style.left = (rect.left + rect.width / 2) + 'px';
+      const col = line.closest('.cal-col, .week-col');
+      const colRect = col ? col.getBoundingClientRect() : rect;
+      slotHoverBtn.style.top   = (rect.top + rect.height / 2) + 'px';
+      slotHoverBtn.style.left  = (colRect.left + 10) + 'px';
+      slotHoverBtn.style.width = (colRect.width - 20) + 'px';
       slotHoverBtn.style.display = 'flex';
     });
     line.addEventListener('mouseleave', e => {
