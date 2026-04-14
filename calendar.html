@@ -1810,8 +1810,8 @@
       <span class="cal-date" id="cal-date-label">Wtorek, 14 maja</span>
       <div style="flex:1;"></div>
       <div class="view-switcher">
-        <button class="view-btn active" data-view="day">Dzień</button>
-        <button class="view-btn" data-view="week">Tydzień</button>
+        <button class="view-btn" data-view="day">Dzień</button>
+        <button class="view-btn active" data-view="week">Tydzień</button>
         <button class="view-btn" data-view="month">Miesiąc</button>
       </div>
       <!-- Dodaj wizytę in toolbar -->
@@ -1830,7 +1830,7 @@
       <button class="filter-chip" data-station="Stanowisko Antykorozyjne">Stanowisko Antykorozyjne</button>
     </div>
     <div class="cal-main">
-      <div id="view-day" class="view-daily v-active">
+      <div id="view-day" class="view-daily">
       <div class="cal-scroll-area">
         <!-- Headers row -->
         <div class="cal-col-headers">
@@ -2028,7 +2028,7 @@
         </div>
       </div>
       </div><!-- /view-day -->
-      <div id="view-week" class="view-weekly"></div>
+      <div id="view-week" class="view-weekly v-active"></div>
       <div id="view-month" class="view-monthly"></div>
     </div><!-- /cal-main -->
   </div><!-- /cal-card -->
@@ -4449,10 +4449,14 @@
       // Merge: keep demo entries, add real Supabase visits
       const realIds = new Set(visits.map(v => v.id));
       APPOINTMENTS = [...DEMO_APPOINTMENTS.filter(d => !realIds.has(d.id)), ...visits];
-      renderDayView();
+      if (currentView === 'day') renderDayView();
+      else if (currentView === 'week') renderWeekView();
+      else renderMonthView();
     } catch (e) {
       console.error('Supabase init error:', e);
-      renderDayView();
+      if (currentView === 'day') renderDayView();
+      else if (currentView === 'week') renderWeekView();
+      else renderMonthView();
     }
   }
   initSupabase();
@@ -4750,7 +4754,7 @@
   // ════════════════════════════
   const VIEW_TODAY = new Date(2025, 4, 14);
   let viewCurrent = new Date(VIEW_TODAY);
-  let currentView = 'day';
+  let currentView = 'week';
 
   const PL_MONTHS     = ['stycznia','lutego','marca','kwietnia','maja','czerwca','lipca','sierpnia','września','października','listopada','grudnia'];
   const PL_MONTHS_NOM = ['Styczeń','Luty','Marzec','Kwiecień','Maj','Czerwiec','Lipiec','Sierpień','Wrzesień','Październik','Listopad','Grudzień'];
@@ -5011,8 +5015,8 @@
     setTimeout(updateThumb, 100);
   })();
 
-  // Initialize day view on load
-  renderDayView();
+  // Initialize week view on load
+  renderWeekView();
 </script>
 
 <!-- ══════════════════════════════════════
