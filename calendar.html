@@ -5361,9 +5361,8 @@
     } catch (_) { /* silent fail */ }
   }
 
-  // Pola blur
+  // Pola blur (standardowe)
   const BLUR_FIELDS = {
-    'qi-pop-ta':     'quick_input',      // Quick Input (wersja A)
     'service-input': 'service_name',
     'szcz-textarea': 'szczegoly',
     'qa-phone':      'pojazd_telefon',
@@ -5375,22 +5374,35 @@
     'qa-email':      'pojazd_email',
   };
 
+  // qi-pop-ta: wartość jest czyszczona przez hideQiPop() przed blur (przy Enter).
+  // Zapamiętujemy ostatnią wpisaną wartość i wysyłamy przy kliknięciu Submit/Manual
+  // używając capture=true żeby strzelić PRZED głównym handlerem.
+  let _lastQiVal = '';
+  function attachQiTracking() {
+    const ta  = document.getElementById('qi-pop-ta');
+    const sub = document.getElementById('qp-submit');
+    const man = document.getElementById('qp-manual');
+    if (!ta || ta.dataset.qiTracked) return;
+    ta.dataset.qiTracked = '1';
+    ta.addEventListener('input', () => { if (ta.value.trim()) _lastQiVal = ta.value.trim(); });
+    const sendQi = () => { if (_lastQiVal) { track('quick_input', _lastQiVal); _lastQiVal = ''; } };
+    sub?.addEventListener('click', sendQi, true); // capture — przed hideQiPop
+    man?.addEventListener('click', sendQi, true);
+    ta.addEventListener('blur',   sendQi);        // fallback gdy kliknie poza pop-up
+  }
+
   // search-input: pole czyszczone przed blur → zapamiętaj ostatnią wartość
   let _lastSearch = '';
-
   function attachSearchTracking() {
     const el = document.getElementById('search-input');
     if (!el || el.dataset.tracked) return;
     el.dataset.tracked = '1';
-    el.addEventListener('input', () => {
-      if (el.value.trim()) _lastSearch = el.value.trim();
-    });
-    el.addEventListener('blur', () => {
-      if (_lastSearch) { track('search_client', _lastSearch); _lastSearch = ''; }
-    });
+    el.addEventListener('input', () => { if (el.value.trim()) _lastSearch = el.value.trim(); });
+    el.addEventListener('blur',  () => { if (_lastSearch) { track('search_client', _lastSearch); _lastSearch = ''; } });
   }
 
   function attachAllTracking() {
+    attachQiTracking();
     Object.entries(BLUR_FIELDS).forEach(([id, name]) => {
       const el = document.getElementById(id);
       if (el && !el.dataset.tracked) {
