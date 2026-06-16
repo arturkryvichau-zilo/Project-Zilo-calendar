@@ -6093,6 +6093,14 @@
         assignee: (a && a.assignee) || null
       });
     }
+    // Reset to 'Szczegóły zlecenia' tab on every modal open, regardless of
+    // which tab was active when the modal was last closed.
+    scope.querySelectorAll('.tab').forEach(t => t.classList.remove('tab--active'));
+    const defaultTab = scope.querySelector('.tab[data-tab="szczegoly"]');
+    if (defaultTab) defaultTab.classList.add('tab--active');
+    scope.querySelectorAll('.tab-panel').forEach(p => {
+      p.hidden = p.dataset.tabPanel !== 'szczegoly';
+    });
     scope.hidden = false;
     document.body.classList.add("vd-modal-open");
   }
@@ -6358,7 +6366,7 @@
       id: 'z' + (state.nextId++),
       name: '',
       personId: null,
-      unit: 'czas',
+      unit: 'sztuka',
       qty: null,
       unitNet: null,
       done: false,
