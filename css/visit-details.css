@@ -962,16 +962,6 @@ code, pre, .mono {
   color: var(--zilo-primary);
   border-bottom-color: var(--zilo-primary);
 }
-.tab__notif-dot {
-  position: absolute;
-  top: 14px;
-  right: -8px;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #EA4335;
-}
-
 /* Detail rows in main */
 .detail-row {
   padding: 20px 4px;
