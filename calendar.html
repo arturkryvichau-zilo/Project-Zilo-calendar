@@ -321,7 +321,7 @@
     /* Sticky header row inside scroll */
     .cal-col-headers {
       display: flex;
-      border-bottom: 1px solid var(--grey5);
+      border-bottom: 1px solid var(--grey4);
       flex-shrink: 0;
       position: sticky;
       top: 0;
@@ -341,7 +341,7 @@
       width: var(--col-w);
       flex-shrink: 0;
       padding: 10px 14px;
-      border-left: 1px solid var(--grey5);
+      border-left: 1px solid var(--grey4);
     }
     .col-header__name { font-size: 13px; font-weight: 500; color: var(--black); margin-bottom: 4px; }
     .col-header__meta { display: flex; align-items: center; gap: 8px; }
@@ -371,10 +371,10 @@
     .cal-col {
       width: var(--col-w);
       flex-shrink: 0;
-      border-left: 1px solid var(--grey5);
+      border-left: 1px solid var(--grey4);
       position: relative;
     }
-    .col-line { height: 52px; border-bottom: 1px solid var(--grey5); position: relative; }
+    .col-line { height: 52px; border-bottom: 1px solid var(--grey4); position: relative; }
     .col-line--major { border-bottom-color: var(--grey4); }
 
     /* Hover add-visit button on time slot */
@@ -607,14 +607,14 @@
     }
     .wk-col {
       flex: 1; min-width: 120px; display: flex; flex-direction: column;
-      border-right: 1px solid var(--grey5);
+      border-right: 1px solid var(--grey4);
     }
     .wk-col:last-child { border-right: none; }
     .wk-col.wk-weekend { background: #F3F4F8; }
     .wk-col-head {
       display: flex; align-items: center; gap: 6px;
       padding: 10px 12px 10px;
-      border-bottom: 1px solid var(--grey5);
+      border-bottom: 1px solid var(--grey4);
       flex-shrink: 0;
     }
     .wk-col-head__label {
@@ -916,10 +916,10 @@
     .week-col { position: relative; }
 
     /* ── Monthly view ── */
-    .month-dow-header { display: grid; grid-template-columns: repeat(7, 1fr); border-bottom: 1px solid var(--grey5); flex-shrink: 0; }
+    .month-dow-header { display: grid; grid-template-columns: repeat(7, 1fr); border-bottom: 1px solid var(--grey4); flex-shrink: 0; }
     .month-dow-cell { padding: 10px 0 8px; text-align: center; font-size: 11px; font-weight: 500; color: var(--grey3); text-transform: uppercase; letter-spacing: .05em; }
     .month-grid { flex: 1; display: grid; grid-template-columns: repeat(7, 1fr); grid-auto-rows: minmax(110px, 1fr); overflow-y: auto; }
-    .month-cell { border-right: 1px solid var(--grey5); border-bottom: 1px solid var(--grey5); padding: 6px 8px; cursor: pointer; transition: background 120ms; overflow: hidden; }
+    .month-cell { border-right: 1px solid var(--grey4); border-bottom: 1px solid var(--grey4); padding: 6px 8px; cursor: pointer; transition: background 120ms; overflow: hidden; }
     .month-cell:hover { background: #f8f8ff; }
     .month-cell.mc-today { background: #f0f0ff; }
     .month-cell.mc-other { opacity: .45; }
@@ -5936,7 +5936,7 @@
           <span class="tab__notif-dot"></span>
         </div>
         <div class="tab" style="font-weight: 400">
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="5" y="3" width="10" height="14" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M7.5 3.5v-.5a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1v.5" stroke="currentColor" stroke-width="1.5"/><line x1="7.5" y1="8" x2="12.5" y2="8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="7.5" y1="11" x2="12.5" y2="11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="7.5" y1="14" x2="10.5" y2="14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M13.1868 8.44259C13.4184 8.211 13.4184 7.83551 13.1868 7.60392C12.9552 7.37233 12.5797 7.37233 12.3481 7.60392L8.81395 11.1381L7.65189 9.97602C7.4203 9.74443 7.04482 9.74443 6.81323 9.97602C6.58164 10.2076 6.58164 10.5831 6.81323 10.8147L8.39462 12.3961C8.62621 12.6277 9.00169 12.6277 9.23328 12.3961L13.1868 8.44259Z" fill="currentColor"/><path fill-rule="evenodd" clip-rule="evenodd" d="M10 1.5C5.30558 1.5 1.5 5.30558 1.5 10C1.5 14.6944 5.30558 18.5 10 18.5C14.6944 18.5 18.5 14.6944 18.5 10C18.5 5.30558 14.6944 1.5 10 1.5ZM2.68605 10C2.68605 5.96062 5.96062 2.68605 10 2.68605C14.0394 2.68605 17.314 5.96062 17.314 10C17.314 14.0394 14.0394 17.314 10 17.314C5.96062 17.314 2.68605 14.0394 2.68605 10Z" fill="currentColor"/></svg>
           Zadania
         </div>
         <div class="tab" style="font-weight: 400">
@@ -6270,6 +6270,32 @@
   const visitStates = new Map();
   let currentVisitId = null;
 
+  // ─── A/B version (Zadania tab design variants) ───────────────────────────
+  // Two designs coexist in the same module:
+  //   A = current / new (DS-faithful inputs, responsive grid, drag handle,
+  //                       default materialized task, bottom progress bar)
+  //   B = legacy / prod (boxed summary fields, fixed 6-col grid, plain inputs,
+  //                       empty state, single full-width '+ Dodaj zadanie')
+  // Toggle lives in modal at top of Zadania panel. Selection persists in
+  // localStorage so it survives reloads & visit switches.
+  let _zadVersion = (function () {
+    try { return localStorage.getItem('zad-version') === 'B' ? 'B' : 'A'; }
+    catch (_) { return 'A'; }
+  })();
+  // Show A/B toggle ONLY in local development; production (Vercel) gets A only.
+  // Detection: empty hostname = file://; localhost / 127.* / *.local = local dev.
+  const _zadShowToggle = (function () {
+    try {
+      const h = (window.location && window.location.hostname) || '';
+      return h === '' || h === 'localhost' || h === '127.0.0.1' || h.endsWith('.local');
+    } catch (_) { return false; }
+  })();
+  function setZadVersion(v) {
+    _zadVersion = (v === 'B') ? 'B' : 'A';
+    try { localStorage.setItem('zad-version', _zadVersion); } catch (_) {}
+    render();
+  }
+
   function createEmptyState(orderData) {
     const od = orderData || {};
     const s = {
@@ -6281,29 +6307,18 @@
         serviceName: od.serviceName || '',
         estimatedPriceBrutto: (od.estimatedPriceBrutto != null && od.estimatedPriceBrutto > 0)
           ? od.estimatedPriceBrutto
-          : null
+          : null,
+        // assignee = card-level mechanic initials (e.g. 'AK') from APPOINTMENTS[i].assignee.
+        // Used by addTask() to pre-fill personId on the FIRST task added from empty state.
+        assignee: od.assignee || null
       }
     };
     if (s.order.estimatedPriceBrutto != null) {
       s.targetNet = s.order.estimatedPriceBrutto / (1 + VAT);
     }
-    // If visit has a card-level assignee (initials), materialize one task for
-    // that person so the modal mirrors the calendar card on first open.
-    if (od.assignee) {
-      const person = PEOPLE.find(p => p.initials === od.assignee);
-      if (person) {
-        s.tasks.push({
-          id: 'z' + (s.nextId++),
-          name: s.order.serviceName,
-          personId: person.id,
-          unit: 'sztuka',
-          qty: 1,
-          unitNet: null,  // recalcAuto will fill this from targetNet
-          done: false,
-          manual: false
-        });
-      }
-    }
+    // No auto-materialized task — start with empty state.
+    // First addTask() inherits visit context (service name + assignee);
+    // subsequent ones start blank with focus on the name input.
     return s;
   }
 
@@ -6343,7 +6358,7 @@
   }
   function fmtPLN(n)  { return n == null ? '' : n.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' zł'; }
   function fmtQty(n)  { return n == null ? '' : n.toLocaleString('pl-PL', { minimumFractionDigits: 0, maximumFractionDigits: 2 }); }
-  function fmtTime(n) { return n.toLocaleString('pl-PL', { minimumFractionDigits: 0, maximumFractionDigits: 2 }) + ' godz.'; }
+  function fmtTime(n) { return n.toLocaleString('pl-PL', { minimumFractionDigits: 0, maximumFractionDigits: 2 }) + 'h'; }
   function esc(s)     { return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
   // ─── Auto-distribution: runs only in 'from sum' mode ─────────────────────
@@ -6361,19 +6376,35 @@
   }
 
   // ─── Actions ─────────────────────────────────────────────────────────────
+  // addTask special-cases the FIRST task added from empty state:
+  //   - name pre-filled from order.serviceName (service description)
+  //   - personId from order.assignee (if visit card has assignee initials)
+  //   - qty: 1 so recalcAuto can distribute targetNet via this task
+  // For subsequent tasks: blank name, no person, qty: null; focus on name input.
   function addTask() {
+    const isFirst = state.tasks.length === 0;
+    const defaultPerson = (isFirst && state.order && state.order.assignee)
+      ? (PEOPLE.find(p => p.initials === state.order.assignee) || null)
+      : null;
     state.tasks.push({
       id: 'z' + (state.nextId++),
-      name: '',
-      personId: null,
+      name: isFirst ? (state.order.serviceName || '') : '',
+      personId: defaultPerson ? defaultPerson.id : null,
       unit: 'sztuka',
-      qty: null,
+      qty: isFirst ? 1 : null,
       unitNet: null,
       done: false,
       manual: false
     });
     recalcAuto();
     render();
+    // Subsequent tasks: focus newly added row's name input so user types immediately
+    if (!isFirst) {
+      const rows = document.querySelectorAll('#zad-panel .zad-list .zad-row');
+      const lastRow = rows[rows.length - 1];
+      const nameInput = lastRow && lastRow.querySelector('.zad-row__name');
+      if (nameInput) nameInput.focus();
+    }
   }
   function removeTask(id) {
     state.tasks = state.tasks.filter(t => t.id !== id);
@@ -6577,11 +6608,43 @@
     render();
   }
 
-  // ─── Render ──────────────────────────────────────────────────────────────
+  // ─── Render dispatcher (A or B) ──────────────────────────────────────────
+  // Wraps version-specific content in .zad-panel-inner--{a,b} so CSS can
+  // target each layout independently. Toggle UI sits at the top of the
+  // panel, identical for both versions.
   function render() {
     const panel = document.getElementById('zad-panel');
     if (!panel) return;
 
+    // Production gets version A only (no toggle). Local dev sees both via toggle.
+    const effective = _zadShowToggle ? _zadVersion : 'A';
+    const inner = (effective === 'B') ? buildB() : buildA();
+    const toggleHTML = _zadShowToggle
+      ? ('<div class="zad-version-toggle">' +
+          '<span class="zad-version-toggle__label">Wersja zakładki Zadania (tylko lokalnie):</span>' +
+          '<button type="button" class="zad-version-toggle__btn' + (effective === 'A' ? ' is-active' : '') + '" data-ver="A">A</button>' +
+          '<button type="button" class="zad-version-toggle__btn' + (effective === 'B' ? ' is-active' : '') + '" data-ver="B">B</button>' +
+        '</div>')
+      : '';
+    panel.innerHTML =
+      toggleHTML +
+      '<div class="zad-panel-inner zad-panel-inner--' + (effective === 'B' ? 'b' : 'a') + '">' + inner + '</div>';
+
+    // Toggle wiring (no-op on production since no buttons present)
+    panel.querySelectorAll('.zad-version-toggle__btn').forEach(btn => {
+      btn.addEventListener('click', () => setZadVersion(btn.dataset.ver));
+    });
+
+    wireUp();
+    renderAssignedChips();
+    wireEstimatedPriceInput();
+    syncEstimatedPriceInput();
+    if (currentVisitId) visitStates.set(currentVisitId, state);
+    syncCardAssignee();
+  }
+
+  // ─── Build A (current / new design) ──────────────────────────────────────
+  function buildA() {
     const sN = sumNet();
     const sT = sumTime();
     const isTarget = state.targetNet != null;
@@ -6590,7 +6653,78 @@
     const remainder = isTarget ? state.targetNet - sN : 0;
     const overByMore = isTarget && remainder < -0.01;
 
-    panel.innerHTML = (
+    return (
+      '<div class="zad-summary">' +
+        '<div class="ds-field">' +
+          '<input type="text" id="zad-top-net" class="ds-field__input" value="' + esc(fmtPLN(topNet || 0)) + '" placeholder=" ">' +
+          '<label class="ds-field__label" for="zad-top-net">Suma robocizny netto</label>' +
+        '</div>' +
+        '<div class="ds-field">' +
+          '<input type="text" id="zad-top-brutto" class="ds-field__input" value="' + esc(fmtPLN(topBrutto || 0)) + '" placeholder=" ">' +
+          '<label class="ds-field__label" for="zad-top-brutto">Suma robocizny brutto (z VAT 23%)</label>' +
+        '</div>' +
+        '<div class="ds-field ds-field--readonly">' +
+          '<div class="ds-field__input--static">' + esc(fmtTime(sT)) + '</div>' +
+          '<label class="ds-field__label">Łączny czas pracy</label>' +
+        '</div>' +
+      '</div>' +
+
+      (isTarget
+        ? '<div class="zad-remainder">' +
+            '<div class="zad-remainder__bar"><div class="zad-remainder__fill" style="width:' +
+              Math.max(0, Math.min(100, Math.round((sN / state.targetNet) * 100))) + '%' +
+            '"></div></div>' +
+            '<div class="zad-remainder__row">' +
+              '<span>Do rozdzielenia między zadania (netto): <strong class="' +
+                (overByMore ? 'zad-remainder__over' : '') +
+                '">' + esc(fmtPLN(remainder)) + '</strong></span>' +
+              '<button id="zad-clear-target" class="zad-link" type="button">Wróć do sumowania</button>' +
+            '</div>' +
+          '</div>'
+        : '') +
+
+      '<div class="zad-list">' +
+        state.tasks.map(taskRowHTML).join('') +
+        (state.tasks.length === 0 ? '<div class="zad-empty">Brak zadań. Dodaj pierwsze zadanie poniżej.</div>' : '') +
+      '</div>' +
+
+      // Bottom bar — '+ Dodaj zadanie' (left, .btn--ghost) + progress (right)
+      (function () {
+        const total = state.tasks.length;
+        const doneCount = state.tasks.filter(t => t.done).length;
+        const pct = total > 0 ? (doneCount / total) * 100 : 0;
+        return (
+          '<div class="zad-bottom">' +
+            '<button class="btn btn--ghost zad-add-task" id="zad-add-task" type="button" style="font-weight: 400">' +
+              '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" style="width: 20px; height: 20px"><path d="M10 3C10.4035 3 10.7303 3.32702 10.7305 3.73047V9.26953H16.2695C16.673 9.26965 17 9.59653 17 10C17 10.4035 16.673 10.7303 16.2695 10.7305H10.7305V16.2695C10.7303 16.673 10.4035 17 10 17C9.59653 17 9.26965 16.673 9.26953 16.2695V10.7305H3.73047C3.32702 10.7303 3 10.4035 3 10C3 9.59653 3.32702 9.26965 3.73047 9.26953H9.26953V3.73047C9.26965 3.32702 9.59653 3 10 3Z" fill="currentColor"/></svg>' +
+              'Dodaj zadanie' +
+            '</button>' +
+            (total > 0
+              ? '<div class="zad-progress">' +
+                  '<div class="zad-progress__bar"><div class="zad-progress__fill" style="width:' + pct + '%"></div></div>' +
+                  '<span class="zad-progress__text">' + doneCount + '/' + total + ' zadań ukończonych</span>' +
+                '</div>'
+              : '<div></div>') +
+          '</div>'
+        );
+      })()
+    );
+  }
+
+  // ─── Build B (legacy / production design — preserved verbatim from 8b615c8) ──
+  // Reference: commit 8b615c8062629cf488d56dc1e71f5a2a698a06e0
+  // Same shared state model as A; markup uses old class names (.zad-summary-field,
+  // .zad-time-value, .zad-empty, .zad-row__header, .zad-row__fields, .zad-field).
+  function buildB() {
+    const sN = sumNet();
+    const sT = sumTime();
+    const isTarget = state.targetNet != null;
+    const topNet = isTarget ? state.targetNet : sN;
+    const topBrutto = topNet * (1 + VAT);
+    const remainder = isTarget ? state.targetNet - sN : 0;
+    const overByMore = isTarget && remainder < -0.01;
+
+    return (
       '<div class="zad-summary">' +
         '<div class="zad-summary-field">' +
           '<label>Suma robocizny netto</label>' +
@@ -6621,7 +6755,7 @@
         : '') +
 
       '<div class="zad-list">' +
-        state.tasks.map(taskRowHTML).join('') +
+        state.tasks.map(taskRowHTMLB).join('') +
         (state.tasks.length === 0 ? '<div class="zad-empty">Brak zadań. Dodaj pierwsze zadanie poniżej.</div>' : '') +
       '</div>' +
 
@@ -6630,15 +6764,58 @@
         'Dodaj zadanie' +
       '</button>'
     );
+  }
 
-    wireUp();
-    renderAssignedChips();
-    wireEstimatedPriceInput();
-    syncEstimatedPriceInput();
-    // Persist current visit's state (in case state object was reassigned)
-    if (currentVisitId) visitStates.set(currentVisitId, state);
-    // Sync card-level assignee on the appointment + refresh calendar if changed
-    syncCardAssignee();
+  // Build B's task row — old prod markup (header row + 6-column fields grid)
+  function taskRowHTMLB(t) {
+    const lN = lineNet(t);
+    const lB = lineBrutto(t);
+    const peopleOptions = '<option value="">— wybierz —</option>' + PEOPLE.map(p =>
+      '<option value="' + esc(p.id) + '"' + (t.personId === p.id ? ' selected' : '') + '>' + esc(p.name) + '</option>'
+    ).join('');
+    return (
+      '<div class="zad-row' + (t.done ? ' zad-row--done' : '') + '" data-task-id="' + esc(t.id) + '">' +
+        '<div class="zad-row__header">' +
+          '<label class="zad-row__done-wrap">' +
+            '<input type="checkbox" class="zad-row__done"' + (t.done ? ' checked' : '') + '>' +
+            '<span class="zad-row__done-box"><svg viewBox="0 0 14 14"><polyline points="2,7 6,11 12,3" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>' +
+          '</label>' +
+          '<input type="text" class="zad-row__name" value="' + esc(t.name) + '" placeholder="Nazwa zadania...">' +
+          '<button class="zad-row__delete" type="button" title="Usuń zadanie">' +
+            '<svg viewBox="0 0 16 16" fill="none"><path d="M3 4h10M5.5 4V3a1 1 0 011-1h3a1 1 0 011 1v1M6.5 7v5M9.5 7v5M4 4l.6 9a1 1 0 001 1h4.8a1 1 0 001-1L12 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
+          '</button>' +
+        '</div>' +
+        '<div class="zad-row__fields">' +
+          '<div class="zad-field">' +
+            '<label>Osoba</label>' +
+            '<select class="zad-row__person">' + peopleOptions + '</select>' +
+          '</div>' +
+          '<div class="zad-field">' +
+            '<label>Jednostka</label>' +
+            '<select class="zad-row__unit">' +
+              '<option value="czas"'   + (t.unit === 'czas'   ? ' selected' : '') + '>Czas</option>' +
+              '<option value="sztuka"' + (t.unit === 'sztuka' ? ' selected' : '') + '>Sztuka</option>' +
+            '</select>' +
+          '</div>' +
+          '<div class="zad-field">' +
+            '<label>Ilość</label>' +
+            '<input type="text" class="zad-row__qty" value="' + esc(fmtQty(t.qty)) + '" placeholder="—">' +
+          '</div>' +
+          '<div class="zad-field">' +
+            '<label>Cena netto</label>' +
+            '<input type="text" class="zad-row__unit-net" value="' + esc(t.unitNet != null ? fmtPLN(t.unitNet) : '') + '" placeholder="0,00 zł">' +
+          '</div>' +
+          '<div class="zad-field">' +
+            '<label>Suma netto</label>' +
+            '<input type="text" class="zad-row__sum-net" value="' + esc(lN != null ? fmtPLN(lN) : '') + '" placeholder="0,00 zł">' +
+          '</div>' +
+          '<div class="zad-field">' +
+            '<label>Suma brutto</label>' +
+            '<input type="text" class="zad-row__sum-brutto" value="' + esc(lB != null ? fmtPLN(lB) : '') + '" placeholder="0,00 zł">' +
+          '</div>' +
+        '</div>' +
+      '</div>'
+    );
   }
 
   // Card on the calendar shows ONE assignee badge (initials). We pick the first
@@ -6663,57 +6840,82 @@
     }
   }
 
+  // Helper: build a DS-style input field with floating label.
+  // placeholder=" " (single space) keeps :placeholder-shown true when empty.
+  function dsInput(opts) {
+    const cls = opts.cls || '';
+    const value = opts.value != null ? esc(opts.value) : '';
+    const label = esc(opts.label);
+    return (
+      '<div class="ds-field">' +
+        '<input type="text" class="ds-field__input ' + cls + '" value="' + value + '" placeholder=" ">' +
+        '<label class="ds-field__label">' + label + '</label>' +
+      '</div>'
+    );
+  }
+  // Helper: DS-style select field. Selects always have a current value
+  // (or empty-value "placeholder" option), so the label sits on top by default.
+  function dsSelect(opts) {
+    const cls = opts.cls || '';
+    return (
+      '<div class="ds-field ds-field--select">' +
+        '<select class="ds-field__select ' + cls + '">' + opts.optionsHTML + '</select>' +
+        '<label class="ds-field__label">' + esc(opts.label) + '</label>' +
+        '<svg class="ds-field__chevron" viewBox="0 0 12 12" aria-hidden="true"><polyline points="3,4.5 6,8 9,4.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>' +
+      '</div>'
+    );
+  }
+
   function taskRowHTML(t) {
     const lN = lineNet(t);
     const lB = lineBrutto(t);
-    const peopleOptions = PEOPLE.map(p =>
+    const peopleOptions = '<option value="">— wybierz —</option>' + PEOPLE.map(p =>
       '<option value="' + esc(p.id) + '"' + (t.personId === p.id ? ' selected' : '') + '>' + esc(p.name) + '</option>'
     ).join('');
+    const unitOptions =
+      '<option value="czas"'   + (t.unit === 'czas'   ? ' selected' : '') + '>Czas</option>' +
+      '<option value="sztuka"' + (t.unit === 'sztuka' ? ' selected' : '') + '>Sztuka</option>';
+
     return (
       '<div class="zad-row' + (t.done ? ' zad-row--done' : '') + '" data-task-id="' + esc(t.id) + '">' +
-        '<div class="zad-row__header">' +
-          '<label class="zad-row__done-wrap">' +
-            '<input type="checkbox" class="zad-row__done"' + (t.done ? ' checked' : '') + '>' +
-            '<span class="zad-row__done-box"><svg viewBox="0 0 14 14"><polyline points="2,7 6,11 12,3" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>' +
-          '</label>' +
-          '<input type="text" class="zad-row__name" value="' + esc(t.name) + '" placeholder="Nazwa zadania...">' +
-          '<button class="zad-row__delete" type="button" title="Usuń zadanie">' +
-            '<svg viewBox="0 0 16 16" fill="none"><path d="M3 4h10M5.5 4V3a1 1 0 011-1h3a1 1 0 011 1v1M6.5 7v5M9.5 7v5M4 4l.6 9a1 1 0 001 1h4.8a1 1 0 001-1L12 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
-          '</button>' +
+        '<button class="zad-row__drag" type="button" draggable="true" title="Przeciągnij aby zmienić kolejność" aria-label="Zmień kolejność">' +
+          '<svg viewBox="0 0 20 20" fill="none"><path d="M4.49719 7.54453C4.49719 7.2144 4.77356 6.94678 5.11447 6.94678H14.8413C15.1822 6.94678 15.4585 7.2144 15.4585 7.54453C15.4585 7.87466 15.1822 8.14228 14.8413 8.14228H5.11447C4.77356 8.14228 4.49719 7.87466 4.49719 7.54453Z" fill="currentColor"/><path d="M4.49719 10.035C4.49719 9.70491 4.77356 9.43728 5.11447 9.43728H14.8413C15.1822 9.43728 15.4586 9.70491 15.4586 10.035C15.4586 10.3652 15.1822 10.6328 14.8413 10.6328H5.11447C4.77356 10.6328 4.49719 10.3652 4.49719 10.035Z" fill="currentColor"/><path d="M4.49728 12.456C4.49728 12.1258 4.77365 11.8582 5.11456 11.8582H14.8414C15.1823 11.8582 15.4586 12.1258 15.4586 12.456C15.4586 12.7861 15.1823 13.0537 14.8414 13.0537H5.11456C4.77365 13.0537 4.49728 12.7861 4.49728 12.456Z" fill="currentColor"/><path d="M9.75731 1.3458C9.87661 1.1736 10.1312 1.1736 10.2505 1.3458L12.2758 4.26902C12.4136 4.46798 12.2712 4.73987 12.0292 4.73987H7.97864C7.7366 4.73987 7.5942 4.46798 7.73204 4.26902L9.75731 1.3458Z" fill="currentColor"/><path d="M10.2505 18.6552C10.1312 18.8274 9.87661 18.8274 9.75731 18.6552L7.73204 15.732C7.5942 15.533 7.7366 15.2611 7.97864 15.2611H12.0292C12.2712 15.2611 12.4136 15.533 12.2758 15.732L10.2505 18.6552Z" fill="currentColor"/></svg>' +
+        '</button>' +
+        '<label class="zad-row__done-wrap">' +
+          '<input type="checkbox" class="zad-row__done"' + (t.done ? ' checked' : '') + '>' +
+          '<span class="zad-row__done-box"><svg viewBox="0 0 14 14"><polyline points="2,7 6,11 12,3" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>' +
+        '</label>' +
+        // Name field — direct child of .zad-row (sits with checkbox + delete on narrow viewport)
+        '<div class="ds-field zad-field--name">' +
+          '<input type="text" class="ds-field__input zad-row__name" value="' + esc(t.name) + '" placeholder=" ">' +
+          '<label class="ds-field__label">Zadanie</label>' +
         '</div>' +
+        '<button class="zad-row__delete" type="button" title="Usuń zadanie" aria-label="Usuń zadanie">' +
+          '<svg viewBox="0 0 16 16" fill="none"><path d="M3 4h10M5.5 4V3a1 1 0 011-1h3a1 1 0 011 1v1M6.5 7v5M9.5 7v5M4 4l.6 9a1 1 0 001 1h4.8a1 1 0 001-1L12 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
+        '</button>' +
+        // Six fields — wrap to a separate row below on narrow viewport
         '<div class="zad-row__fields">' +
-          '<div class="zad-field">' +
-            '<label>Osoba</label>' +
-            '<select class="zad-row__person">' +
-              '<option value="">— wybierz —</option>' + peopleOptions +
-            '</select>' +
-          '</div>' +
-          '<div class="zad-field">' +
-            '<label>Jednostka</label>' +
-            '<select class="zad-row__unit">' +
-              '<option value="czas"' + (t.unit === 'czas' ? ' selected' : '') + '>Czas</option>' +
-              '<option value="sztuka"' + (t.unit === 'sztuka' ? ' selected' : '') + '>Sztuka</option>' +
-            '</select>' +
-          '</div>' +
-          '<div class="zad-field">' +
-            '<label>Ilość</label>' +
-            '<input type="text" class="zad-row__qty" value="' + esc(fmtQty(t.qty)) + '" placeholder="—">' +
-          '</div>' +
-          '<div class="zad-field">' +
-            '<label>Cena netto</label>' +
-            '<input type="text" class="zad-row__unit-net" value="' + esc(t.unitNet != null ? fmtPLN(t.unitNet) : '') + '" placeholder="0,00 zł">' +
-          '</div>' +
-          '<div class="zad-field">' +
-            '<label>Suma netto</label>' +
-            '<input type="text" class="zad-row__sum-net" value="' + esc(lN != null ? fmtPLN(lN) : '') + '" placeholder="0,00 zł">' +
-          '</div>' +
-          '<div class="zad-field">' +
-            '<label>Suma brutto</label>' +
-            '<input type="text" class="zad-row__sum-brutto" value="' + esc(lB != null ? fmtPLN(lB) : '') + '" placeholder="0,00 zł">' +
-          '</div>' +
+          dsSelect({ cls: 'zad-row__person',   label: 'Osoba',        optionsHTML: peopleOptions }) +
+          dsSelect({ cls: 'zad-row__unit',     label: 'Jednostka',    optionsHTML: unitOptions }) +
+          dsInput({ cls: 'zad-row__qty',       label: 'Ilość',        value: fmtQty(t.qty) }) +
+          dsInput({ cls: 'zad-row__unit-net',  label: 'Cena netto',   value: t.unitNet != null ? fmtPLN(t.unitNet) : '' }) +
+          dsInput({ cls: 'zad-row__sum-net',   label: 'Suma netto',   value: lN != null ? fmtPLN(lN) : '' }) +
+          dsInput({ cls: 'zad-row__sum-brutto',label: 'Suma brutto',  value: lB != null ? fmtPLN(lB) : '' }) +
         '</div>' +
       '</div>'
     );
+  }
+
+  // ─── Drag-and-drop reorder ───────────────────────────────────────────────
+  let _zadDragId = null;
+  function reorderTask(fromId, toId) {
+    if (!fromId || !toId || fromId === toId) return;
+    const fromIdx = state.tasks.findIndex(t => t.id === fromId);
+    const toIdx = state.tasks.findIndex(t => t.id === toId);
+    if (fromIdx < 0 || toIdx < 0) return;
+    const [moved] = state.tasks.splice(fromIdx, 1);
+    state.tasks.splice(toIdx, 0, moved);
+    render();
   }
 
   // ─── Event wiring ────────────────────────────────────────────────────────
@@ -6740,6 +6942,38 @@
       row.querySelector('.zad-row__unit-net')  ?.addEventListener('change', e => editField(id, 'unitNet',   e.target.value));
       row.querySelector('.zad-row__sum-net')   ?.addEventListener('change', e => editField(id, 'sumNet',    e.target.value));
       row.querySelector('.zad-row__sum-brutto')?.addEventListener('change', e => editField(id, 'sumBrutto', e.target.value));
+
+      // Drag-and-drop reorder: handle initiates, row accepts drops
+      const handle = row.querySelector('.zad-row__drag');
+      if (handle) {
+        handle.addEventListener('dragstart', (e) => {
+          _zadDragId = id;
+          row.classList.add('zad-row--dragging');
+          if (e.dataTransfer) {
+            e.dataTransfer.effectAllowed = 'move';
+            try { e.dataTransfer.setData('text/plain', id); } catch (_) {}
+          }
+        });
+        handle.addEventListener('dragend', () => {
+          row.classList.remove('zad-row--dragging');
+          document.querySelectorAll('.zad-row--drop-target').forEach(el => el.classList.remove('zad-row--drop-target'));
+          _zadDragId = null;
+        });
+      }
+      row.addEventListener('dragover', (e) => {
+        if (!_zadDragId || _zadDragId === id) return;
+        e.preventDefault();
+        if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
+        row.classList.add('zad-row--drop-target');
+      });
+      row.addEventListener('dragleave', () => row.classList.remove('zad-row--drop-target'));
+      row.addEventListener('drop', (e) => {
+        if (!_zadDragId || _zadDragId === id) return;
+        e.preventDefault();
+        row.classList.remove('zad-row--drop-target');
+        reorderTask(_zadDragId, id);
+        _zadDragId = null;
+      });
     });
   }
 
