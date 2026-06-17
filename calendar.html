@@ -6388,18 +6388,17 @@
   // ─── Actions ─────────────────────────────────────────────────────────────
   // addTask special-cases the FIRST task added from empty state:
   //   - name pre-filled from order.serviceName (service description)
-  //   - personId from order.assignee (if visit card has assignee initials)
   //   - qty: 1 so recalcAuto can distribute targetNet via this task
-  // For subsequent tasks: blank name, no person, qty: null; focus on name input.
+  // Mechanic is NEVER auto-assigned — even when the calendar card already has
+  // an assignee. User picks the mechanic manually via the task row select or
+  // the left-panel 'Przypisz mechanika' dropdown.
+  // For subsequent tasks: blank name, qty: null; focus on name input.
   function addTask() {
     const isFirst = state.tasks.length === 0;
-    const defaultPerson = (isFirst && state.order && state.order.assignee)
-      ? (PEOPLE.find(p => p.initials === state.order.assignee) || null)
-      : null;
     state.tasks.push({
       id: 'z' + (state.nextId++),
       name: isFirst ? (state.order.serviceName || '') : '',
-      personId: defaultPerson ? defaultPerson.id : null,
+      personId: null,
       unit: 'sztuka',
       qty: isFirst ? 1 : null,
       unitNet: null,
@@ -6841,9 +6840,13 @@
   // Card on the calendar shows ONE assignee badge (initials). We pick the first
   // task with a personId as the visible assignee. When persons change in the
   // modal, write the result back to APPOINTMENTS[i].assignee and re-render the
-  // calendar so the badge updates. Skips re-render when nothing changed.
+  // calendar so the badge updates.
+  // GUARD: when state.tasks is empty (visit just opened, user hasn't acted yet)
+  // do NOT touch appt.assignee — otherwise opening any visit with an existing
+  // card assignee would clear it just because tasks=[] in the modal.
   function syncCardAssignee() {
     if (!currentVisitId || !window.APPOINTMENTS) return;
+    if (state.tasks.length === 0) return;
     const appt = window.APPOINTMENTS.find(a => a.id === currentVisitId);
     if (!appt) return;
     const firstAssigned = state.tasks.find(t => t.personId);
