@@ -6312,9 +6312,8 @@
         assignee: od.assignee || null
       }
     };
-    if (s.order.estimatedPriceBrutto != null) {
-      s.targetNet = s.order.estimatedPriceBrutto / (1 + VAT);
-    }
+    // 'Szacowana cena' is a NOTE ONLY — it doesn't drive targetNet.
+    // The Zadania tab's targetNet is set explicitly via the top Suma fields.
     // No auto-materialized task — start with empty state.
     // First addTask() inherits visit context (service name + assignee);
     // subsequent ones start blank with focus on the name input.
@@ -6360,18 +6359,30 @@
   function fmtTime(n) { return n.toLocaleString('pl-PL', { minimumFractionDigits: 0, maximumFractionDigits: 2 }) + 'h'; }
   function esc(s)     { return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
-  // ─── Auto-distribution: runs only in 'from sum' mode ─────────────────────
-  // rest = targetNet - Σ(manual tasks); split equally among auto (non-manual) tasks.
-  // Manual tasks are NEVER overwritten by this. qty=1, unitNet=each.
+  // ─── Bufor model: 'first-fit' auto-assignment ────────────────────────────
+  // bufor = targetNet - Σ(manual tasks).
+  // The entire bufor is assigned to the FIRST auto (non-manual) task in
+  // document order. All other auto tasks stay empty (qty=null, unitNet=null).
+  // When the user manually edits the first auto task it flips to manual
+  // (in editField), promoting the next auto task to absorb the new bufor.
+  // No 50/50 split — the user always sees the bufor sitting in exactly one
+  // task and decides how to redistribute by editing values manually.
   function recalcAuto() {
     if (state.targetNet == null) return;
     const manualSum = state.tasks.filter(t => t.manual).reduce((a,t) => a + (lineNet(t) ?? 0), 0);
-    const autos = state.tasks.filter(t => !t.manual);
     const rest = state.targetNet - manualSum;
-    if (autos.length > 0) {
-      const each = rest / autos.length;
-      autos.forEach(t => { t.qty = 1; t.unitNet = each; });
-    }
+    let firstAutoAssigned = false;
+    state.tasks.forEach(t => {
+      if (t.manual) return;
+      if (!firstAutoAssigned) {
+        t.qty = 1;
+        t.unitNet = rest;
+        firstAutoAssigned = true;
+      } else {
+        t.qty = null;
+        t.unitNet = null;
+      }
+    });
   }
 
   // ─── Actions ─────────────────────────────────────────────────────────────
@@ -6452,25 +6463,30 @@
     return ids;
   }
 
-  // assignPerson: 1 person = 1 task. Tasks are auto (manual=false) so when
-  // estimatedPriceBrutto is set (→ targetNet), recalcAuto splits the price
-  // equally among them. Task name reuses serviceName for clarity.
+  // assignPerson — called from LEFT PANEL ('Przypisz mechanika' dropdown).
+  // Rules:
+  //   1) If at least one UNASSIGNED task exists (personId === null), assign
+  //      the chosen mechanic to ALL of them (regardless of manual flag).
+  //   2) Otherwise (no unassigned task — visit has tasks all assigned to
+  //      other mechanics, OR no tasks at all), CREATE a new task with this
+  //      mechanic. First-ever task uses serviceName + qty:1 so recalcAuto
+  //      can absorb bufor; subsequent additions stay blank.
+  // NOTE: Direct mechanic change inside a row (.zad-row__person <select>)
+  // goes through editField — its behavior is intentionally unchanged.
   function assignPerson(personId) {
     if (!personId) return;
-    if (assignedPersonIds().includes(personId)) return; // already assigned somewhere
-    // Reuse an empty slot if present; else create new task
-    const emptySlot = state.tasks.find(t => !t.personId && !t.manual);
-    if (emptySlot) {
-      emptySlot.personId = personId;
-      if (!emptySlot.name) emptySlot.name = state.order.serviceName || '';
+    const unassigned = state.tasks.filter(t => !t.personId);
+    if (unassigned.length > 0) {
+      unassigned.forEach(t => { t.personId = personId; });
     } else {
+      const isFirst = state.tasks.length === 0;
       state.tasks.push({
         id: 'z' + (state.nextId++),
-        name: state.order.serviceName || '',
+        name: isFirst ? (state.order.serviceName || '') : '',
         personId: personId,
         unit: 'sztuka',
-        qty: 1,
-        unitNet: null,        // recalcAuto will set this from targetNet split
+        qty: isFirst ? 1 : null,
+        unitNet: null,
         done: false,
         manual: false
       });
@@ -6528,8 +6544,9 @@
     render();
   };
 
-  // Sync the Szczegóły tab display + input with state.order.estimatedPriceBrutto.
-  // When set, also drives targetNet (auto-distribution mode in Zadania).
+  // 'Szacowana cena' (Szczegóły tab) is a NOTE FIELD — its value is stored
+  // in state.order.estimatedPriceBrutto but does NOT drive Zadania math.
+  // targetNet is controlled only by the top Suma fields in the Zadania tab.
   function fmtPriceWithSuffix(n) {
     if (n == null) return '';
     return n.toLocaleString('pl-PL', { minimumFractionDigits: 0, maximumFractionDigits: 2 }) + ' zł (brutto)';
@@ -6544,13 +6561,7 @@
   function commitEstimatedPrice(raw) {
     const v = parsePL(raw);
     state.order.estimatedPriceBrutto = (v != null && v > 0) ? v : null;
-    // Drive auto-distribution: targetNet (netto) = brutto / (1+VAT)
-    if (state.order.estimatedPriceBrutto != null) {
-      state.targetNet = state.order.estimatedPriceBrutto / (1 + VAT);
-    } else {
-      state.targetNet = null;
-    }
-    recalcAuto();
+    // No targetNet linkage — Szacowana cena is purely a note.
     render();
   }
   function enterEditPrice() {
@@ -6649,8 +6660,16 @@
     const isTarget = state.targetNet != null;
     const topNet = isTarget ? state.targetNet : sN;
     const topBrutto = topNet * (1 + VAT);
-    const remainder = isTarget ? state.targetNet - sN : 0;
-    const overByMore = isTarget && remainder < -0.01;
+    // Remainder = targetNet - what's actually assigned (sum of all task line
+    // nets, manual + auto). The row is visible WHENEVER isTarget is true,
+    // even when remainder is 0 — it acts as a persistent allocation indicator.
+    // Only 'Wróć do sumowania' (clearTarget) makes isTarget false → row hides.
+    const remNet = isTarget ? (state.targetNet - sN) : 0;
+    const remBrutto = remNet * (1 + VAT);
+    const overByMore = isTarget && remNet < -0.005;
+    const barFillPct = isTarget && state.targetNet > 0
+      ? Math.max(0, Math.min(100, Math.round((sN / state.targetNet) * 100)))
+      : 0;
 
     return (
       '<div class="zad-summary">' +
@@ -6670,13 +6689,12 @@
 
       (isTarget
         ? '<div class="zad-remainder">' +
-            '<div class="zad-remainder__bar"><div class="zad-remainder__fill" style="width:' +
-              Math.max(0, Math.min(100, Math.round((sN / state.targetNet) * 100))) + '%' +
-            '"></div></div>' +
+            '<div class="zad-remainder__bar"><div class="zad-remainder__fill" style="width:' + barFillPct + '%"></div></div>' +
             '<div class="zad-remainder__row">' +
-              '<span>Do rozdzielenia między zadania (netto): <strong class="' +
-                (overByMore ? 'zad-remainder__over' : '') +
-                '">' + esc(fmtPLN(remainder)) + '</strong></span>' +
+              '<span>Do rozdzielenia między zadania: ' +
+                '<strong class="' + (overByMore ? 'zad-remainder__over' : '') + '">' + esc(fmtPLN(remNet)) + '</strong> netto / ' +
+                '<strong class="' + (overByMore ? 'zad-remainder__over' : '') + '">' + esc(fmtPLN(remBrutto)) + '</strong> brutto' +
+              '</span>' +
               '<button id="zad-clear-target" class="zad-link" type="button">Wróć do sumowania</button>' +
             '</div>' +
           '</div>'
@@ -6720,8 +6738,12 @@
     const isTarget = state.targetNet != null;
     const topNet = isTarget ? state.targetNet : sN;
     const topBrutto = topNet * (1 + VAT);
-    const remainder = isTarget ? state.targetNet - sN : 0;
-    const overByMore = isTarget && remainder < -0.01;
+    const remNet = isTarget ? (state.targetNet - sN) : 0;
+    const remBrutto = remNet * (1 + VAT);
+    const overByMore = isTarget && remNet < -0.005;
+    const barFillPct = isTarget && state.targetNet > 0
+      ? Math.max(0, Math.min(100, Math.round((sN / state.targetNet) * 100)))
+      : 0;
 
     return (
       '<div class="zad-summary">' +
@@ -6741,13 +6763,12 @@
 
       (isTarget
         ? '<div class="zad-remainder">' +
-            '<div class="zad-remainder__bar"><div class="zad-remainder__fill" style="width:' +
-              Math.max(0, Math.min(100, Math.round((sN / state.targetNet) * 100))) + '%' +
-            '"></div></div>' +
+            '<div class="zad-remainder__bar"><div class="zad-remainder__fill" style="width:' + barFillPct + '%"></div></div>' +
             '<div class="zad-remainder__row">' +
-              '<span>Do rozdzielenia między zadania (netto): <strong class="' +
-                (overByMore ? 'zad-remainder__over' : '') +
-                '">' + esc(fmtPLN(remainder)) + '</strong></span>' +
+              '<span>Do rozdzielenia między zadania: ' +
+                '<strong class="' + (overByMore ? 'zad-remainder__over' : '') + '">' + esc(fmtPLN(remNet)) + '</strong> netto / ' +
+                '<strong class="' + (overByMore ? 'zad-remainder__over' : '') + '">' + esc(fmtPLN(remBrutto)) + '</strong> brutto' +
+              '</span>' +
               '<button id="zad-clear-target" class="zad-link" type="button">Wróć do sumowania</button>' +
             '</div>' +
           '</div>'
