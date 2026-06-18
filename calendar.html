@@ -377,32 +377,14 @@
     .col-line { height: 52px; border-bottom: 1px solid var(--grey4); position: relative; }
     .col-line--major { border-bottom-color: var(--grey4); }
 
-    /* Hover add-visit button on time slot */
-    .slot-hover-btn {
-      position: fixed;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      height: 46px;
-      padding: 12px 18px;
-      background: #222693;
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      font-family: 'Rubik', sans-serif;
-      font-size: 16px;
-      font-weight: 300;
-      cursor: pointer;
-      z-index: 25;
-      white-space: nowrap;
-      box-shadow: 0 2px 12px rgba(34,38,147,0.30);
-      transform: translateY(-50%);
-      pointer-events: auto;
-      transition: background 140ms;
-    }
-    .slot-hover-btn:hover { background: #1D207C; }
-    .slot-hover-btn svg { width: 16px; height: 16px; stroke: #fff; stroke-width: 2.5; fill: none; stroke-linecap: round; }
+    /* Hover add-visit button on time slot — kept in DOM for backward compat
+       but always hidden. The hover affordance is now the slot background. */
+    .slot-hover-btn { display: none !important; }
+
+    /* Time-based station: empty 15-min slot lights up #F6F6FC on hover.
+       Click anywhere on the line opens the new-visit popover. */
+    .col-line { cursor: pointer; transition: background 100ms; }
+    .col-line:hover { background: #F6F6FC; }
 
     /* New appointment preview slot (Google Calendar style) */
     .new-appt-preview {
@@ -419,7 +401,12 @@
     /* Quantity column preview — block flow, not absolute */
     .new-appt-preview.nap-quantity {
       position: relative; left: auto; right: auto;
-      min-height: 72px; margin: 0;
+      min-height: 50px; margin: 0;
+    }
+    /* Week-view preview — placed in the column at click position, small */
+    .new-appt-preview.nap-week {
+      position: relative; left: auto; right: auto;
+      height: 86px; margin: 0; flex-shrink: 0;
     }
     .new-appt-preview__time { font-size: 11px; font-weight: 600; }
     .new-appt-preview__label { font-size: 12px; opacity: .72; margin-top: 2px; }
@@ -471,7 +458,7 @@
 
     /* ── Quantity column ── */
     .col--quantity { display:flex !important; flex-direction:column; overflow:hidden; }
-    .qty-body { overflow-y:visible; padding:10px 10px 4px; display:flex; flex-direction:column; gap:8px; }
+    .qty-body { overflow-y:visible; padding:10px 10px 4px; display:flex; flex-direction:column; gap:11px; }
 
     .qty-appt { position:relative; border-radius:6px; padding:10px 12px 10px 15px; cursor:pointer; transition:filter 150ms; flex-shrink:0; }
     .qty-appt:hover { filter:brightness(.96); }
@@ -481,11 +468,14 @@
     .qty-appt__name  { font-size:13px; font-weight:500; line-height:1.3; }
     .qty-appt__phone { font-size:11px; opacity:.8; margin-top:2px; }
     .qty-appt__desc  { font-size:11px; opacity:.75; margin-top:2px; line-height:1.3; }
-    .qty-add-btn {
-      width: calc(100% - 20px); margin: 8px 10px 10px; flex-shrink: 0;
-      font-weight: 300;
-    }
-    .qty-add-btn svg { width:16px; height:16px; stroke:#fff; stroke-width:2.5; fill:none; stroke-linecap:round; }
+    /* Old '+ Dodaj wizytę' button on quantity columns — replaced by the
+       qty-body hover background; kept hidden for backward compat. */
+    .qty-add-btn { display: none !important; }
+
+    /* Quantity-based station: the .qty-body region (visits list) lights up
+       #F6F6FC on hover. Click anywhere on the body opens the new-visit popover. */
+    .col--quantity .qty-body { cursor: pointer; transition: background 100ms; min-height: 100%; flex: 1; }
+    .col--quantity .qty-body:hover { background: #F6F6FC; }
 
     /* "+ Dodaj wizytę" toolbar button */
     .btn-add-visit {
@@ -628,8 +618,11 @@
       padding: 1px 7px; line-height: 18px; flex-shrink: 0;
     }
     .wk-col-body {
-      flex: 1; overflow-y: auto; padding: 8px 8px; display: flex; flex-direction: column; gap: 6px;
+      flex: 1; overflow-y: auto; padding: 8px 8px; display: flex; flex-direction: column; gap: 9px;
+      cursor: pointer; transition: background 100ms;
     }
+    .wk-col-body:hover { background: #F6F6FC; }
+    .wk-col.wk-weekend .wk-col-body:hover { background: #ECEDF2; }
     .wk-appt {
       position: relative;
       border-radius: 6px; padding: 8px 10px 8px 15px;
@@ -2897,7 +2890,7 @@
     _qiPhotos = [];
     _qpRenderStrip();
     // Remove preview slot
-    newApptPreview.classList.remove('nap-visible', 'nap-quantity');
+    newApptPreview.classList.remove('nap-visible', 'nap-quantity', 'nap-week');
     if (newApptPreview.parentNode) newApptPreview.parentNode.removeChild(newApptPreview);
   }
 
@@ -3115,80 +3108,64 @@
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); document.getElementById('qp-submit')?.click(); }
   });
 
-  // ── Slot hover button ──
-  const slotHoverBtn = document.createElement('button');
-  slotHoverBtn.className = 'slot-hover-btn';
-  slotHoverBtn.innerHTML = `<svg viewBox="0 0 16 16"><line x1="8" y1="2" x2="8" y2="14"/><line x1="2" y1="8" x2="14" y2="8"/></svg> Dodaj wizytę`;
-  slotHoverBtn.addEventListener('click', e => {
-    e.stopPropagation();
-    const rect = slotHoverBtn.getBoundingClientRect(); // get BEFORE hiding
-    slotHoverBtn.style.display = 'none';
-
-    // Show preview slot in the calendar column
-    if (_hoveredLine) {
-      const col = _hoveredLine.closest('.cal-col, .week-col');
-      if (col) {
-        const lines = Array.from(col.querySelectorAll('.col-line'));
-        const lineIdx = lines.indexOf(_hoveredLine);
-        const SLOT_H = 52; // px per 15-min slot
-        const top = lineIdx * SLOT_H;
-        const height = SLOT_H * 4; // 1 hour
-
-        const GSTART = 6 * 60 + 30;
-        const slotMin = GSTART + lineIdx * 15;
-        const endMin  = slotMin + 60;
-        const fmt = m => `${Math.floor(m / 60)}:${String(m % 60).padStart(2, '0')}`;
-
-        newApptPreview.querySelector('.new-appt-preview__time').textContent =
-          `${fmt(slotMin)} – ${fmt(endMin)}`;
-        newApptPreview.style.top    = top + 'px';
-        newApptPreview.style.height = height + 'px';
-
-        col.appendChild(newApptPreview);
-        newApptPreview.classList.add('nap-visible');
-
-        // Recompute popover anchor from the preview slot's viewport position
-        const colRect = col.getBoundingClientRect();
-        const previewRect = {
-          left:   colRect.left + 4,
-          right:  colRect.right - 4,
-          top:    colRect.top + top,
-          bottom: colRect.top + top + height,
-          width:  colRect.width - 8,
-          height: height
-        };
-        showQiPop(previewRect, newApptPreview);
-        return;
-      }
-    }
-    showQiPop(rect);
-  });
-  document.body.appendChild(slotHoverBtn);
-
-  let _hoverTimeout = null;
+  // ── Slot hover (time-based stations) ──
+  // The blue '+ Dodaj wizytę' button is gone; the affordance is now the
+  // line's hover background (#F6F6FC, via CSS). Click on .col-line opens
+  // the new-visit popover anchored to a 1-hour preview from the clicked slot.
   let _hoveredLine = null;
 
+  // Kept (hidden) so any leftover references don't crash; never shown.
+  const slotHoverBtn = document.createElement('button');
+  slotHoverBtn.className = 'slot-hover-btn';
+  document.body.appendChild(slotHoverBtn);
+
+  function openTimeSlotFromLine(line) {
+    if (!line) return;
+    if (qiPop.classList.contains('qp-visible')) { hideQiPop(); return; }
+    const col = line.closest('.cal-col, .week-col');
+    if (!col) return;
+    const lines = Array.from(col.querySelectorAll('.col-line'));
+    const lineIdx = lines.indexOf(line);
+    const SLOT_H = 52; // px per 15-min slot
+    const top = lineIdx * SLOT_H;
+    const height = SLOT_H * 2; // 30 min (was 4 = 1h; 2x smaller per design)
+
+    const GSTART = 6 * 60 + 30;
+    const slotMin = GSTART + lineIdx * 15;
+    const endMin  = slotMin + 30;
+    const fmt = m => `${Math.floor(m / 60)}:${String(m % 60).padStart(2, '0')}`;
+
+    // Switch back to absolute time-grid positioning — strip qty/week variants
+    // so .new-appt-preview's base position:absolute + top/height take effect.
+    newApptPreview.classList.remove('nap-quantity', 'nap-week');
+    newApptPreview.querySelector('.new-appt-preview__time').textContent =
+      `${fmt(slotMin)} – ${fmt(endMin)}`;
+    newApptPreview.style.top    = top + 'px';
+    newApptPreview.style.height = height + 'px';
+    col.appendChild(newApptPreview);
+    newApptPreview.classList.add('nap-visible');
+
+    const colRect = col.getBoundingClientRect();
+    const previewRect = {
+      left:   colRect.left + 4,
+      right:  colRect.right - 4,
+      top:    colRect.top + top,
+      bottom: colRect.top + top + height,
+      width:  colRect.width - 8,
+      height: height
+    };
+    showQiPop(previewRect, newApptPreview);
+  }
+  // Expose so day-view qty handler (below) and any future caller can reuse it.
+  window.__openTimeSlotFromLine = openTimeSlotFromLine;
+
   document.querySelectorAll('.col-line').forEach(line => {
-    line.addEventListener('mouseenter', () => {
-      // Don't show hover button while QI popover is open
-      if (qiPop.classList.contains('qp-visible')) return;
-      clearTimeout(_hoverTimeout);
-      _hoveredLine = line;
-      const rect = line.getBoundingClientRect();
-      const col = line.closest('.cal-col, .week-col');
-      const colRect = col ? col.getBoundingClientRect() : rect;
-      slotHoverBtn.style.top   = (rect.top + rect.height / 2) + 'px';
-      slotHoverBtn.style.left  = (colRect.left + 10) + 'px';
-      slotHoverBtn.style.width = (colRect.width - 20) + 'px';
-      slotHoverBtn.style.display = 'flex';
-    });
-    line.addEventListener('mouseleave', e => {
-      if (e.relatedTarget === slotHoverBtn) return;
-      _hoverTimeout = setTimeout(() => { slotHoverBtn.style.display = 'none'; }, 80);
+    line.addEventListener('mouseenter', () => { _hoveredLine = line; });
+    line.addEventListener('click', (e) => {
+      e.stopPropagation();
+      openTimeSlotFromLine(line);
     });
   });
-  slotHoverBtn.addEventListener('mouseenter', () => clearTimeout(_hoverTimeout));
-  slotHoverBtn.addEventListener('mouseleave', () => { slotHoverBtn.style.display = 'none'; });
 
   function prefillPanelFromSlot(line) {
     const parentCol = line.closest('.cal-col, .week-col');
@@ -4839,50 +4816,50 @@
       }
     });
 
-    // Add "+ Dodaj wizytę" button to each quantity column + update badge
+    // Quantity columns — '+ Dodaj wizytę' button replaced by clickable
+    // .qty-body region (hover background #F6F6FC via CSS). Click anywhere
+    // outside an existing visit card opens the new-visit popover.
     STANOWISKA.forEach((st, i) => {
       const meta = STATION_META[st];
       if (meta?.type !== 'quantity') return;
       const colEl = document.getElementById(`cal-col-${i + 1}`);
       if (!colEl) return;
-      // Do NOT skip col-hidden columns here — updateDayColumns() runs after
-      // and handles visibility. Skipping would cause missing button when
-      // switching from a temporal filter (which hides quantity columns).
 
       // Update count badge
       const count = (byCol[`cal-col-${i + 1}`] || []).length;
       const badge = document.getElementById(`qty-badge-${i + 1}`);
       if (badge) badge.textContent = `${count}/${meta.capacity}`;
 
-      // Add button
-      const btn = document.createElement('button');
-      btn.className = 'dm-btn dm-btn--primary qty-add-btn';
-      btn.innerHTML = `<svg viewBox="0 0 16 16"><line x1="8" y1="2" x2="8" y2="14"/><line x1="2" y1="8" x2="14" y2="8"/></svg> Dodaj wizytę`;
-      btn.addEventListener('click', (e) => {
+      const body = colEl.querySelector('.qty-body');
+      if (!body) return;
+      body.addEventListener('click', (e) => {
+        // Ignore clicks on existing visit cards — those open visit details.
+        if (e.target.closest('.qty-appt')) return;
         e.stopPropagation();
         if (qiPop.classList.contains('qp-visible')) { hideQiPop(); return; }
         selectedStation = st;
 
-        // Insert Nowe zlecenie preview into qty-body
-        const body = colEl.querySelector('.qty-body');
-        if (body) {
-          newApptPreview.querySelector('.new-appt-preview__time').textContent = '';
-          newApptPreview.classList.add('nap-visible', 'nap-quantity');
-          if (newApptPreview.parentNode !== body) body.appendChild(newApptPreview);
-        }
+        // Reset preview state — clear inline top/height set by a prior time-slot
+        // click; drop nap-week (week-view variant) so .nap-quantity wins.
+        newApptPreview.classList.remove('nap-week');
+        newApptPreview.classList.add('nap-visible', 'nap-quantity');
+        newApptPreview.querySelector('.new-appt-preview__time').textContent = '';
+        newApptPreview.style.top = '';
+        newApptPreview.style.height = '';
+        // Append at the END of qty-body → sits directly under existing visits
+        // (or at the top of an empty column, where qty-body's flex-start packs it).
+        if (newApptPreview.parentNode !== body) body.appendChild(newApptPreview);
+        else { body.removeChild(newApptPreview); body.appendChild(newApptPreview); }
 
         // Wait one frame so preview card is painted, then anchor qi-pop below it.
-        // Center horizontally over the column, vertical from preview card bottom.
         requestAnimationFrame(() => {
           const previewRect = newApptPreview.getBoundingClientRect();
           const colRect     = colEl.getBoundingClientRect();
-          const vRef        = previewRect.width > 0 ? previewRect : btn.getBoundingClientRect();
-          // Composite rect: column width for centering, preview bottom for vertical
+          const vRef        = previewRect.width > 0 ? previewRect : colRect;
           const anchorRect  = { left: colRect.left, width: colRect.width, top: vRef.top, bottom: vRef.bottom };
           showQiPop(anchorRect, newApptPreview);
         });
       });
-      colEl.appendChild(btn);
     });
 
     updateDayColumns();
@@ -5260,6 +5237,42 @@
       el.addEventListener('mousedown', e => {
         const appt = APPOINTMENTS[+el.dataset.apptIdx];
         if (appt) startApptDrag(e, appt, 'week', el);
+      });
+    });
+
+    // Click on empty .wk-col-body area → insert a 'Nowe zlecenie' preview
+    // card AT the click position (between existing visits, or at the bottom
+    // when clicked below them) and anchor the Quick Input popover to it.
+    container.querySelectorAll('.wk-col[data-ts] > .wk-col-body').forEach(body => {
+      body.addEventListener('click', (e) => {
+        if (e.target.closest('.wk-appt')) return; // ignore clicks on visit cards
+        e.stopPropagation();
+        if (qiPop.classList.contains('qp-visible')) { hideQiPop(); return; }
+
+        // Reset preview state, mark as week-view variant (small + relative flow)
+        newApptPreview.classList.remove('nap-quantity');
+        newApptPreview.classList.add('nap-visible', 'nap-week');
+        newApptPreview.querySelector('.new-appt-preview__time').textContent = '';
+        newApptPreview.style.top = '';
+        newApptPreview.style.height = '';
+
+        // Find insertion point: first visit whose vertical midpoint sits
+        // BELOW the click → insert preview before it. Otherwise (click was
+        // below every visit) → append to the end of the body.
+        const bodyRect = body.getBoundingClientRect();
+        const clickY = e.clientY - bodyRect.top + body.scrollTop;
+        let insertBefore = null;
+        for (const v of body.querySelectorAll('.wk-appt')) {
+          if (clickY < v.offsetTop + v.offsetHeight / 2) { insertBefore = v; break; }
+        }
+        if (insertBefore) body.insertBefore(newApptPreview, insertBefore);
+        else body.appendChild(newApptPreview);
+
+        // Wait one frame for layout, then anchor the popover to the preview rect.
+        requestAnimationFrame(() => {
+          const previewRect = newApptPreview.getBoundingClientRect();
+          showQiPop(previewRect, newApptPreview);
+        });
       });
     });
   }
@@ -6082,6 +6095,15 @@
         if (phoneEl) phoneEl.textContent = a.phone;
       }
     }
+    // Push order data into Wyceny module FIRST so Zadania can read quotes
+    // back (via window.__wycGetQuotes) when deciding whether to suggest a
+    // 'Przenieś z wyceny' import for an empty zadania panel.
+    if (typeof window.__wycSetOrder === 'function') {
+      window.__wycSetOrder({
+        visitId: (a && a.id) || null,
+        serviceName: (a && a.desc) || ''
+      });
+    }
     // Push order data into Zadania module so 'Osoby przypisane' / Zadania
     // tab can use serviceName + estimatedPriceBrutto when materializing.
     if (typeof window.__zadSetOrder === 'function') {
@@ -6219,8 +6241,8 @@
     Array.from(main.querySelectorAll(':scope > .detail-row')).forEach(el => szcz.appendChild(el));
     main.appendChild(szcz);
 
-    // Placeholder panels
-    ['wyceny','asystent','aktualnosci'].forEach(key => {
+    // Placeholder panels (Asystent / Aktualności — Wyceny gets its own panel below)
+    ['asystent','aktualnosci'].forEach(key => {
       const p = document.createElement('div');
       p.className = 'tab-panel';
       p.dataset.tabPanel = key;
@@ -6228,6 +6250,14 @@
       p.innerHTML = '<p style="color:#6B707D;font-size:14px;padding:8px 4px;">Wkrótce.</p>';
       main.appendChild(p);
     });
+
+    // Wyceny panel — filled by wyc module
+    const wyc = document.createElement('div');
+    wyc.className = 'tab-panel';
+    wyc.dataset.tabPanel = 'wyceny';
+    wyc.id = 'wyc-panel';
+    wyc.hidden = true;
+    main.appendChild(wyc);
 
     // Zadania panel — filled by zad module
     const zad = document.createElement('div');
@@ -6283,12 +6313,14 @@
   })();
   // Show A/B toggle ONLY in local development; production (Vercel) gets A only.
   // Detection: empty hostname = file://; localhost / 127.* / *.local = local dev.
-  const _zadShowToggle = (function () {
-    try {
-      const h = (window.location && window.location.hostname) || '';
-      return h === '' || h === 'localhost' || h === '127.0.0.1' || h.endsWith('.local');
-    } catch (_) { return false; }
-  })();
+  // TEMP: hidden during testing — flip back to the IIFE below when needed.
+  const _zadShowToggle = false;
+  // const _zadShowToggle = (function () {
+  //   try {
+  //     const h = (window.location && window.location.hostname) || '';
+  //     return h === '' || h === 'localhost' || h === '127.0.0.1' || h.endsWith('.local');
+  //   } catch (_) { return false; }
+  // })();
   function setZadVersion(v) {
     _zadVersion = (v === 'B') ? 'B' : 'A';
     try { localStorage.setItem('zad-version', _zadVersion); } catch (_) {}
@@ -6359,30 +6391,23 @@
   function fmtTime(n) { return n.toLocaleString('pl-PL', { minimumFractionDigits: 0, maximumFractionDigits: 2 }) + 'h'; }
   function esc(s)     { return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
-  // ─── Bufor model: 'first-fit' auto-assignment ────────────────────────────
-  // bufor = targetNet - Σ(manual tasks).
-  // The entire bufor is assigned to the FIRST auto (non-manual) task in
-  // document order. All other auto tasks stay empty (qty=null, unitNet=null).
-  // When the user manually edits the first auto task it flips to manual
-  // (in editField), promoting the next auto task to absorb the new bufor.
-  // No 50/50 split — the user always sees the bufor sitting in exactly one
-  // task and decides how to redistribute by editing values manually.
+  // ─── recalcAuto — fill empty slots only, never overwrite ─────────────────
+  // Rule: the FIRST task with no value yet (unitNet === null) absorbs the
+  // CURRENT positive rest. Tasks that already have a value are NEVER touched
+  // — neither auto-decreased nor auto-increased when other tasks change.
+  // Negative rest is shown in 'Do rozdzielenia między zadania' instead of
+  // being pushed into a task; the user balances by raising Suma robocizny.
   function recalcAuto() {
     if (state.targetNet == null) return;
-    const manualSum = state.tasks.filter(t => t.manual).reduce((a,t) => a + (lineNet(t) ?? 0), 0);
-    const rest = state.targetNet - manualSum;
-    let firstAutoAssigned = false;
-    state.tasks.forEach(t => {
-      if (t.manual) return;
-      if (!firstAutoAssigned) {
-        t.qty = 1;
-        t.unitNet = rest;
-        firstAutoAssigned = true;
-      } else {
-        t.qty = null;
-        t.unitNet = null;
+    const assigned = state.tasks.reduce((sum, t) => sum + (lineNet(t) ?? 0), 0);
+    const rest = state.targetNet - assigned;
+    if (rest > 0.005) {
+      const emptySlot = state.tasks.find(t => t.unitNet == null);
+      if (emptySlot) {
+        emptySlot.qty = 1;
+        emptySlot.unitNet = rest;
       }
-    });
+    }
   }
 
   // ─── Actions ─────────────────────────────────────────────────────────────
@@ -6526,6 +6551,9 @@
     if (currentVisitId && currentVisitId !== newId) {
       visitStates.set(currentVisitId, state);
     }
+    // Reset banner's wycena selector when switching visits — different visit,
+    // different quotes, so 'Wycena 1' should be the default.
+    if (currentVisitId !== newId) _zadWycSelectedIdx = 0;
     currentVisitId = newId;
     if (newId && visitStates.has(newId)) {
       // Returning to a visit we've edited before
@@ -6617,6 +6645,80 @@
     render();
   }
 
+  // ─── Wyceny → Zadania bridge ─────────────────────────────────────────────
+  // Tracks which quote (by index in the array) the user has selected in the
+  // banner's <select>. Defaults to the first one (index 0). Reset when a new
+  // visit loads via setOrderData.
+  let _zadWycSelectedIdx = 0;
+
+  // Returns the suggestion payload when:
+  //   - state.tasks is empty (banner only proposes the FIRST task), AND
+  //   - the visit has at least one quote.
+  // Otherwise null and the banner hides.
+  function wycSuggestFor() {
+    if (state.tasks.length > 0) return null;
+    if (!currentVisitId || typeof window.__wycGetQuotes !== 'function') return null;
+    const quotes = window.__wycGetQuotes(currentVisitId);
+    if (!quotes || quotes.length === 0) return null;
+    if (_zadWycSelectedIdx >= quotes.length) _zadWycSelectedIdx = 0;
+    return { quotes: quotes, selectedIdx: _zadWycSelectedIdx };
+  }
+  function wycSuggestHTML(s) {
+    const q = s.quotes[s.selectedIdx];
+    const options = s.quotes.map((quote, i) =>
+      '<option value="' + i + '"' + (i === s.selectedIdx ? ' selected' : '') + '>Wycena ' + (i + 1) + '</option>'
+    ).join('');
+    return (
+      '<div class="zad-wyc-suggest">' +
+        // Row 1 — wycena selector + breakdown amounts
+        '<div class="zad-wyc-suggest__info">' +
+          '<div class="zad-wyc-suggest__head">' +
+            '<span class="zad-wyc-suggest__head-label">Wycena:</span>' +
+            '<div class="zad-wyc-suggest__select-wrap">' +
+              '<select class="zad-wyc-suggest__select" id="zad-wyc-select">' + options + '</select>' +
+              '<svg class="zad-wyc-suggest__select-chev" viewBox="0 0 12 12" aria-hidden="true"><polyline points="3,4.5 6,8 9,4.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>' +
+            '</div>' +
+          '</div>' +
+          '<div class="zad-wyc-suggest__amounts">' +
+            '<div class="zad-wyc-suggest__amount">' +
+              '<span class="zad-wyc-suggest__amount-label">Robocizna:</span> ' +
+              '<strong>' + esc(fmtPLN(q.laborBrutto)) + '</strong> brutto' +
+            '</div>' +
+            '<div class="zad-wyc-suggest__amount">' +
+              '<span class="zad-wyc-suggest__amount-label">Łącznie:</span> ' +
+              '<strong>' + esc(fmtPLN(q.amount)) + '</strong> brutto' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+        // Row 2 — short instructional copy + action button
+        '<div class="zad-wyc-suggest__cta">' +
+          '<div class="zad-wyc-suggest__desc">Przenieś kwotę robocizny z wybranej wyceny do <strong>Sumy robocizny brutto</strong> i utwórz zadanie — pozostanie tylko przypisać osobę.</div>' +
+          '<button class="btn btn--ghost zad-wyc-import" id="zad-wyc-import" type="button" data-brutto="' + q.laborBrutto + '" style="font-weight: 400">Przenieś robociznę z wyceny</button>' +
+        '</div>' +
+      '</div>'
+    );
+  }
+  // Import: only the LABOR portion of the selected quote (not the total),
+  // because parts cost (oil/filters/refrigerant) doesn't belong in Zadania —
+  // Zadania tracks labor hours and labor money. Creates one auto-task that
+  // absorbs the entire targetNet via recalcAuto. Only personId is left.
+  function importFromWyc(laborBrutto) {
+    if (!laborBrutto || laborBrutto <= 0) return;
+    state.targetNet = laborBrutto / (1 + VAT);
+    state.tasks.push({
+      id: 'z' + (state.nextId++),
+      name: state.order.serviceName || '',
+      personId: null,
+      unit: 'sztuka',
+      qty: 1,
+      unitNet: null,
+      done: false,
+      manual: false
+    });
+    recalcAuto();
+    render();
+  }
+
   // ─── Render dispatcher (A or B) ──────────────────────────────────────────
   // Wraps version-specific content in .zad-panel-inner--{a,b} so CSS can
   // target each layout independently. Toggle UI sits at the top of the
@@ -6662,15 +6764,18 @@
     // Remainder = targetNet - what's actually assigned (sum of all task line
     // nets, manual + auto). The row is visible WHENEVER isTarget is true,
     // even when remainder is 0 — it acts as a persistent allocation indicator.
-    // Only 'Wróć do sumowania' (clearTarget) makes isTarget false → row hides.
+    // Only 'Sumuj z zadań' (clearTarget) makes isTarget false → row hides.
     const remNet = isTarget ? (state.targetNet - sN) : 0;
     const remBrutto = remNet * (1 + VAT);
     const overByMore = isTarget && remNet < -0.005;
     const barFillPct = isTarget && state.targetNet > 0
       ? Math.max(0, Math.min(100, Math.round((sN / state.targetNet) * 100)))
       : 0;
+    const wycSuggest = wycSuggestFor();
 
     return (
+      (wycSuggest ? wycSuggestHTML(wycSuggest) : '') +
+
       '<div class="zad-summary">' +
         '<div class="ds-field">' +
           '<input type="text" id="zad-top-net" class="ds-field__input" value="' + esc(fmtPLN(topNet || 0)) + '" placeholder=" ">' +
@@ -6694,7 +6799,7 @@
                 '<strong class="' + (overByMore ? 'zad-remainder__over' : '') + '">' + esc(fmtPLN(remNet)) + '</strong> netto / ' +
                 '<strong class="' + (overByMore ? 'zad-remainder__over' : '') + '">' + esc(fmtPLN(remBrutto)) + '</strong> brutto' +
               '</span>' +
-              '<button id="zad-clear-target" class="zad-link" type="button">Wróć do sumowania</button>' +
+              '<button id="zad-clear-target" class="zad-link" type="button">Sumuj z zadań</button>' +
             '</div>' +
           '</div>'
         : '') +
@@ -6743,8 +6848,11 @@
     const barFillPct = isTarget && state.targetNet > 0
       ? Math.max(0, Math.min(100, Math.round((sN / state.targetNet) * 100)))
       : 0;
+    const wycSuggest = wycSuggestFor();
 
     return (
+      (wycSuggest ? wycSuggestHTML(wycSuggest) : '') +
+
       '<div class="zad-summary">' +
         '<div class="zad-summary-field">' +
           '<label>Suma robocizny netto</label>' +
@@ -6768,7 +6876,7 @@
                 '<strong class="' + (overByMore ? 'zad-remainder__over' : '') + '">' + esc(fmtPLN(remNet)) + '</strong> netto / ' +
                 '<strong class="' + (overByMore ? 'zad-remainder__over' : '') + '">' + esc(fmtPLN(remBrutto)) + '</strong> brutto' +
               '</span>' +
-              '<button id="zad-clear-target" class="zad-link" type="button">Wróć do sumowania</button>' +
+              '<button id="zad-clear-target" class="zad-link" type="button">Sumuj z zadań</button>' +
             '</div>' +
           '</div>'
         : '') +
@@ -6953,6 +7061,17 @@
 
     const addBtn = document.getElementById('zad-add-task');
     if (addBtn) addBtn.addEventListener('click', addTask);
+
+    const wycImportBtn = document.getElementById('zad-wyc-import');
+    if (wycImportBtn) wycImportBtn.addEventListener('click', (e) => {
+      const brutto = parseFloat(e.currentTarget.dataset.brutto);
+      importFromWyc(brutto);
+    });
+    const wycSelect = document.getElementById('zad-wyc-select');
+    if (wycSelect) wycSelect.addEventListener('change', (e) => {
+      _zadWycSelectedIdx = parseInt(e.target.value, 10) || 0;
+      render();
+    });
 
     document.querySelectorAll('#zad-panel .zad-row').forEach(row => {
       const id = row.dataset.taskId;
@@ -7152,6 +7271,189 @@
   } else {
     init();
   }
+})();
+</script>
+
+<!-- ════════════════════════════════════════════════════════════════════
+     WYCENY — quotes tab module for visit details modal
+     ════════════════════════════════════════════════════════════════════ -->
+<script>
+(function () {
+  "use strict";
+
+  // Per-visit quotes; seeded lazily on first open so each visit has its own
+  // sample row. Real implementation would load from API.
+  const visitQuotes = new Map();
+  let currentVisitId = null;
+  let currentServiceName = '';
+
+  // Service → quote breakdown (brutto, in PLN).
+  //   labor = robocizna (this is what can be transferred to Zadania)
+  //   parts = części (oil, filters, refrigerant, materials etc.)
+  //   total = labor + parts (displayed in the Wyceny table's 'Kwota' column)
+  // Visit description (a.desc) is the lookup key — must match EXACTLY.
+  const SERVICE_PRICES = {
+    'Wymiana oleju silnikowego i filtrów': { labor: 300, parts: 500 },   //  800 total
+    'Serwis klimatyzacji R134a':           { labor: 250, parts: 100 },   //  350 total
+    'Wymiana opon – felga stalowa 15″':    { labor: 200, parts:   0 }    //  200 total (100% labor)
+  };
+
+  const STATUS_META = {
+    'szkic':         { label: 'Szkic',         bg: '#F1F2F4', fg: '#6B707D' },
+    'wyslana':       { label: 'Wysłana',       bg: '#FDF4E2', fg: '#9C6F1E' },
+    'zaakceptowana': { label: 'Zaakceptowana', bg: '#E1F4DD', fg: '#1F7A2A' },
+    'odrzucona':     { label: 'Odrzucona',     bg: '#FBE2E2', fg: '#A8311F' }
+  };
+  const STATUS_ORDER = ['szkic', 'wyslana', 'zaakceptowana', 'odrzucona'];
+
+  function esc(s) { return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+  function fmtPLN(n) { return (n == null ? 0 : n).toLocaleString('pl-PL', { minimumFractionDigits: 1, maximumFractionDigits: 2 }) + ' zł'; }
+
+  function sampleQuotes() {
+    // Only seed a sample quote when SERVICE_PRICES has a mapped amount for
+    // this visit's service. Otherwise return an empty array → empty state.
+    const p = SERVICE_PRICES[currentServiceName];
+    if (!p) return [];
+    return [{
+      id: 'q1',
+      signature: '2026/05/12/1',
+      createdAt: '12-05-2026, 14:00',
+      status: 'wyslana',
+      laborBrutto: p.labor,
+      partsBrutto: p.parts,
+      amount: p.labor + p.parts
+    }];
+  }
+  // Append a new draft quote — used by the '+ Dodaj wycenę' button so the
+  // selector in Zadania becomes meaningful (1, 2, 3...).
+  function addNewQuote() {
+    if (!currentVisitId) return;
+    const list = getQuotes();
+    const idx = list.length + 1;
+    const p = SERVICE_PRICES[currentServiceName] || { labor: 0, parts: 0 };
+    list.push({
+      id: 'q' + idx,
+      signature: '2026/05/12/' + idx,
+      createdAt: '12-05-2026, 14:00',
+      status: 'szkic',
+      laborBrutto: p.labor,
+      partsBrutto: p.parts,
+      amount: p.labor + p.parts
+    });
+    render();
+  }
+  function getQuotes() {
+    if (!currentVisitId) return [];
+    if (!visitQuotes.has(currentVisitId)) visitQuotes.set(currentVisitId, sampleQuotes());
+    return visitQuotes.get(currentVisitId);
+  }
+
+  // SVG icons (inline so they get currentColor and we don't fight external loading)
+  const SVG_DOWNLOAD = '<svg viewBox="0 0 20 20" fill="none"><path d="M17.5 11.875C17.8452 11.875 18.125 12.1548 18.125 12.5V12.5459C18.125 13.6853 18.1254 14.6038 18.0283 15.3262C17.9275 16.0763 17.7116 16.7084 17.21 17.21C16.7084 17.7116 16.0763 17.9275 15.3262 18.0283C14.6038 18.1254 13.6853 18.125 12.5459 18.125H7.4541C6.3147 18.125 5.39621 18.1254 4.67383 18.0283C3.92374 17.9275 3.29164 17.7116 2.79004 17.21C2.28844 16.7084 2.07253 16.0763 1.97168 15.3262C1.8746 14.6038 1.87498 13.6853 1.875 12.5459V12.5C1.875 12.1548 2.15482 11.875 2.5 11.875C2.84518 11.875 3.125 12.1548 3.125 12.5C3.125 13.6962 3.12631 14.5307 3.21094 15.1602C3.29316 15.7715 3.44322 16.0956 3.67383 16.3262C3.90443 16.5568 4.22853 16.7068 4.83984 16.7891C5.4693 16.8737 6.30382 16.875 7.5 16.875H12.5C13.6962 16.875 14.5307 16.8737 15.1602 16.7891C15.7715 16.7068 16.0956 16.5568 16.3262 16.3262C16.5568 16.0956 16.7068 15.7715 16.7891 15.1602C16.8737 14.5307 16.875 13.6962 16.875 12.5C16.875 12.1548 17.1548 11.875 17.5 11.875ZM10 1.875C10.3452 1.875 10.625 2.15482 10.625 2.5V11.7236L12.8721 9.26562C13.105 9.01095 13.5002 8.99367 13.7549 9.22656C14.0095 9.45946 14.0277 9.85464 13.7949 10.1094L10.4609 13.7549C10.3425 13.8843 10.1754 13.958 10 13.958C9.82456 13.958 9.65746 13.8843 9.53906 13.7549L6.20508 10.1094C5.97226 9.85464 5.99046 9.45946 6.24512 9.22656C6.49984 8.99367 6.895 9.01095 7.12793 9.26562L9.375 11.7236V2.5C9.375 2.15482 9.65482 1.875 10 1.875Z" fill="currentColor"/></svg>';
+  const SVG_EDIT     = '<svg viewBox="0 0 20 20" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M11.6598 2.40226C12.8628 1.19925 14.8133 1.19925 16.0163 2.40226C17.2193 3.60527 17.2193 5.55574 16.0163 6.75875L10.0117 12.7633C9.67328 13.1018 9.46661 13.3085 9.23626 13.4881C8.96487 13.6998 8.67123 13.8813 8.36052 14.0294C8.09681 14.1551 7.81951 14.2475 7.36544 14.3988L5.25218 15.1032L4.74482 15.2723C4.29068 15.4237 3.78999 15.3055 3.4515 14.967C3.11301 14.6285 2.99481 14.1278 3.14619 13.6737L4.01973 11.0531C4.17106 10.599 4.26347 10.3217 4.38915 10.058C4.53723 9.7473 4.71871 9.45365 4.93039 9.18226C5.11006 8.95191 5.31675 8.74524 5.65521 8.40682L11.6598 2.40226ZM5.22482 13.8621L4.55639 13.1937L5.13235 11.4658C5.30005 10.9627 5.36931 10.7582 5.45983 10.5683C5.57084 10.3353 5.7069 10.1152 5.8656 9.91171C5.995 9.74581 6.14698 9.59238 6.52195 9.21741L11.1799 4.55943C11.3722 5.04174 11.6975 5.62387 12.2461 6.17245C12.7947 6.72102 13.3768 7.04633 13.8591 7.2386L9.20112 11.8966C8.82615 12.2715 8.67272 12.4235 8.50682 12.5529C8.30335 12.7116 8.0832 12.8477 7.85026 12.9587C7.66033 13.0492 7.45579 13.1185 6.95271 13.2862L5.22482 13.8621ZM14.8042 6.29353C14.7063 6.27204 14.5838 6.23969 14.4446 6.1914C14.0619 6.05863 13.5585 5.80755 13.0847 5.33379C12.611 4.86002 12.3599 4.3566 12.2271 3.97388C12.1788 3.83469 12.1465 3.71227 12.125 3.61436L12.4984 3.24092C13.2383 2.50109 14.4378 2.50109 15.1776 3.24092C15.9174 3.98075 15.9174 5.18026 15.1776 5.92009L14.8042 6.29353ZM3.08131 17.907C3.08131 17.5795 3.34682 17.314 3.67434 17.314H16.3255V18.5H3.67434C3.34682 18.5 3.08131 18.2345 3.08131 17.907Z" fill="currentColor"/></svg>';
+  const SVG_EYE      = '<svg viewBox="0 0 20 20" fill="none"><path d="M10 5C5.5 5 2.5 10 2.5 10s3 5 7.5 5 7.5-5 7.5-5-3-5-7.5-5z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><circle cx="10" cy="10" r="2.5" stroke="currentColor" stroke-width="1.4"/></svg>';
+  // SVGs sized inline (20×20) to match the 'Edytuj' / 'Dodaj załącznik' buttons exactly.
+  const SVG_IMPORT   = '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" style="width: 20px; height: 20px"><path d="M10 13.125V3.125M10 3.125L6.25 6.875M10 3.125L13.75 6.875M2.5 13.125V14.5C2.5 15.6 3.4 16.5 4.5 16.5H15.5C16.6 16.5 17.5 15.6 17.5 14.5V13.125" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  const SVG_PLUS     = '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" style="width: 20px; height: 20px"><path d="M10 3C10.4035 3 10.7303 3.32702 10.7305 3.73047V9.26953H16.2695C16.673 9.26965 17 9.59653 17 10C17 10.4035 16.673 10.7303 16.2695 10.7305H10.7305V16.2695C10.7303 16.673 10.4035 17 10 17C9.59653 17 9.26965 16.673 9.26953 16.2695V10.7305H3.73047C3.32702 10.7303 3 10.4035 3 10C3 9.59653 3.32702 9.26965 3.73047 9.26953H9.26953V3.73047C9.26965 3.32702 9.59653 3 10 3Z" fill="currentColor"/></svg>';
+
+  function render() {
+    const panel = document.getElementById('wyc-panel');
+    if (!panel) return;
+    const quotes = getQuotes();
+
+    const header =
+      '<div class="wyc-section-head">' +
+        '<h3 class="wyc-section-head__title">Wycena zlecenia</h3>' +
+        '<div class="wyc-section-head__actions">' +
+          '<button class="btn btn--ghost" id="wyc-import" type="button" style="font-weight: 400">' + SVG_IMPORT + 'Importuj wycenę</button>' +
+          '<button class="btn btn--ghost" id="wyc-add" type="button" style="font-weight: 400">' + SVG_PLUS + 'Dodaj wycenę</button>' +
+        '</div>' +
+      '</div>';
+
+    const body = quotes.length === 0
+      ? '<div class="wyc-empty">Brak wyceny dla tej wizyty. Dodaj pierwszą wycenę używając przycisku „+ Dodaj wycenę".</div>'
+      : ('<div class="wyc-list">' +
+          '<div class="wyc-row wyc-row--head">' +
+            '<div>Sygnatura</div>' +
+            '<div>Data utworzenia</div>' +
+            '<div>Status wyceny</div>' +
+            '<div>Kwota</div>' +
+            '<div></div>' +
+          '</div>' +
+          quotes.map(quoteRow).join('') +
+        '</div>');
+
+    panel.innerHTML = header + body;
+
+    wireUp();
+  }
+
+  function quoteRow(q) {
+    const s = STATUS_META[q.status] || STATUS_META.szkic;
+    const statusOptions = STATUS_ORDER.map(k =>
+      '<option value="' + k + '"' + (k === q.status ? ' selected' : '') + '>' + esc(STATUS_META[k].label) + '</option>'
+    ).join('');
+    return (
+      '<div class="wyc-row" data-quote-id="' + esc(q.id) + '">' +
+        '<div class="wyc-row__sig">' + esc(q.signature) + '</div>' +
+        '<div class="wyc-row__date">' + esc(q.createdAt) + '</div>' +
+        '<div class="wyc-row__status">' +
+          '<div class="wyc-status-pill" style="background:' + s.bg + ';color:' + s.fg + '">' +
+            '<select class="wyc-status-pill__select" data-quote-id="' + esc(q.id) + '" style="color:' + s.fg + '">' + statusOptions + '</select>' +
+            '<svg class="wyc-status-pill__chev" viewBox="0 0 12 12"><polyline points="3,4.5 6,8 9,4.5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
+          '</div>' +
+        '</div>' +
+        '<div class="wyc-row__amount">' + esc(fmtPLN(q.amount)) + '</div>' +
+        '<div class="wyc-row__actions">' +
+          '<button type="button" class="wyc-action-btn" title="Pobierz wycenę" aria-label="Pobierz wycenę">' + SVG_DOWNLOAD + '</button>' +
+          '<button type="button" class="wyc-action-btn" title="Edytuj wycenę" aria-label="Edytuj wycenę">' + SVG_EDIT + '</button>' +
+          '<button type="button" class="wyc-action-btn" title="Podgląd wyceny" aria-label="Podgląd wyceny">' + SVG_EYE + '</button>' +
+        '</div>' +
+      '</div>'
+    );
+  }
+
+  function wireUp() {
+    const addBtn = document.getElementById('wyc-add');
+    if (addBtn) addBtn.addEventListener('click', addNewQuote);
+    const importBtn = document.getElementById('wyc-import');
+    if (importBtn) importBtn.addEventListener('click', () => alert('Importuj wycenę — w pełnej wersji to import z pliku. (placeholder)'));
+
+    document.querySelectorAll('#wyc-panel .wyc-status-pill__select').forEach(sel => {
+      sel.addEventListener('change', (e) => {
+        const id = e.target.dataset.quoteId;
+        const quotes = getQuotes();
+        const q = quotes.find(x => x.id === id);
+        if (!q) return;
+        q.status = e.target.value;
+        render();
+      });
+    });
+
+    document.querySelectorAll('#wyc-panel .wyc-action-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        // Placeholder — real flow would open the quote in edit/preview mode
+      });
+    });
+  }
+
+  function setOrder(orderData) {
+    currentVisitId     = (orderData && orderData.visitId) || null;
+    currentServiceName = (orderData && orderData.serviceName) || '';
+    // Force lazy-seed so getQuotes() below has data ready for Zadania module
+    // (which queries us via window.__wycGetQuotes immediately after).
+    getQuotes();
+    render();
+  }
+  // Read-only accessor used by the Zadania module to detect available quotes
+  // and offer a 'Przenieś z wyceny' shortcut in the empty-state.
+  function getQuotesForVisit(visitId) {
+    if (!visitId) return [];
+    return visitQuotes.get(visitId) || [];
+  }
+  window.__wycSetOrder  = setOrder;
+  window.__wycGetQuotes = getQuotesForVisit;
 })();
 </script>
 
