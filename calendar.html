@@ -450,6 +450,21 @@
       position: relative; left: auto; right: auto;
       height: 86px; margin: 0; flex-shrink: 0;
     }
+    /* Month-view preview — same dashed/purple treatment as time-grid preview
+       but compact, sized to match a single .month-appt-chip row. */
+    .new-appt-preview.nap-month {
+      position: relative; left: auto; right: auto;
+      height: auto; margin: 0 0 2px 0;
+      padding: 2px 6px;
+      border-width: 1px; border-left-width: 2px;
+      border-radius: 3px;
+      font-size: 11px; line-height: 16px;
+      display: block;
+    }
+    .new-appt-preview.nap-month .new-appt-preview__time { display: none; }
+    .new-appt-preview.nap-month .new-appt-preview__label {
+      font-size: 11px; line-height: 16px; opacity: 1; font-weight: 500; margin: 0;
+    }
     .new-appt-preview__time { font-size: 11px; font-weight: 600; }
     .new-appt-preview__label { font-size: 12px; opacity: .72; margin-top: 2px; }
 
@@ -2940,7 +2955,7 @@
     _qiPhotos = [];
     _qpRenderStrip();
     // Remove preview slot
-    newApptPreview.classList.remove('nap-visible', 'nap-quantity', 'nap-week');
+    newApptPreview.classList.remove('nap-visible', 'nap-quantity', 'nap-week', 'nap-month');
     if (newApptPreview.parentNode) newApptPreview.parentNode.removeChild(newApptPreview);
   }
 
@@ -5364,7 +5379,8 @@
     // Click routing inside each .month-cell:
     //   1) day number  → switch to day view for that date
     //   2) visit chip  → no-op (future: open visit details)
-    //   3) empty area  → open Quick Input popover anchored to the cell
+    //   3) empty area  → insert a chip-sized 'Nowe zlecenie' preview into
+    //      the cell, then open the Quick Input anchored to that preview.
     container.querySelectorAll('.month-cell[data-ts]').forEach(el => {
       el.addEventListener('click', (e) => {
         if (e.target.closest('.month-day-num')) {
@@ -5375,7 +5391,24 @@
         if (e.target.closest('.month-appt-chip')) return;
         e.stopPropagation();
         if (qiPop.classList.contains('qp-visible')) { hideQiPop(); return; }
-        showQiPop(el.getBoundingClientRect());
+
+        // Reset preview state, switch to month-cell variant (compact, chip-sized)
+        newApptPreview.classList.remove('nap-quantity', 'nap-week');
+        newApptPreview.classList.add('nap-visible', 'nap-month');
+        newApptPreview.querySelector('.new-appt-preview__time').textContent = '';
+        newApptPreview.style.top = '';
+        newApptPreview.style.height = '';
+
+        // Insert right AFTER the day-num so the preview sits as the first
+        // "chip" in the cell. Existing chips push down.
+        const dayNum = el.querySelector('.month-day-num');
+        if (dayNum && dayNum.nextSibling) el.insertBefore(newApptPreview, dayNum.nextSibling);
+        else el.appendChild(newApptPreview);
+
+        requestAnimationFrame(() => {
+          const previewRect = newApptPreview.getBoundingClientRect();
+          showQiPop(previewRect, newApptPreview);
+        });
       });
     });
   }
