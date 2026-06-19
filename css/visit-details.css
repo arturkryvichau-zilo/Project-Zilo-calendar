@@ -959,8 +959,8 @@ code, pre, .mono {
 .tab:hover:not(.tab--active) { color: var(--zilo-primary); }
 .tab svg { width: 20px; height: 20px; }
 .tab--active {
-  color: var(--zilo-primary);
-  border-bottom-color: var(--zilo-primary);
+  color: #242629;
+  border-bottom-color: #242629;
 }
 /* Detail rows in main */
 .detail-row {

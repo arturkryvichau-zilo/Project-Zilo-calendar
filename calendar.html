@@ -201,88 +201,109 @@
       border-bottom: 1px solid var(--grey5);
       flex-shrink: 0;
     }
-    .btn-today {
+    /* Nav group — 'Dzisiaj' + prev/next arrows in a single rounded pill
+       with hairline dividers between the three buttons. */
+    .cal-nav-group {
+      display: inline-flex;
+      align-items: stretch;
       height: 46px;
       box-sizing: border-box;
+      border: 1px solid var(--grey4);
+      border-radius: 8px;
+      background: var(--white);
+      overflow: hidden;
+    }
+    .cal-nav-group > button {
+      position: relative;
+      height: 100%;
+      box-sizing: border-box;
+      border: none;
+      background: transparent;
+      color: #222693;
+      cursor: pointer;
+      transition: background 150ms;
       display: inline-flex;
       align-items: center;
-      padding: 0 18px;
-      border: 1px solid var(--grey4);
-      border-radius: 8px;
-      background: var(--white);
+      justify-content: center;
+    }
+    .cal-nav-group > button:hover { background: #F3F3FF; }
+    /* Hairline divider on the RIGHT of every button except the last */
+    .cal-nav-group > button:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      right: 0;
+      top: 10px;
+      bottom: 10px;
+      width: 1px;
+      background: var(--grey4);
+    }
+
+    .btn-today {
+      padding: 0 22px;
       font-family: 'Rubik', sans-serif;
       font-size: 16px;
-      font-weight: 300;
-      color: var(--black);
-      cursor: pointer;
-      transition: background 150ms;
+      font-weight: 400;
+      color: #222693;
     }
-    .btn-today:hover { background: var(--grey6); }
-
-    .cal-nav { display: flex; align-items: center; gap: 0; }
+    /* When the user is already on today's day / current week / current month
+       the 'Dzisiaj' button switches its label to black (still clickable, but
+       visually marks 'you're already here'). */
+    .btn-today.is-on-today { color: var(--black); }
     .btn-arrow {
-      width: 46px; height: 46px;
-      box-sizing: border-box;
-      border: 1px solid var(--grey4);
-      border-radius: 8px;
-      background: var(--white);
-      cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      transition: background 150ms;
+      width: 46px;
     }
-    .btn-arrow:first-child { border-right-width: 0; border-top-right-radius: 0; border-bottom-right-radius: 0; }
-    .btn-arrow:last-child  { border-top-left-radius: 0; border-bottom-left-radius: 0; }
-    .btn-arrow:hover { background: var(--grey6); }
-    .btn-arrow svg { width: 13px; height: 13px; stroke: var(--black); stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+    .btn-arrow svg {
+      width: 14px; height: 14px;
+      stroke: #222693;
+      stroke-width: 2;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
 
     .cal-date { font-size: 16px; font-weight: 500; color: var(--black); margin-left: 6px; }
 
     /* Right-side button group in toolbar */
     .cal-toolbar-right { display: flex; align-items: center; gap: 7px; margin-left: auto; }
 
-    /* View dropdown */
-    .view-dropdown { position: relative; }
-    .view-dropdown-btn {
-      height: 46px;
-      box-sizing: border-box;
-      display: inline-flex; align-items: center; gap: 8px;
-      padding: 0 18px;
-      border: 1px solid var(--grey4);
-      border-radius: 8px;
-      background: var(--white);
-      font-family: 'Rubik', sans-serif;
-      font-size: 16px;
-      font-weight: 300;
-      color: var(--black);
-      cursor: pointer;
-      transition: background 150ms;
-    }
-    .view-dropdown-btn:hover { background: var(--grey6); }
-    .view-dropdown-btn svg { width: 12px; height: 12px; stroke: var(--black); stroke-width: 2; fill: none; }
-    .view-dropdown-menu {
-      position: absolute; top: calc(100% + 4px); left: 0; right: 0;
-      background: var(--white);
-      border: 1px solid var(--grey4);
+    /* View switcher — segmented radio control (replaces .view-dropdown).
+       Four options (Dzień / Tydzień / Miesiąc / Lista) in a single pill;
+       the active one gets a white pill background, the rest are flat text. */
+    .view-switcher {
+      display: inline-flex; align-items: center;
+      background: #F1F2F4;
       border-radius: 8px;
       padding: 4px;
-      box-shadow: 0 4px 16px rgba(0,0,0,.08);
-      z-index: 30;
-      display: flex; flex-direction: column; gap: 2px;
+      gap: 2px;
+      height: 46px;
+      box-sizing: border-box;
     }
-    .view-dropdown-menu.hidden { display: none; }
-    .view-dropdown-item {
-      padding: 8px 12px;
-      border: none; background: transparent;
-      text-align: left; cursor: pointer;
-      border-radius: 4px;
-      font-family: 'Rubik', sans-serif; font-size: 14px;
+    .view-switcher__opt {
+      background: transparent;
+      border: none;
+      height: 38px;
+      padding: 0 16px;
+      border-radius: 8px;
+      font-family: 'Rubik', sans-serif;
+      font-size: 15px;
+      font-weight: 400;
       color: var(--black);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 150ms, color 150ms;
     }
-    .view-dropdown-item:hover { background: var(--grey6); }
-    .view-dropdown-item.is-current { background: #F3F3FF; color: #222693; font-weight: 500; }
+    .view-switcher__opt:hover { background: #F3F3FF; }
+    .view-switcher__opt.is-active {
+      background: var(--white);
+      color: var(--black);
+      font-weight: 400;
+      box-shadow: 0 1px 2px rgba(0,0,0,.06);
+    }
+    .view-switcher__opt.is-active:hover { background: var(--white); }
 
     /* Asystent AI ghost button */
     .btn-ai {
+      position: relative;
       height: 46px;
       box-sizing: border-box;
       display: inline-flex; align-items: center; gap: 8px;
@@ -293,13 +314,34 @@
       color: #222693;
       font-family: 'Rubik', sans-serif;
       font-size: 16px;
-      font-weight: 300;
+      font-weight: 400;
       cursor: pointer;
       transition: background 150ms;
       white-space: nowrap;
     }
     .btn-ai:hover { background: #F3F3FF; }
     .btn-ai svg { width: 20px; height: 20px; }
+    /* Notification badge — red circle with white count, anchored to the
+       button's top-right corner and overflowing it by ~50%. */
+    .btn-ai__badge {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      min-width: 22px;
+      height: 22px;
+      padding: 0 6px;
+      border-radius: 11px;
+      background: #EA4335;
+      color: #FFFFFF;
+      font-family: 'Rubik', sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      line-height: 22px;
+      text-align: center;
+      box-sizing: border-box;
+      pointer-events: none;
+      box-shadow: 0 0 0 2px var(--white);
+    }
 
     /* Calendar main area */
     .cal-main {
@@ -491,7 +533,7 @@
       border-radius: 8px;
       font-family: 'Rubik', sans-serif;
       font-size: 16px;
-      font-weight: 300;
+      font-weight: 400;
       cursor: pointer;
       white-space: nowrap;
       transition: opacity 150ms;
@@ -520,7 +562,7 @@
       transition: all 150ms; flex-shrink: 0;
     }
     /* Selected state: dark blue outline (no fill) */
-    .filter-chip.active { background: var(--white); border-color: #222693; color: var(--black); }
+    .filter-chip.active { background: var(--white); border-color: var(--black); color: var(--black); }
     .filter-chip:hover:not(.active) { border-color: #8386E2; }
     /* Color bar on the left for station chips (set via --chip-bar in JS) */
     .filter-chip[data-station]:not([data-station="all"]) {
@@ -1064,7 +1106,7 @@
     }
     .st-option:last-child { border-bottom: none; }
     .st-option:hover { background: #F3F3FF; color: #222693; }
-    .st-option.st-selected { color: #222693; font-weight: 500; }
+    .st-option.st-selected { color: var(--black); font-weight: 500; }
     .st-option.st-selected:hover { background: #F3F3FF; }
     .st-check { width: 14px; height: 14px; stroke: #222693; fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
     .input-field .inner {
@@ -1156,7 +1198,7 @@
     .dp-cell--weekend { color: #6B707D; }
     .dp-cell--today { background: #222693 !important; color: #fff !important; }
     .dp-cell--today:hover { background: #1D207C !important; }
-    .dp-cell--selected:not(.dp-cell--today) { background: #F3F3FF; color: #222693; }
+    .dp-cell--selected:not(.dp-cell--today) { background: #F3F3FF; color: var(--black); }
     .dp-cell--empty { opacity: 0; pointer-events: none; cursor: default; }
 
     /* ── Time picker popup ── */
@@ -1232,7 +1274,7 @@
       cursor: pointer; transition: background 140ms, color 140ms;
     }
     .opt-toggle-btn:hover { background: #e6e6ff; }
-    .opt-toggle-btn.active { background: #D5D7F8; color: #222693; }
+    .opt-toggle-btn.active { background: #D5D7F8; color: var(--black); }
     .opt-plus { display: inline-flex; transition: transform 180ms ease; }
     .opt-toggle-btn.active .opt-plus { transform: rotate(45deg); }
     .opt-plus svg { width: 12px; height: 12px; stroke: currentColor; stroke-width: 2.2; fill: none; stroke-linecap: round; }
@@ -1810,7 +1852,7 @@
       transition: background 100ms;
     }
     .service-opt:last-child { border-bottom: none; }
-    .service-opt:hover, .service-opt.active { background: #F3F3FF; color: #222693; }
+    .service-opt:hover, .service-opt.active { background: #F3F3FF; color: var(--black); }
     .service-opt strong { color: #222693; font-weight: 500; }
 
     .hidden { display: none !important; }
@@ -1979,25 +2021,20 @@
 
   <div class="cal-card">
     <div class="cal-toolbar">
-      <button class="btn-today">Dzisiaj</button>
-      <div class="cal-nav">
-        <button class="btn-arrow"><svg viewBox="0 0 14 14"><polyline points="9,2 4,7 9,12"/></svg></button>
-        <button class="btn-arrow"><svg viewBox="0 0 14 14"><polyline points="5,2 10,7 5,12"/></svg></button>
+      <div class="cal-nav-group">
+        <button class="btn-today" type="button">Dzisiaj</button>
+        <button class="btn-arrow" type="button" aria-label="Poprzedni"><svg viewBox="0 0 14 14"><polyline points="9,2 4,7 9,12"/></svg></button>
+        <button class="btn-arrow" type="button" aria-label="Następny"><svg viewBox="0 0 14 14"><polyline points="5,2 10,7 5,12"/></svg></button>
       </div>
       <span class="cal-date" id="cal-date-label">Wtorek, 14 maja</span>
 
       <div class="cal-toolbar-right">
-        <!-- View dropdown -->
-        <div class="view-dropdown" id="view-dropdown">
-          <button class="view-dropdown-btn" id="view-dropdown-btn" type="button">
-            <span id="view-dropdown-label">Tydzień</span>
-            <svg viewBox="0 0 12 12"><polyline points="3,4.5 6,8 9,4.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </button>
-          <div class="view-dropdown-menu hidden" id="view-dropdown-menu" role="menu">
-            <button class="view-dropdown-item" data-view="day"   type="button">Dzień</button>
-            <button class="view-dropdown-item is-current" data-view="week"  type="button">Tydzień</button>
-            <button class="view-dropdown-item" data-view="month" type="button">Miesiąc</button>
-          </div>
+        <!-- View switcher (segmented radio) -->
+        <div class="view-switcher" id="view-switcher" role="tablist" aria-label="Widok kalendarza">
+          <button class="view-switcher__opt"            data-view="day"   type="button" role="tab">Dzień</button>
+          <button class="view-switcher__opt is-active"  data-view="week"  type="button" role="tab">Tydzień</button>
+          <button class="view-switcher__opt"            data-view="month" type="button" role="tab">Miesiąc</button>
+          <button class="view-switcher__opt"            data-view="list"  type="button" role="tab">Lista</button>
         </div>
 
         <!-- Asystent AI -->
@@ -2007,6 +2044,7 @@
           <path d="M13.9459 6.81127L13.5217 8.36364L13.0976 6.81127C12.9879 6.41029 12.7824 6.04512 12.5003 5.75022C12.2182 5.45533 11.8689 5.24043 11.4854 5.12582L10 4.68182L11.4849 4.23836C11.8684 4.12375 12.2177 3.90885 12.4998 3.61396C12.7819 3.31906 12.9874 2.95389 13.097 2.55291L13.5217 1L13.9459 2.55236C14.0555 2.95335 14.2611 3.31852 14.5432 3.61341C14.8252 3.90831 15.1745 4.1232 15.5581 4.23782L17.0435 4.68182L15.5586 5.12527C15.1751 5.23989 14.8258 5.45478 14.5437 5.74968C14.2616 6.04457 14.0555 6.41029 13.9459 6.81127Z" stroke="#7C3AED" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
           Asystent AI
+          <span class="btn-ai__badge" aria-label="8 powiadomień">8</span>
         </button>
 
         <!-- Dodaj wizytę -->
@@ -5077,17 +5115,33 @@
     } else {
       label.textContent = `${PL_MONTHS_NOM[viewCurrent.getMonth()]} ${viewCurrent.getFullYear()}`;
     }
+    updateTodayBtnState();
+  }
+
+  // Decides whether viewCurrent already shows 'today' for the active view —
+  // used to flip the 'Dzisiaj' button label from blue (clickable jump-back)
+  // to black (you're already here, click is a no-op visually).
+  function isViewOnToday() {
+    if (currentView === 'day') return isSameDay(viewCurrent, VIEW_TODAY);
+    if (currentView === 'week') {
+      return getWeekStart(viewCurrent).getTime() === getWeekStart(VIEW_TODAY).getTime();
+    }
+    // month
+    return viewCurrent.getMonth() === VIEW_TODAY.getMonth()
+        && viewCurrent.getFullYear() === VIEW_TODAY.getFullYear();
+  }
+  function updateTodayBtnState() {
+    const btn = document.querySelector('.btn-today');
+    if (btn) btn.classList.toggle('is-on-today', isViewOnToday());
   }
 
   const VIEW_LABELS = { day: 'Dzień', week: 'Tydzień', month: 'Miesiąc' };
 
   function setViewMode(view) {
     currentView = view;
-    // Update view dropdown label + selected item state
-    const lbl = document.getElementById('view-dropdown-label');
-    if (lbl) lbl.textContent = VIEW_LABELS[view] || 'Tydzień';
-    document.querySelectorAll('.view-dropdown-item').forEach(item => {
-      item.classList.toggle('is-current', item.dataset.view === view);
+    // Update segmented switcher's active option
+    document.querySelectorAll('.view-switcher__opt').forEach(opt => {
+      opt.classList.toggle('is-active', opt.dataset.view === view);
     });
     document.getElementById('view-day').classList.toggle('v-active', view === 'day');
     document.getElementById('view-week').classList.toggle('v-active', view === 'week');
@@ -5118,24 +5172,20 @@
     if (currentView === 'month') renderMonthView();
   };
 
-  // View dropdown — toggle menu + select item
+  // View switcher — click an option to set the view. 'list' is a placeholder
+  // (no renderer yet); shows an alert so the option is visible but a no-op.
   (function () {
-    const wrap = document.getElementById('view-dropdown');
-    const btn  = document.getElementById('view-dropdown-btn');
-    const menu = document.getElementById('view-dropdown-menu');
-    if (!wrap || !btn || !menu) return;
-    btn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      menu.classList.toggle('hidden');
-    });
-    menu.querySelectorAll('.view-dropdown-item').forEach(item => {
-      item.addEventListener('click', () => {
-        setViewMode(item.dataset.view);
-        menu.classList.add('hidden');
+    const wrap = document.getElementById('view-switcher');
+    if (!wrap) return;
+    wrap.querySelectorAll('.view-switcher__opt').forEach(opt => {
+      opt.addEventListener('click', () => {
+        const v = opt.dataset.view;
+        if (v === 'list') {
+          alert('Widok "Lista" — w pełnej wersji to płaska lista zleceń. (placeholder)');
+          return;
+        }
+        setViewMode(v);
       });
-    });
-    document.addEventListener('click', (e) => {
-      if (!wrap.contains(e.target)) menu.classList.add('hidden');
     });
   })();
 
