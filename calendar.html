@@ -7197,21 +7197,44 @@ window.ZiloStore = (function () {
         '</div>' +
       '</div>';
 
-    // Allocation bar — hidden in the fresh/empty state; appears once the first
-    // task has been added (state.bufferShown), and stays even if tasks are
-    // later removed. Keeps the initial screen simple.
-    const remFillPct = isTarget ? barFillPct : (sN > 0 ? 100 : 0);
-    const remainder = !state.bufferShown ? '' :
-      '<div class="zad-remainder">' +
-        '<div class="zad-remainder__bar"><div class="zad-remainder__fill" style="width:' + remFillPct + '%"></div></div>' +
-        '<div class="zad-remainder__row">' +
-          '<span>Do rozdzielenia między zadania: ' +
-            '<strong class="' + (overByMore ? 'zad-remainder__over' : '') + '">' + esc(fmtPLN(remNet)) + '</strong> netto / ' +
-            '<strong class="' + (overByMore ? 'zad-remainder__over' : '') + '">' + esc(fmtPLN(remBrutto)) + '</strong> brutto' +
-          '</span>' +
-          (isTarget ? '<button id="zad-clear-target" class="zad-link" type="button">Sumuj z zadań</button>' : '') +
-        '</div>' +
-      '</div>';
+    // Allocation bar (bufor) — original form (progress bar + opis left + CTA right,
+    // unchanged fonts/sizes). Only the BAR COLOR, the description and the CTA change
+    // per state. Shown after the first task (sticky). koszt zlecenia = suma główna
+    // (topNet), bufor = koszt − suma zadań (remNet):
+    //   koszt = 0  → szary pasek,   "Suma zadań: X"            + [Ustaw jako koszt zlecenia]
+    //   bufor > 0  → żółty pasek,   "Do rozdzielenia: X"
+    //   bufor = 0  → zielony pasek, "Cały koszt rozpisany na zadania"
+    //   bufor < 0  → czerwony pasek,"Rozpisałeś o X więcej…"   + [Podnieś koszt do Y]
+    let remainder = '';
+    if (state.bufferShown) {
+      let fillColor, desc, cta = '';
+      if (topNet <= 0.005) {
+        fillColor = '#979DB0';
+        desc = 'Suma zadań: <strong>' + esc(fmtPLN(sN)) + '</strong>';
+        cta = '<button id="zad-clear-target" class="zad-link" type="button">Ustaw jako koszt zlecenia</button>';
+      } else if (remNet > 0.005) {
+        fillColor = '#F6AE2D';
+        desc = 'Do rozdzielenia: <strong>' + esc(fmtPLN(remNet)) + '</strong>';
+      } else if (remNet < -0.005) {
+        fillColor = '#EA4335';
+        desc = 'Rozpisałeś o <strong>' + esc(fmtPLN(-remNet)) + '</strong> więcej, niż wynosi koszt zlecenia';
+        cta = '<button id="zad-clear-target" class="zad-link" type="button">Podnieś koszt do ' + esc(fmtPLN(sN)) + '</button>';
+      } else {
+        fillColor = '#00B286';
+        desc = 'Cały koszt rozpisany na zadania';
+      }
+      // Fill = how much of koszt is already allocated to tasks (suma zadań / koszt).
+      // bufor > 0 → partial; bufor = 0 / over → 100%; koszt = 0 → full (no target).
+      const fillPct = topNet <= 0.005 ? 100 : Math.max(0, Math.min(100, Math.round(sN / topNet * 100)));
+      remainder =
+        '<div class="zad-remainder" style="background:#fff;">' +
+          '<div class="zad-remainder__bar"><div class="zad-remainder__fill" style="width:' + fillPct + '%;background:' + fillColor + ';"></div></div>' +
+          '<div class="zad-remainder__row">' +
+            '<span>' + desc + '</span>' +
+            cta +
+          '</div>' +
+        '</div>';
+    }
 
     // Section header — title (left) + optional progress + spacer + '+ Dodaj zadanie' (right).
     const head =
