@@ -1411,7 +1411,7 @@
       overflow: hidden;
     }
     /* Dropdown scroll area */
-    .dd-scroll { overflow-y: auto; max-height: 280px; padding: 12px 12px 6px; display: flex; flex-direction: column; gap: 8px; }
+    .dd-scroll { overflow-y: auto; max-height: 310px; padding: 12px 12px 6px; display: flex; flex-direction: column; gap: 8px; }
 
     /* Client card */
     .cust-card {
@@ -3476,6 +3476,7 @@ window.ZiloStore = (function () {
 
   // ── Client database ──
   let CLIENTS = []; // loaded from Supabase on init
+  let clientsLoading = true; // true until the first Supabase load resolves (success or error)
 
   // ── Search helpers ──
   function normalize(str) {
@@ -3545,7 +3546,26 @@ window.ZiloStore = (function () {
       scroll.innerHTML   = '';
       scroll.classList.add('hidden');
       notFound.classList.remove('hidden');
+      // Distinguish "baza jeszcze się ładuje" from "brak dopasowania"
+      const nfTitle = notFound.querySelector('.nf-title');
+      const nfSub   = notFound.querySelector('.nf-sub');
+      if (clientsLoading && !CLIENTS.length) {
+        if (nfTitle) nfTitle.textContent = 'Ładowanie bazy klientów…';
+        if (nfSub)   nfSub.innerHTML     = 'Pobieram klientów z serwera. Chwila…';
+      } else {
+        if (nfTitle) nfTitle.textContent = 'Nie znaleziono klienta';
+        if (nfSub)   nfSub.innerHTML     = 'Brak klienta pasującego do wyszukiwania.<br>Możesz dodać nowego klienta.';
+      }
     }
+  }
+
+  // Re-render the client picker if it's currently open — used after the async
+  // Supabase load finishes, so a picker opened before data arrived fills in live.
+  function refreshClientPicker() {
+    if (!searchDropdown || searchDropdown.classList.contains('hidden')) return;
+    const q = searchInput.value.trim();
+    renderResults(q ? searchClients(q) : allClientsSorted());
+    positionDropdown();
   }
 
   // ── Selected client state ──
@@ -4846,6 +4866,7 @@ window.ZiloStore = (function () {
         sbLoadVisits(`${y - 1}-01-01`, `${y + 1}-12-31`),
       ]);
       CLIENTS = clients;
+      clientsLoading = false;
       // Merge: keep demo entries, add real Supabase visits
       const realIds = new Set(visits.map(v => v.id));
       APPOINTMENTS = [...DEMO_APPOINTMENTS.filter(d => !realIds.has(d.id)), ...visits];
@@ -4853,11 +4874,14 @@ window.ZiloStore = (function () {
       if (currentView === 'day') renderDayView();
       else if (currentView === 'week') renderWeekView();
       else renderMonthView();
+      refreshClientPicker(); // fill an already-open client picker now that the base is here
     } catch (e) {
       console.error('Supabase init error:', e);
+      clientsLoading = false;
       if (currentView === 'day') renderDayView();
       else if (currentView === 'week') renderWeekView();
       else renderMonthView();
+      refreshClientPicker();
     }
   }
   initSupabase();
