@@ -2266,7 +2266,7 @@ window.ZiloStore = (function () {
           <path d="M13.9459 6.81127L13.5217 8.36364L13.0976 6.81127C12.9879 6.41029 12.7824 6.04512 12.5003 5.75022C12.2182 5.45533 11.8689 5.24043 11.4854 5.12582L10 4.68182L11.4849 4.23836C11.8684 4.12375 12.2177 3.90885 12.4998 3.61396C12.7819 3.31906 12.9874 2.95389 13.097 2.55291L13.5217 1L13.9459 2.55236C14.0555 2.95335 14.2611 3.31852 14.5432 3.61341C14.8252 3.90831 15.1745 4.1232 15.5581 4.23782L17.0435 4.68182L15.5586 5.12527C15.1751 5.23989 14.8258 5.45478 14.5437 5.74968C14.2616 6.04457 14.0555 6.41029 13.9459 6.81127Z" stroke="#7C3AED" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
           Asystent AI
-          <span class="btn-ai__badge" aria-label="8 powiadomień">8</span>
+          <span class="btn-ai__badge" aria-label="8 powiadomień" style="display:none">8</span>
         </button>
 
         <!-- Dodaj wizytę -->
@@ -4733,6 +4733,7 @@ window.ZiloStore = (function () {
     'Klimatyzacja':         { type:'temporal',  hours:'8:00 – 16:00', capacity: null },
     'Myjnia':               { type:'temporal',  hours:'8:00 – 17:00', capacity: null },
   };
+  window.STATION_META = STATION_META; // exposed for the visit-details modal (separate IIFE)
 
   // ── Stanowisko selector ──
   const STANOWISKA = [
@@ -4848,8 +4849,8 @@ window.ZiloStore = (function () {
     return d;
   }
   const DEMO_APPOINTMENTS = [
-    { id:'d9', date: __wd(0), start:'9:00',  end:'10:00', name:'Audi A4 2019 2.0 TDI', phone:'+48 516 000 009', desc:'Wymiana rozrządu',                  stanowisko:'Mechanika ogólna',     status:'umowione', assignee: null, estimatedPriceBrutto: null },
-    { id:'d12',date: __wd(0), start:'9:00',  end:'10:00', name:'BMW 520i 2019',    phone:'+48 516 000 012', desc:'Mycie i czyszczenie wnętrza',         stanowisko:'Myjnia',               status:'umowione', assignee: null, estimatedPriceBrutto: null },
+    { id:'d9', date: __wd(0), start:'9:00',  end:'10:00', name:'Audi A4',            phone:'+48 516 000 009', desc:'Wymiana rozrządu',                  stanowisko:'Mechanika ogólna',     status:'umowione', assignee: null, estimatedPriceBrutto: 2200, veh:{ year:'2019', engine:'2.0 TDI' } },
+    { id:'d12',date: __wd(0), start:'9:00',  end:'10:00', name:'BMW 520i',         phone:'+48 516 000 012', desc:'Mycie auta',                          stanowisko:'Myjnia',               status:'umowione', assignee: null, estimatedPriceBrutto: null, veh:{ year:'2019', engine:'2.0 benzyna' } },
     { id:'d10',date: __wd(0), start:'11:30', end:'12:30', name:'Mazda CX-5',       phone:'+48 516 000 010', desc:'Wymiana opon – felga aluminiowa 18″', stanowisko:'Opony i wulkanizacja', status:'umowione', assignee: null, estimatedPriceBrutto: null },
     { id:'d2', date: __wd(1), start:'10:00', end:'11:30', name:'Toyota Corolla',   phone:'+48 516 000 002', desc:'Wymiana oleju silnikowego i filtrów', stanowisko:'Mechanika ogólna',     status:'umowione', assignee:'PN',   estimatedPriceBrutto: 350 },
     { id:'d11',date: __wd(1), start:'13:00', end:'14:00', name:'Hyundai Tucson',   phone:'+48 516 000 011', desc:'Serwis klimatyzacji R1234yf',         stanowisko:'Klimatyzacja',         status:'umowione', assignee:'FD',   estimatedPriceBrutto: 450 },
@@ -5520,8 +5521,9 @@ window.ZiloStore = (function () {
       let cardsHTML = '';
       appts.forEach((a, i) => {
         const idx = APPOINTMENTS.indexOf(a);
+        const wkTime = (STATION_META[a.stanowisko] && STATION_META[a.stanowisko].type === 'quantity') ? a.start : `${a.start}–${a.end}`;
         cardsHTML += `<div class="wk-appt${a._isNew?' appt-new':''}" data-appt-idx="${idx}" style="${stationStyleAttr(a.stanowisko)}">
-          <div class="wk-appt__time">${a.start}–${a.end}</div>
+          <div class="wk-appt__time">${wkTime}</div>
           <div class="wk-appt__name">${a.name}</div>
           ${a.desc ? `<div class="appt-service">${a.desc}</div>` : ''}
           ${apptFooterHTML(a)}
@@ -6230,7 +6232,7 @@ window.ZiloStore = (function () {
           <div class="car-grid" id="car-grid" data-vin-state="present" style="padding: 8px 8px 1px">
             <div class="car-grid__field">
               <div class="car-grid__label">Marka, model</div>
-              <div class="car-grid__value">Mersedes-Benz Klassa S</div>
+              <div class="car-grid__value">Audi A4</div>
             </div>
             <div class="car-grid__field">
               <div class="car-grid__label">Rejestracje</div>
@@ -6253,11 +6255,11 @@ window.ZiloStore = (function () {
             </div>
             <div class="car-grid__field">
               <div class="car-grid__label">Rok</div>
-              <div class="car-grid__value">2020</div>
+              <div class="car-grid__value" id="car-year">2019</div>
             </div>
             <div class="car-grid__field car-grid__field--full">
               <div class="car-grid__label">Model silnika</div>
-              <div class="car-grid__value">Diesel, S 350 BlueTEC 3.0</div>
+              <div class="car-grid__value" id="car-engine">2.0 TDI</div>
             </div>
           </div>
         </div>
@@ -6410,7 +6412,10 @@ window.ZiloStore = (function () {
         const span = fields[2].querySelector(".visit-field__value span");
         if (span) {
           const dateLbl = a.date instanceof Date ? formatDateLabelPL(a.date) : (a.dateLabel || '');
-          const t = `${a.start || ""}${a.end ? "–" + a.end : ""}`;
+          // Stanowisko ilościowe → tylko godzina przyjazdu (np. 09:00); czasowe → zakres od–do.
+          const _stMeta = (typeof window.STATION_META !== 'undefined') ? window.STATION_META[a.stanowisko] : null;
+          const _isQty  = !!(_stMeta && _stMeta.type === 'quantity');
+          const t = _isQty ? (a.start || "") : `${a.start || ""}${a.end ? "–" + a.end : ""}`;
           const composed = (dateLbl ? dateLbl + " " : "") + t;
           if (composed.trim()) span.textContent = composed;
         }
@@ -6431,6 +6436,11 @@ window.ZiloStore = (function () {
       // 5) POJAZD: marka + model — first car-grid field
       const carValues = scope.querySelectorAll('.car-grid__value');
       if (a.name && carValues[0]) carValues[0].textContent = a.name;
+      // 5b) Rok + Model silnika — per-visit (a.veh), with static fallback
+      const yearEl = scope.querySelector('#car-year');
+      if (yearEl && a.veh && a.veh.year)   yearEl.textContent   = a.veh.year;
+      const engEl = scope.querySelector('#car-engine');
+      if (engEl && a.veh && a.veh.engine)  engEl.textContent    = a.veh.engine;
 
       // 6) TELEFON
       if (a.phone) {
@@ -7113,17 +7123,42 @@ window.ZiloStore = (function () {
   // absorbs the entire targetNet via recalcAuto. Only personId is left.
   function importFromWyc(laborBrutto) {
     if (!laborBrutto || laborBrutto <= 0) return;
-    state.targetNet = laborBrutto / (1 + VAT);
-    state.tasks.push({
-      id: 'z' + (state.nextId++),
-      name: state.order.serviceName || '',
-      personId: null,
-      unit: 'sztuka',
-      qty: 1,
-      unitNet: null,
-      done: false,
-      manual: false
-    });
+    // If the selected quote carries labor line items, copy them as individual
+    // tasks (each with its own netto). Otherwise fall back to a single auto-task
+    // that absorbs the whole labor portion via recalcAuto.
+    let items = null;
+    if (currentVisitId && typeof window.__wycGetQuotes === 'function') {
+      const quotes = window.__wycGetQuotes(currentVisitId);
+      const q = quotes && quotes[_zadWycSelectedIdx];
+      if (q && Array.isArray(q.laborItems) && q.laborItems.length) items = q.laborItems;
+    }
+    if (items) {
+      state.targetNet = items.reduce((a, it) => a + (it.net || 0), 0);
+      items.forEach(it => {
+        state.tasks.push({
+          id: 'z' + (state.nextId++),
+          name: it.name || '',
+          personId: null,
+          unit: 'sztuka',
+          qty: 1,
+          unitNet: it.net,
+          done: false,
+          manual: true
+        });
+      });
+    } else {
+      state.targetNet = laborBrutto / (1 + VAT);
+      state.tasks.push({
+        id: 'z' + (state.nextId++),
+        name: state.order.serviceName || '',
+        personId: null,
+        unit: 'sztuka',
+        qty: 1,
+        unitNet: null,
+        done: false,
+        manual: false
+      });
+    }
     recalcAuto();
     render();
   }
@@ -7809,7 +7844,13 @@ window.ZiloStore = (function () {
   const SERVICE_PRICES = {
     'Wymiana oleju silnikowego i filtrów': { labor: 300, parts: 500 },   //  800 total
     'Serwis klimatyzacji R134a':           { labor: 250, parts: 100 },   //  350 total
-    'Wymiana opon – felga stalowa 15″':    { labor: 200, parts:   0 }    //  200 total (100% labor)
+    'Wymiana opon – felga stalowa 15″':    { labor: 200, parts:   0 },   //  200 total (100% labor)
+    // Robocizna 1230 brutto (= 1000 netto, 3 pozycje) + części 970 brutto = 2200 total
+    'Wymiana rozrządu':                    { labor: 1230, parts: 970, laborItems: [
+      { name: 'Wymiana paska rozrządu',                        net: 700 },
+      { name: 'Wymiana pompy wody',                            net: 220 },
+      { name: 'Uzupełnienie i odpowietrzenie układu chłodniczego', net: 80 }
+    ] }
   };
 
   const STATUS_META = {
@@ -7835,7 +7876,8 @@ window.ZiloStore = (function () {
       status: 'wyslana',
       laborBrutto: p.labor,
       partsBrutto: p.parts,
-      amount: p.labor + p.parts
+      amount: p.labor + p.parts,
+      laborItems: p.laborItems || null
     }];
   }
   // Append a new draft quote — used by the '+ Dodaj wycenę' button so the
