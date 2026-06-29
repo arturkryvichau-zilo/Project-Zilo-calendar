@@ -2253,8 +2253,8 @@ window.ZiloStore = (function () {
       <div class="cal-toolbar-right">
         <!-- View switcher (segmented radio) -->
         <div class="view-switcher" id="view-switcher" role="tablist" aria-label="Widok kalendarza">
-          <button class="view-switcher__opt"            data-view="day"   type="button" role="tab">Dzień</button>
-          <button class="view-switcher__opt is-active"  data-view="week"  type="button" role="tab">Tydzień</button>
+          <button class="view-switcher__opt is-active"  data-view="day"   type="button" role="tab">Dzień</button>
+          <button class="view-switcher__opt"            data-view="week"  type="button" role="tab">Tydzień</button>
           <button class="view-switcher__opt"            data-view="month" type="button" role="tab">Miesiąc</button>
           <button class="view-switcher__opt"            data-view="list"  type="button" role="tab">Lista</button>
         </div>
@@ -2281,10 +2281,10 @@ window.ZiloStore = (function () {
       <button class="filter-chip" data-station="Opony i wulkanizacja">Opony i wulkanizacja</button>
       <button class="filter-chip" data-station="Mechanika ogólna">Mechanika ogólna</button>
       <button class="filter-chip" data-station="Klimatyzacja">Klimatyzacja</button>
-      <button class="filter-chip" data-station="Blacharstwo">Blacharstwo</button>
+      <button class="filter-chip" data-station="Myjnia">Myjnia</button>
     </div>
     <div class="cal-main">
-      <div id="view-day" class="view-daily">
+      <div id="view-day" class="view-daily v-active">
       <div class="cal-scroll-area">
         <!-- Headers row -->
         <div class="cal-col-headers">
@@ -2313,12 +2313,12 @@ window.ZiloStore = (function () {
               <span class="badge-hours">8:00 – 16:00</span>
             </div>
           </div>
-          <!-- Quantity: Blacharstwo -->
+          <!-- Temporal: Myjnia -->
           <div class="col-header" id="col-hdr-4">
-            <div class="col-header__name">Blacharstwo</div>
+            <div class="col-header__name">Myjnia</div>
             <div class="col-header__meta">
               <span class="badge-live"><svg viewBox="0 0 16 11" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="8" cy="5.5" r="1.5" fill="#3bb08f"/><path d="M5.2 2.7a4 4 0 0 0 0 5.6" stroke="#3bb08f" stroke-width="1.4" stroke-linecap="round"/><path d="M10.8 2.7a4 4 0 0 1 0 5.6" stroke="#3bb08f" stroke-width="1.4" stroke-linecap="round"/><path d="M2.4.5a8 8 0 0 0 0 10" stroke="#3bb08f" stroke-width="1.4" stroke-linecap="round"/><path d="M13.6.5a8 8 0 0 1 0 10" stroke="#3bb08f" stroke-width="1.4" stroke-linecap="round"/></svg></span>
-              <span class="badge-count" id="qty-badge-4">0/6</span>
+              <span class="badge-hours">8:00 – 17:00</span>
             </div>
           </div>
         </div>
@@ -2425,8 +2425,31 @@ window.ZiloStore = (function () {
               <div class="col-line col-line--major"></div><div class="col-line"></div>
               <div class="col-line col-line--major"></div><div class="col-line"></div>
             </div>
-            <!-- Col 4: Blacharstwo (quantity) -->
-            <div class="cal-col col--quantity" id="cal-col-4"></div>
+            <!-- Col 4: Myjnia (temporal) -->
+            <div class="cal-col col--temporal" id="cal-col-4">
+              <div class="col-line col-line--major"></div><div class="col-line"></div>
+              <div class="col-line col-line--major"></div><div class="col-line"></div>
+              <div class="col-line col-line--major"></div><div class="col-line"></div>
+              <div class="col-line col-line--major"></div><div class="col-line"></div>
+              <div class="col-line col-line--major"></div><div class="col-line"></div>
+              <div class="col-line col-line--major"></div><div class="col-line"></div>
+              <div class="col-line col-line--major"></div><div class="col-line"></div>
+              <div class="col-line col-line--major"></div><div class="col-line"></div>
+              <div class="col-line col-line--major"></div><div class="col-line"></div>
+              <div class="col-line col-line--major"></div><div class="col-line"></div>
+              <div class="col-line col-line--major"></div><div class="col-line"></div>
+              <div class="col-line col-line--major"></div><div class="col-line"></div>
+              <div class="col-line col-line--major"></div><div class="col-line"></div>
+              <div class="col-line col-line--major"></div><div class="col-line"></div>
+              <div class="col-line col-line--major"></div><div class="col-line"></div>
+              <div class="col-line col-line--major"></div><div class="col-line"></div>
+              <div class="col-line col-line--major"></div><div class="col-line"></div>
+              <div class="col-line col-line--major"></div><div class="col-line"></div>
+              <div class="col-line col-line--major"></div><div class="col-line"></div>
+              <div class="col-line col-line--major"></div><div class="col-line"></div>
+              <div class="col-line col-line--major"></div><div class="col-line"></div>
+              <div class="col-line col-line--major"></div><div class="col-line"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -2437,7 +2460,7 @@ window.ZiloStore = (function () {
         </div>
       </div>
       </div><!-- /view-day -->
-      <div id="view-week" class="view-weekly v-active"></div>
+      <div id="view-week" class="view-weekly"></div>
       <div id="view-month" class="view-monthly"></div>
     </div><!-- /cal-main -->
   </div><!-- /cal-card -->
@@ -2901,13 +2924,13 @@ window.ZiloStore = (function () {
   const screenQi     = document.getElementById('screen-qi');
 
   function setPanelScreen(name) {
-    // name: 'choose' | 'qi' | 'form'
-    screenChoose.classList.toggle('ps-active', name === 'choose');
-    screenQi.classList.toggle('ps-active',     name === 'qi');
-    // form is the default — header/body always present; just ensure screens are off
+    // Quick Input usunięty na tym buildzie (Link 2): zawsze pokazujemy formularz.
+    // Ekrany 'choose' (wybór metody) i 'qi' (szybkie wypełnienie) nigdy nie są aktywne.
+    screenChoose.classList.remove('ps-active');
+    screenQi.classList.remove('ps-active');
   }
 
-  function openPanel(screen = 'choose') {
+  function openPanel(screen = 'form') {
     panel.classList.add('open');
     backdrop.classList.add('visible');
     setPanelScreen(screen);
@@ -3099,28 +3122,11 @@ window.ZiloStore = (function () {
   // Position popover near a given rect
   let _qiAnchorEl = null;
   function showQiPop(anchorRect, anchorEl, forceAbove) {
-    _qiAnchorEl = anchorEl || null;
-    qiPop.classList.add('qp-visible');
-    const pw = 360, ph = 220, margin = 10;
-    const vw = window.innerWidth, vh = window.innerHeight;
-    // Center horizontally relative to anchor
-    let left = anchorRect.left + anchorRect.width / 2 - pw / 2;
-    // Clamp to viewport
-    if (left + pw > vw - margin) left = vw - pw - margin;
-    if (left < margin) left = margin;
-    // Vertical: forceAbove → always above; otherwise below with fallback above
-    let top;
-    if (forceAbove) {
-      top = anchorRect.top - ph - margin;
-      if (top < margin) top = anchorRect.bottom + margin; // not enough space above → fall back below
-    } else {
-      top = anchorRect.bottom + margin;
-      if (top + ph > vh - margin) top = anchorRect.top - ph - margin;
-    }
-    qiPop.style.left = left + 'px';
-    qiPop.style.top  = top  + 'px';
-    document.getElementById('qi-pop-ta')?.focus();
-    window._startQiAnim?.();
+    // Quick Input usunięty (Link 2): zamiast pop-overu otwieramy od razu formularz.
+    // Klik w slot siatki (anchorEl = podgląd) → przenosimy do formularza godzinę/stanowisko.
+    if (anchorEl && _hoveredLine) prefillPanelFromSlot(_hoveredLine);
+    hideQiPop(); // sprząta podgląd slotu i ewentualny stan pop-overu
+    openPanel('form');
   }
 
   // Follow slot on horizontal scroll only (vertical stays fixed like Google Calendar)
@@ -4725,7 +4731,7 @@ window.ZiloStore = (function () {
     'Opony i wulkanizacja': { type:'temporal',  hours:'8:00 – 16:30', capacity: null },
     'Mechanika ogólna':     { type:'quantity',  hours:'8:00 – 17:00', capacity: 6 },
     'Klimatyzacja':         { type:'temporal',  hours:'8:00 – 16:00', capacity: null },
-    'Blacharstwo':          { type:'quantity',  hours:'8:00 – 16:30', capacity: 6 },
+    'Myjnia':               { type:'temporal',  hours:'8:00 – 17:00', capacity: null },
   };
 
   // ── Stanowisko selector ──
@@ -4733,7 +4739,7 @@ window.ZiloStore = (function () {
     'Opony i wulkanizacja',
     'Mechanika ogólna',
     'Klimatyzacja',
-    'Blacharstwo',
+    'Myjnia',
   ];
   let selectedStation = STANOWISKA[0];
 
@@ -4742,7 +4748,7 @@ window.ZiloStore = (function () {
     'Opony i wulkanizacja':       'cal-col-1',
     'Mechanika ogólna':           'cal-col-2',
     'Klimatyzacja':               'cal-col-3',
-    'Blacharstwo':                'cal-col-4',
+    'Myjnia':                     'cal-col-4',
     // Legacy aliases — map old station names to new columns for any pre-existing data
     'Mechanika i usterki':        'cal-col-2',
     'Olej':                       'cal-col-2',
@@ -4842,14 +4848,13 @@ window.ZiloStore = (function () {
     return d;
   }
   const DEMO_APPOINTMENTS = [
-    { id:'d1', date: __wd(0), start:'8:00',  end:'9:00',  name:'Audi A4',          phone:'+48 516 000 001', desc:'Lakierowanie zderzaka przedniego',    stanowisko:'Blacharstwo',          status:'umowione', assignee:'AK',   estimatedPriceBrutto: 2400 },
-    { id:'d9', date: __wd(0), start:'9:00',  end:'10:00', name:'BMW 520i',         phone:'+48 516 000 009', desc:'Diagnostyka komputerowa silnika',     stanowisko:'Mechanika ogólna',     status:'umowione', assignee: null, estimatedPriceBrutto: null },
+    { id:'d9', date: __wd(0), start:'9:00',  end:'10:00', name:'Audi A4 2019 2.0 TDI', phone:'+48 516 000 009', desc:'Wymiana rozrządu',                  stanowisko:'Mechanika ogólna',     status:'umowione', assignee: null, estimatedPriceBrutto: null },
+    { id:'d12',date: __wd(0), start:'9:00',  end:'10:00', name:'BMW 520i 2019',    phone:'+48 516 000 012', desc:'Mycie i czyszczenie wnętrza',         stanowisko:'Myjnia',               status:'umowione', assignee: null, estimatedPriceBrutto: null },
     { id:'d10',date: __wd(0), start:'11:30', end:'12:30', name:'Mazda CX-5',       phone:'+48 516 000 010', desc:'Wymiana opon – felga aluminiowa 18″', stanowisko:'Opony i wulkanizacja', status:'umowione', assignee: null, estimatedPriceBrutto: null },
     { id:'d2', date: __wd(1), start:'10:00', end:'11:30', name:'Toyota Corolla',   phone:'+48 516 000 002', desc:'Wymiana oleju silnikowego i filtrów', stanowisko:'Mechanika ogólna',     status:'umowione', assignee:'PN',   estimatedPriceBrutto: 350 },
     { id:'d11',date: __wd(1), start:'13:00', end:'14:00', name:'Hyundai Tucson',   phone:'+48 516 000 011', desc:'Serwis klimatyzacji R1234yf',         stanowisko:'Klimatyzacja',         status:'umowione', assignee:'FD',   estimatedPriceBrutto: 450 },
     { id:'d3', date: __wd(2), start:'8:00',  end:'9:30',  name:'Volkswagen Passat',phone:'+48 516 000 003', desc:'Wymiana opon – felga aluminiowa 17″', stanowisko:'Opony i wulkanizacja', status:'umowione', assignee:'AK',   estimatedPriceBrutto: 250 },
     { id:'d4', date: __wd(2), start:'11:00', end:'12:00', name:'Skoda Octavia',    phone:'+48 516 000 004', desc:'Serwis klimatyzacji R134a',           stanowisko:'Klimatyzacja',         status:'umowione', assignee: null, estimatedPriceBrutto: null },
-    { id:'d5', date: __wd(3), start:'9:00',  end:'10:30', name:'BMW 320d',         phone:'+48 516 000 005', desc:'Naprawa drzwi po stłuczce',           stanowisko:'Blacharstwo',          status:'umowione', assignee:'AK',   estimatedPriceBrutto: 3800 },
     { id:'d6', date: __wd(3), start:'13:00', end:'14:00', name:'Ford Focus',       phone:'+48 516 000 006', desc:'Naprawa układu kierowniczego',        stanowisko:'Mechanika ogólna',     status:'umowione', assignee: null, estimatedPriceBrutto: null },
     { id:'d7', date: __wd(4), start:'8:30',  end:'9:30',  name:'Opel Astra',       phone:'+48 516 000 007', desc:'Wymiana opon – felga stalowa 15″',    stanowisko:'Opony i wulkanizacja', status:'umowione', assignee: null, estimatedPriceBrutto: null },
     { id:'d8', date: __wd(5), start:'10:00', end:'11:00', name:'Renault Megane',   phone:'+48 516 000 008', desc:'Uzupełnienie czynnika chłodniczego',  stanowisko:'Klimatyzacja',         status:'umowione', assignee:'AW',   estimatedPriceBrutto: 280 },
@@ -5196,7 +5201,7 @@ window.ZiloStore = (function () {
     'Opony i wulkanizacja':     'niebieski',
     'Mechanika ogólna':         'zolty',
     'Klimatyzacja':             'turkusowy',
-    'Blacharstwo':              'fioletowy',
+    'Myjnia':                   'fioletowy',
     // Legacy aliases
     'Mechanika i usterki':      'zolty',
     'Olej':                     'pomaranczowy',
@@ -5340,7 +5345,7 @@ window.ZiloStore = (function () {
   // ════════════════════════════
   const VIEW_TODAY = new Date();
   let viewCurrent = new Date(VIEW_TODAY);
-  let currentView = 'week';
+  let currentView = 'day';
 
   const PL_MONTHS     = ['stycznia','lutego','marca','kwietnia','maja','czerwca','lipca','sierpnia','września','października','listopada','grudnia'];
   const PL_MONTHS_NOM = ['Styczeń','Luty','Marzec','Kwiecień','Maj','Czerwiec','Lipiec','Sierpień','Wrzesień','Październik','Listopad','Grudzień'];
@@ -5444,6 +5449,10 @@ window.ZiloStore = (function () {
       });
     });
   })();
+
+  // Default view = Dzień (Link 2 / warsztat). Applies v-active, switcher state,
+  // hides station filter chips, and renders the day view on load.
+  setViewMode('day');
 
   const [btnPrev, btnNext] = document.querySelectorAll('.btn-arrow');
   btnPrev && btnPrev.addEventListener('click', () => navigateView(-1));
