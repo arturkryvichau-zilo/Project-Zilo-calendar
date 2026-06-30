@@ -2048,6 +2048,17 @@ window.ZiloStore = (function () {
   },
 ];
   const liveByVisit = {};   // visitId -> [ {taskId, visitId, empId, task, vehicle, date, labor, hours, done} ]
+  // ── Scenariusz testowy (na sztywno): rozliczenie Pawła Nowaka (e3) w Raportach ──
+  // Zawsze obecne w „Rozliczenie pracowników", chyba że pojawią się żywe zadania
+  // Pawła (wtedy seed jest pomijany, żeby nie dublować). Prowizja liczona z labor × 30%.
+  const _td = new Date();
+  const _todayStr = ('0' + _td.getDate()).slice(-2) + '.' + ('0' + (_td.getMonth() + 1)).slice(-2) + '.' + _td.getFullYear();
+  const SEED_ORDERS = [
+    { taskId: 'pn-seed-1', visitId: '__pn-seed', empId: 'e3', task: 'Wymiana paska rozrządu',                         vehicle: 'Audi A4', date: _todayStr, labor: 700,    hours: null, done: true },
+    { taskId: 'pn-seed-2', visitId: '__pn-seed', empId: 'e3', task: 'Wymiana pompy wody',                             vehicle: 'Audi A4', date: _todayStr, labor: 220,    hours: null, done: true },
+    { taskId: 'pn-seed-3', visitId: '__pn-seed', empId: 'e3', task: 'Uzupełnienie i odpowietrzenie układu chłodniczego', vehicle: 'Audi A4', date: _todayStr, labor: 80,     hours: null, done: true },
+    { taskId: 'pn-seed-4', visitId: '__pn-seed', empId: 'e3', task: 'Wymiana pasku osprzętu',                         vehicle: 'Audi A4', date: _todayStr, labor: 121.95, hours: null, done: true },
+  ];
   const subs = [];
   function notify() { subs.forEach(function (fn) { try { fn(); } catch (e) {} }); }
   function rebuild() {
@@ -2055,11 +2066,15 @@ window.ZiloStore = (function () {
     Object.keys(liveByVisit).forEach(function (vid) {
       (liveByVisit[vid] || []).forEach(function (o) { live.push(o); });
     });
+    // Hardcoded scenariusz: wiersze Pawła Nowaka (e3) są zawsze, dopóki nie ma
+    // żywych zadań Pawła (wtedy seed pomijamy, by nie dublować).
+    const hasLivePN = live.some(function (o) { return o.empId === 'e3'; });
+    const full = hasLivePN ? live : SEED_ORDERS.concat(live);
     // Raporty → Rozliczenie pracowników reads the FULL list (incl. incomplete
     // tasks: no person, no labor, no name) so gaps/errors are visible.
-    api.allOrders = live.slice();
+    api.allOrders = full.slice();
     EMPLOYEES.forEach(function (emp) {
-      emp.recentOrders = live
+      emp.recentOrders = full
         .filter(function (o) { return o.empId === emp.id; })
         .map(function (o) {
           return { id: o.taskId, visitId: o.visitId, date: o.date, task: o.task, vehicle: o.vehicle, labor: o.labor, hours: o.hours, done: o.done };
@@ -6777,6 +6792,9 @@ window.ZiloStore = (function () {
       // Buffer ('Do rozdzielenia') is hidden until the first task is added, then
       // stays visible (sticky) even after tasks are removed.
       bufferShown: false,
+      // Boks „Przenieś robociznę z wyceny" pozostaje widoczny aż do świadomego
+      // użycia (kliknięcia przenieś). Dodanie osoby/zadania go NIE chowa.
+      wycUsed: false,
       assignMenuOpen: false,
       order: {
         serviceName: od.serviceName || '',
@@ -7143,7 +7161,10 @@ window.ZiloStore = (function () {
   //   - the visit has at least one quote.
   // Otherwise null and the banner hides.
   function wycSuggestFor() {
-    if (state.tasks.length > 0) return null;
+    // Chowamy boks dopiero gdy użyto transferu ORAZ są jeszcze jakieś zadania.
+    // Gdy lista zadań jest pusta — pokazujemy go znów (można ponownie przenieść
+    // robociznę z wyceny zamiast odtwarzać zadania ręcznie).
+    if (state.wycUsed && state.tasks.length > 0) return null;
     if (!currentVisitId || typeof window.__wycGetQuotes !== 'function') return null;
     const quotes = window.__wycGetQuotes(currentVisitId);
     if (!quotes || quotes.length === 0) return null;
@@ -7177,6 +7198,7 @@ window.ZiloStore = (function () {
   // absorbs the entire targetNet via recalcAuto. Only personId is left.
   function importFromWyc(laborBrutto) {
     if (!laborBrutto || laborBrutto <= 0) return;
+    state.wycUsed = true; // świadome skorzystanie z boksu → od teraz chowamy go
     // If the selected quote carries labor line items, copy them as individual
     // tasks (each with its own netto). Otherwise fall back to a single auto-task
     // that absorbs the whole labor portion via recalcAuto.
@@ -7187,7 +7209,9 @@ window.ZiloStore = (function () {
       if (q && Array.isArray(q.laborItems) && q.laborItems.length) items = q.laborItems;
     }
     if (items) {
-      state.targetNet = items.reduce((a, it) => a + (it.net || 0), 0);
+      // Dodajemy do istniejących zadań. Sumę liczymy z REALNYCH zadań (sumNet po
+      // dodaniu), a NIE z lepkiego state.targetNet — inaczej po usunięciu zadań
+      // i ponownym przeniesieniu suma podwajałaby się (x2).
       items.forEach(it => {
         state.tasks.push({
           id: 'z' + (state.nextId++),
@@ -7200,8 +7224,10 @@ window.ZiloStore = (function () {
           manual: true
         });
       });
+      state.targetNet = sumNet();
     } else {
-      state.targetNet = laborBrutto / (1 + VAT);
+      // Baza = realna suma istniejących zadań (bez lepkiego targetNet), + przenoszona robocizna.
+      state.targetNet = sumNet() + laborBrutto / (1 + VAT);
       state.tasks.push({
         id: 'z' + (state.nextId++),
         name: state.order.serviceName || '',
@@ -7377,7 +7403,7 @@ window.ZiloStore = (function () {
 
     // Wyc-import banner sits FIRST — above the summary boxes (shown when there
     // are no tasks yet and the visit has at least one quote).
-    const bannerTop = (total === 0 && wycSuggest) ? wycSuggestHTML(wycSuggest) : '';
+    const bannerTop = wycSuggest ? wycSuggestHTML(wycSuggest) : '';
 
     // Body — task list, or (when no tasks) the empty-state card. The card shows
     // in the tasks section even when the wyc-import banner is present on top.
