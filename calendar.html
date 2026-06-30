@@ -4878,9 +4878,11 @@ window.ZiloStore = (function () {
     d.setHours(0, 0, 0, 0);
     return d;
   }
+  // Always "today" at midnight — used to pin the priority test visits to the current day.
+  function __today() { const d = new Date(); d.setHours(0, 0, 0, 0); return d; }
   const DEMO_APPOINTMENTS = [
-    { id:'d9', date: __wd(0), start:'9:00',  end:'10:00', name:'Audi A4',            phone:'+48 516 000 009', desc:'Wymiana rozrządu',                  stanowisko:'Mechanika ogólna',     status:'umowione', assignee: null, estimatedPriceBrutto: 2200, veh:{ year:'2019', engine:'2.0 TDI' } },
-    { id:'d12',date: __wd(0), start:'9:00',  end:'10:00', name:'BMW 520i',         phone:'+48 516 000 012', desc:'Mycie auta',                          stanowisko:'Myjnia',               status:'umowione', assignee: null, estimatedPriceBrutto: null, veh:{ year:'2019', engine:'2.0 benzyna' } },
+    { id:'d9', date: __today(), start:'9:00',  end:'10:00', name:'Audi A4',          phone:'+48 516 000 009', desc:'Wymiana rozrządu',                  stanowisko:'Mechanika ogólna',     status:'umowione', assignee: null, estimatedPriceBrutto: 2200, veh:{ year:'2019', engine:'2.0 TDI' } },
+    { id:'d12',date: __today(), start:'9:00',  end:'10:00', name:'BMW 520i',         phone:'+48 516 000 012', desc:'Mycie auta',                          stanowisko:'Myjnia',               status:'umowione', assignee: null, estimatedPriceBrutto: null, veh:{ year:'2019', engine:'2.0 benzyna' } },
     { id:'d10',date: __wd(0), start:'11:30', end:'12:30', name:'Mazda CX-5',       phone:'+48 516 000 010', desc:'Wymiana opon – felga aluminiowa 18″', stanowisko:'Opony i wulkanizacja', status:'umowione', assignee: null, estimatedPriceBrutto: null },
     { id:'d2', date: __wd(1), start:'10:00', end:'11:30', name:'Toyota Corolla',   phone:'+48 516 000 002', desc:'Wymiana oleju silnikowego i filtrów', stanowisko:'Mechanika ogólna',     status:'umowione', assignee:'PN',   estimatedPriceBrutto: 350 },
     { id:'d11',date: __wd(1), start:'13:00', end:'14:00', name:'Hyundai Tucson',   phone:'+48 516 000 011', desc:'Serwis klimatyzacji R1234yf',         stanowisko:'Klimatyzacja',         status:'umowione', assignee:'FD',   estimatedPriceBrutto: 450 },
@@ -4891,7 +4893,29 @@ window.ZiloStore = (function () {
     { id:'d8', date: __wd(5), start:'10:00', end:'11:00', name:'Renault Megane',   phone:'+48 516 000 008', desc:'Uzupełnienie czynnika chłodniczego',  stanowisko:'Klimatyzacja',         status:'umowione', assignee:'AW',   estimatedPriceBrutto: 280 },
   ];
 
-  let APPOINTMENTS = [...DEMO_APPOINTMENTS];
+  // ── Scenariusz testowy: wizyty priorytetowe (Audi/Wymiana rozrządu, BMW/Mycie auta) ──
+  // Zawsze przypięte do DZIŚ (date:__today wyżej). Dodatkowo usuwamy każdą inną
+  // wizytę kolidującą z ich slotem dziś (to samo stanowisko + nakładający się czas),
+  // żeby skonfigurowany scenariusz testowy zawsze wyglądał identycznie.
+  const PRIORITY_IDS = ['d9', 'd12'];
+  function enforceTestScenario(list) {
+    const today = __today();
+    const prio = list.filter(a => PRIORITY_IDS.indexOf(a.id) !== -1);
+    return list.filter(a => {
+      if (PRIORITY_IDS.indexOf(a.id) !== -1) return true;   // priorytetowe zawsze zostają
+      // Mechanika ogólna pokazuje WYŁĄCZNIE wizytę priorytetową (Audi A4 / Wymiana rozrządu) —
+      // wszystkie inne wizyty na tym stanowisku ukrywamy (na każdy dzień).
+      if (a.stanowisko === 'Mechanika ogólna') return false;
+      if (!isSameDay(a.date, today)) return true;            // inne dni bez zmian
+      const aS = timeToMin(a.start), aE = timeToMin(a.end || a.start);
+      const collides = prio.some(p =>
+        p.stanowisko === a.stanowisko &&
+        aS < timeToMin(p.end || p.start) && aE > timeToMin(p.start));
+      return !collides;                                      // kolidujące dziś → usuń
+    });
+  }
+
+  let APPOINTMENTS = enforceTestScenario([...DEMO_APPOINTMENTS]);
   window.APPOINTMENTS = APPOINTMENTS; // expose for visit-details modal lookup
 
   async function initSupabase() {
@@ -4905,7 +4929,7 @@ window.ZiloStore = (function () {
       clientsLoading = false;
       // Merge: keep demo entries, add real Supabase visits
       const realIds = new Set(visits.map(v => v.id));
-      APPOINTMENTS = [...DEMO_APPOINTMENTS.filter(d => !realIds.has(d.id)), ...visits];
+      APPOINTMENTS = enforceTestScenario([...DEMO_APPOINTMENTS.filter(d => !realIds.has(d.id)), ...visits]);
       window.APPOINTMENTS = APPOINTMENTS; // keep modal lookup in sync after Supabase load
       if (currentView === 'day') renderDayView();
       else if (currentView === 'week') renderWeekView();
