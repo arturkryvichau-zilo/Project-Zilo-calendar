@@ -2049,15 +2049,30 @@ window.ZiloStore = (function () {
 ];
   const liveByVisit = {};   // visitId -> [ {taskId, visitId, empId, task, vehicle, date, labor, hours, done} ]
   // ── Scenariusz testowy (na sztywno): rozliczenie Pawła Nowaka (e3) w Raportach ──
-  // Zawsze obecne w „Rozliczenie pracowników", chyba że pojawią się żywe zadania
-  // Pawła (wtedy seed jest pomijany, żeby nie dublować). Prowizja liczona z labor × 30%.
-  const _td = new Date();
-  const _todayStr = ('0' + _td.getDate()).slice(-2) + '.' + ('0' + (_td.getMonth() + 1)).slice(-2) + '.' + _td.getFullYear();
+  // Przygotowana, statyczna lista wykonanych zadań przypisana do POPRZEDNIEGO
+  // miesiąca rozliczeniowego (dziś lipiec → czerwiec). Widoczna po wybraniu w
+  // filtrze „Poprzedni miesiąc" (czerwiec). Prowizja liczona z labor × 30%.
+  const _pm = new Date(); _pm.setDate(1); _pm.setMonth(_pm.getMonth() - 1); // 1. dzień poprz. miesiąca
+  const _pmM = _pm.getMonth(), _pmY = _pm.getFullYear();
+  const _pd = (day) => ('0' + day).slice(-2) + '.' + ('0' + (_pmM + 1)).slice(-2) + '.' + _pmY;
   const SEED_ORDERS = [
-    { taskId: 'pn-seed-1', visitId: '__pn-seed', empId: 'e3', task: 'Wymiana paska rozrządu',                         vehicle: 'Audi A4', date: _todayStr, labor: 700,    hours: null, done: true },
-    { taskId: 'pn-seed-2', visitId: '__pn-seed', empId: 'e3', task: 'Wymiana pompy wody',                             vehicle: 'Audi A4', date: _todayStr, labor: 220,    hours: null, done: true },
-    { taskId: 'pn-seed-3', visitId: '__pn-seed', empId: 'e3', task: 'Uzupełnienie i odpowietrzenie układu chłodniczego', vehicle: 'Audi A4', date: _todayStr, labor: 80,     hours: null, done: true },
-    { taskId: 'pn-seed-4', visitId: '__pn-seed', empId: 'e3', task: 'Wymiana pasku osprzętu',                         vehicle: 'Audi A4', date: _todayStr, labor: 121.95, hours: null, done: true },
+    { taskId: 'pn-seed-1', visitId: '__pn-seed', empId: 'e3', task: 'Wymiana sprzęgła',               vehicle: 'Ford Focus',     date: _pd(3),  labor: 2400, hours: null, done: true },
+    { taskId: 'pn-seed-2', visitId: '__pn-seed', empId: 'e3', task: 'Wymiana turbosprężarki',         vehicle: 'Audi A6',        date: _pd(6),  labor: 2800, hours: null, done: true },
+    { taskId: 'pn-seed-3', visitId: '__pn-seed', empId: 'e3', task: 'Diagnostyka silnika',            vehicle: 'BMW X3',         date: _pd(10), labor: 360,  hours: null, done: true },
+    { taskId: 'pn-seed-4', visitId: '__pn-seed', empId: 'e3', task: 'Wymiana amortyzatorów',          vehicle: 'VW Passat',      date: _pd(13), labor: 1100, hours: null, done: true },
+    { taskId: 'pn-seed-5', visitId: '__pn-seed', empId: 'e3', task: 'Wymiana rozrządu',               vehicle: 'Toyota Corolla', date: _pd(17), labor: 1650, hours: null, done: true },
+    { taskId: 'pn-seed-6', visitId: '__pn-seed', empId: 'e3', task: 'Wymiana klocków i tarcz',        vehicle: 'Opel Astra',     date: _pd(20), labor: 720,  hours: null, done: true },
+    { taskId: 'pn-seed-7', visitId: '__pn-seed', empId: 'e3', task: 'Serwis klimatyzacji',            vehicle: 'Skoda Octavia',  date: _pd(25), labor: 340,  hours: null, done: true },
+  ];
+  // Bieżący miesiąc (lipiec) — 4 pozycje ze scenariusza Audi A4 / Wymiana rozrządu.
+  const _cm = new Date();
+  const _cmStr = ('0' + _cm.getDate()).slice(-2) + '.' + ('0' + (_cm.getMonth() + 1)).slice(-2) + '.' + _cm.getFullYear();
+  const _cmSuffix = _cmStr.slice(2); // np. ".07.2026"
+  const SEED_CURR = [
+    { taskId: 'pn-cur-1', visitId: '__pn-cur', empId: 'e3', task: 'Wymiana paska rozrządu',                          vehicle: 'Audi A4', date: _cmStr, labor: 700,    hours: null, done: true },
+    { taskId: 'pn-cur-2', visitId: '__pn-cur', empId: 'e3', task: 'Wymiana pompy wody',                              vehicle: 'Audi A4', date: _cmStr, labor: 220,    hours: null, done: true },
+    { taskId: 'pn-cur-3', visitId: '__pn-cur', empId: 'e3', task: 'Uzupełnienie i odpowietrzenie układu chłodniczego', vehicle: 'Audi A4', date: _cmStr, labor: 80,     hours: null, done: true },
+    { taskId: 'pn-cur-4', visitId: '__pn-cur', empId: 'e3', task: 'Wymiana pasku osprzętu',                          vehicle: 'Audi A4', date: _cmStr, labor: 121.95, hours: null, done: true },
   ];
   const subs = [];
   function notify() { subs.forEach(function (fn) { try { fn(); } catch (e) {} }); }
@@ -2066,10 +2081,14 @@ window.ZiloStore = (function () {
     Object.keys(liveByVisit).forEach(function (vid) {
       (liveByVisit[vid] || []).forEach(function (o) { live.push(o); });
     });
-    // Hardcoded scenariusz: wiersze Pawła Nowaka (e3) są zawsze, dopóki nie ma
-    // żywych zadań Pawła (wtedy seed pomijamy, by nie dublować).
-    const hasLivePN = live.some(function (o) { return o.empId === 'e3'; });
-    const full = hasLivePN ? live : SEED_ORDERS.concat(live);
+    // Hardcoded scenariusz Pawła Nowaka (e3): czerwiec (SEED_ORDERS) — zawsze;
+    // bieżący miesiąc/lipiec (SEED_CURR) — też na sztywno, ale pomijany jeśli
+    // respondent sam wygenerował żywe zadania Pawła w bieżącym miesiącu (bez duplikatów).
+    const liveHasPNcur = live.some(function (o) {
+      return o.empId === 'e3' && typeof o.date === 'string' && o.date.slice(-_cmSuffix.length) === _cmSuffix;
+    });
+    const seed = liveHasPNcur ? SEED_ORDERS : SEED_ORDERS.concat(SEED_CURR);
+    const full = seed.concat(live);
     // Raporty → Rozliczenie pracowników reads the FULL list (incl. incomplete
     // tasks: no person, no labor, no name) so gaps/errors are visible.
     api.allOrders = full.slice();
