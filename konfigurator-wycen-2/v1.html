@@ -37,7 +37,7 @@
 
   <!-- ─── HEADER ───────────────────────────────────────────── -->
   <header style="display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 16px; padding: 14px 28px; border-bottom: 1px solid var(--grey-5); background: #fff; min-height: 70px; box-sizing: border-box">
-    <!-- close + Importuj wycenę (tertiary, po lewej) -->
+    <!-- close + Importuj kosztorys (tertiary, po lewej) -->
     <div style="display:flex;align-items:center;gap:16px;">
       <button aria-label="Zamknij" style="width:40px;height:40px;border:0;background:transparent;color:var(--grey-1);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;border-radius:8px;">
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
@@ -48,14 +48,14 @@
     </div>
 
     <!-- title -->
-    <h1 style="font-size:22px;line-height:28px;font-weight:500;color:var(--grey-1);margin:0;letter-spacing:0;">Wycena wizyty</h1>
+    <h1 style="font-size:22px;line-height:28px;font-weight:500;color:var(--grey-1);margin:0;letter-spacing:0;">Kosztorys wizyty</h1>
 
     <!-- actions -->
     <div class="wyc-hdr-actions" style="display:flex;align-items:center;justify-content:flex-end;gap:12px;">
       <button hidden="" style="display:none;">
-        Importuj wycenę
+        Importuj kosztorys
       </button>
-      <button style="font-family:var(--font-sans);font-weight:400;font-size:16px;line-height:22px;border:0;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:12px 20px;height:46px;border-radius:8px;background:var(--zilo-primary-5);color:var(--zilo-primary);transition:background-color 200ms var(--ease-standard);" style-hover="background:var(--zilo-primary-4);">Zapisz wycenę</button><button style="font-family:var(--font-sans);font-weight:400;font-size:16px;line-height:22px;border:0;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:12px 20px;height:46px;border-radius:8px;background:var(--zilo-primary);color:#fff;transition:background-color 200ms var(--ease-standard);" style-hover="background:var(--zilo-primary-hover);">Wyślij ofertę do klienta</button>
+      <button style="font-family:var(--font-sans);font-weight:400;font-size:16px;line-height:22px;border:0;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:12px 20px;height:46px;border-radius:8px;background:var(--zilo-primary-5);color:var(--zilo-primary);transition:background-color 200ms var(--ease-standard);" style-hover="background:var(--zilo-primary-4);">Zapisz kosztorys</button><button style="font-family:var(--font-sans);font-weight:400;font-size:16px;line-height:22px;border:0;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:12px 20px;height:46px;border-radius:8px;background:var(--zilo-primary);color:#fff;transition:background-color 200ms var(--ease-standard);" style-hover="background:var(--zilo-primary-hover);">Wyślij ofertę do klienta</button>
     </div>
   </header>
 
@@ -959,7 +959,7 @@
     var hb = t.closest('header button');
     if (hb) {
       var tx = (hb.textContent || '').replace(/\s+/g, ' ').trim();
-      if (tx.indexOf('Zapisz wyceni') === 0 || tx.indexOf('Zapisz wycen') === 0) { e.preventDefault(); post('save', { items: (window.__wycData || []), state: (window.__wycState || null) }); return; }
+      if (tx.indexOf('Zapisz koszt') === 0) { e.preventDefault(); post('save', { items: (window.__wycData || []), state: (window.__wycState || null) }); return; }
       if (tx.indexOf('Wyślij ofert') === 0 || tx.indexOf('Wyslij ofert') === 0) { e.preventDefault(); post('save', { send: true, items: (window.__wycData || []), state: (window.__wycState || null) }); return; }
       return;  // inne przyciski w headerze (np. X już obsłużony) — nie liczą się jako zmiana
     }

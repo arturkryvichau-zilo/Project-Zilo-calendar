@@ -43,9 +43,9 @@
       </button>
       <div style="width:1px;height:40px;background:var(--grey-5);"></div>
     </div>
-    <h1 style="font-size:22px;line-height:28px;font-weight:500;color:var(--grey-1);margin:0;">Wycena wizyty</h1>
+    <h1 style="font-size:22px;line-height:28px;font-weight:500;color:var(--grey-1);margin:0;">Kosztorys wizyty</h1>
     <div class="wyc-hdr-actions" style="display:flex;align-items:center;justify-content:flex-end;gap:12px;">
-      <button style="font-family:var(--font-sans);font-weight:400;font-size:16px;line-height:22px;border:0;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:12px 20px;height:46px;border-radius:8px;background:var(--zilo-primary-5);color:var(--zilo-primary);transition:background-color 200ms var(--ease-standard);" style-hover="background:var(--zilo-primary-4);">Zapisz wycenę</button><button style="font-family:var(--font-sans);font-weight:400;font-size:16px;line-height:22px;border:0;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:12px 20px;height:46px;border-radius:8px;background:var(--zilo-primary);color:#fff;transition:background-color 200ms var(--ease-standard);" style-hover="background:var(--zilo-primary-hover);">Wyślij ofertę do klienta</button>
+      <button style="font-family:var(--font-sans);font-weight:400;font-size:16px;line-height:22px;border:0;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:12px 20px;height:46px;border-radius:8px;background:var(--zilo-primary-5);color:var(--zilo-primary);transition:background-color 200ms var(--ease-standard);" style-hover="background:var(--zilo-primary-4);">Zapisz kosztorys</button><button style="font-family:var(--font-sans);font-weight:400;font-size:16px;line-height:22px;border:0;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:12px 20px;height:46px;border-radius:8px;background:var(--zilo-primary);color:#fff;transition:background-color 200ms var(--ease-standard);" style-hover="background:var(--zilo-primary-hover);">Wyślij ofertę do klienta</button>
     </div>
   </header>
 
@@ -866,7 +866,7 @@ class Component extends DCLogic {
     var hb = t.closest('header button');
     if (hb) {
       var tx = (hb.textContent || '').replace(/\s+/g, ' ').trim();
-      if (tx.indexOf('Zapisz wyceni') === 0 || tx.indexOf('Zapisz wycen') === 0) { e.preventDefault(); post('save', { items: (window.__wycData || []), state: (window.__wycState || null) }); return; }
+      if (tx.indexOf('Zapisz koszt') === 0) { e.preventDefault(); post('save', { items: (window.__wycData || []), state: (window.__wycState || null) }); return; }
       if (tx.indexOf('Wyślij ofert') === 0 || tx.indexOf('Wyslij ofert') === 0) { e.preventDefault(); post('save', { send: true, items: (window.__wycData || []), state: (window.__wycState || null) }); return; }
       return;  // inne przyciski w headerze (np. X już obsłużony) — nie liczą się jako zmiana
     }
