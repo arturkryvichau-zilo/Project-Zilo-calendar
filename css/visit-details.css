@@ -1630,6 +1630,21 @@ body.vd-modal-open { overflow: hidden; }
   border-radius: 12px;
 }
 
+/* Empty state — CTA card: ikona + tytuł + podtytuł (wersja 2.0) */
+.wyc-empty-card {
+  display: flex; align-items: center; gap: 16px;
+  width: 100%; text-align: left; cursor: pointer;
+  padding: 18px 22px; border: 1px solid #E9ECF1; border-radius: 12px;
+  background: #fff; font-family: var(--font-sans);
+  transition: background 120ms, border-color 120ms;
+}
+.wyc-empty-card:hover { background: #FBFBFE; border-color: #DCE0E6; }
+.wyc-empty-card__icon { flex: none; width: 44px; height: 44px; display: grid; place-items: center; }
+.wyc-empty-card__icon svg { width: 44px; height: 44px; display: block; }
+.wyc-empty-card__text { display: flex; flex-direction: column; min-width: 0; }
+.wyc-empty-card__title { display: block; font: 500 16px/22px var(--font-sans); color: #242629; }
+.wyc-empty-card__sub { display: block; font: 400 14px/20px var(--font-sans); color: #6B707D; margin-top: 2px; }
+
 /* Row — table-like grid: Sygnatura | Data | Status | Kwota | Actions
    No per-row border or radius; the .wyc-list parent owns those.
    The action column is a FIXED width (not auto) so the header row's empty
