@@ -43,9 +43,9 @@
       </button>
       <div style="width:1px;height:40px;background:var(--grey-5);"></div>
     </div>
-    <h1 style="font-size:22px;line-height:28px;font-weight:500;color:var(--grey-1);margin:0;">Kosztorys wizyty</h1>
+    <h1 style="font-size:22px;line-height:28px;font-weight:500;color:var(--grey-1);margin:0;">Kosztorys zlecenia</h1>
     <div class="wyc-hdr-actions" style="display:flex;align-items:center;justify-content:flex-end;gap:12px;">
-      <button style="font-family:var(--font-sans);font-weight:400;font-size:16px;line-height:22px;border:0;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:12px 20px;height:46px;border-radius:8px;background:var(--zilo-primary-5);color:var(--zilo-primary);transition:background-color 200ms var(--ease-standard);" style-hover="background:var(--zilo-primary-4);">Zapisz kosztorys</button><button style="font-family:var(--font-sans);font-weight:400;font-size:16px;line-height:22px;border:0;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:12px 20px;height:46px;border-radius:8px;background:var(--zilo-primary);color:#fff;transition:background-color 200ms var(--ease-standard);" style-hover="background:var(--zilo-primary-hover);">Wyślij ofertę do klienta</button>
+      <button style="font-family:var(--font-sans);font-weight:400;font-size:16px;line-height:22px;border:0;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:12px 20px;height:46px;border-radius:8px;background:var(--zilo-primary);color:#fff;transition:background-color 200ms var(--ease-standard);" style-hover="background:var(--zilo-primary-hover);">Zapisz kosztorys</button>
     </div>
   </header>
 
@@ -75,8 +75,8 @@
             </svg>
           </div>
           <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:4px;">
-            <div style="font-size:16px;line-height:24px;color:var(--grey-1);">Mersedes-Benz Klasa S, 2020</div>
-            <div style="font-size:16px;line-height:24px;color:var(--grey-1);">Diesel, S 350 BlueTEC 3.0</div>
+            <div data-car="markaYear" style="font-size:16px;line-height:24px;color:var(--grey-1);">Mersedes-Benz Klasa S, 2020</div>
+            <div data-car="engine" style="font-size:16px;line-height:24px;color:var(--grey-1);">Diesel, S 350 BlueTEC 3.0</div>
             <div style="display:flex;align-items:center;gap:8px;font-size:16px;line-height:24px;color:var(--grey-1);">
               WAUZZZ4B74N05832
               <button aria-label="Kopiuj VIN" style="width:22px;height:22px;border:0;background:transparent;color:var(--zilo-blue-1);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:0;border-radius:4px;" style-hover="background:var(--zilo-blue-5);">
@@ -105,7 +105,7 @@
           </div>
           <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:4px;">
             <div style="font-size:16px;line-height:24px;color:var(--grey-1);">Marek Kowalski</div>
-            <a href="tel:+48516375467" style="font-size:16px;line-height:24px;color:var(--zilo-blue-1);text-decoration:underline;text-underline-offset:3px;font-weight:400;">+48 516 375 467</a>
+            <a data-car="phone" href="tel:+48516375467" style="font-size:16px;line-height:24px;color:var(--zilo-blue-1);text-decoration:underline;text-underline-offset:3px;font-weight:400;">+48 516 375 467</a>
             <div style="font-size:16px;line-height:24px;color:var(--grey-1);">marek.kowalski@gmail.com</div>
           </div>
         </div>
@@ -139,7 +139,7 @@
           </div>
           <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; padding-top: 10px; padding-bottom: 10px">
             <div style="font-size:14px;line-height:20px;color:var(--grey-2);">Opis zlecenia:</div>
-            <div style="font-size: 16px; line-height: 22px; color: var(--grey-1); font-weight: 400">Zderzak pęknięty w dolnej części – prawdopodobnie do wymiany. Wycena obejmuje nowy zderzak, lakierowanie i montaż. Ostateczny koszt zostanie potwierdzony po oględzinach auta na miejscu.</div>
+            <div style="font-size: 16px; line-height: 22px; color: var(--grey-1); font-weight: 400">Do wykonania wymiana kompletu rozrządu z pompą wody. Przy okazji sprawdzić stan paska osprzętu, rolek i napinaczy. Jeżeli podczas demontażu wyjdą dodatkowe elementy wymagające wymiany, proszę skontaktować się z klientem przed montażem. Po zakończeniu prac sprawdzić szczelność.</div>
           </div>
         </div>
       </div>
@@ -173,7 +173,7 @@
       <!-- ROBOCIZNA LIST -->
       <div style="display:flex;flex-direction:column;gap:8px;">
         <sc-for list="{{ robociznas }}" as="row" hint-placeholder-count="1">
-          <div style="{{ rowGridStyle }}">
+          <div style="{{ robGridStyle }}">
             <!-- Robocizna (nazwa — edytowalne, tri-state z DS) -->
             <label class="z-input-cell z-tri-cell {{ row.nameCellClass }}" style="display:flex;align-items:stretch;height:56px;box-sizing:border-box;background:#fff;border:1px solid var(--grey-3);border-radius:10px;cursor:text;">
               <div class="z-tri-body">
@@ -241,6 +241,13 @@
               <div style="flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:2px;padding:9px 13px;box-sizing:border-box;">
                 <div style="font-size:12px;font-weight:400;line-height:16px;color:var(--grey-3);">Ilość</div>
                 <input class="z-input" type="text" inputMode="decimal" value="{{ row.qty }}" onChange="{{ row.setQty }}" onFocus="{{ selectOnFocus }}" onKeyDown="{{ commitOnEnter }}">
+              </div>
+            </label>
+            <!-- Przeprac. czas (informacyjne — nie wpływa na wyliczenia) -->
+            <label class="z-input-cell" style="display:flex;align-items:stretch;height:56px;box-sizing:border-box;background:#fff;border:1px solid var(--grey-3);border-radius:10px;cursor:text;">
+              <div style="flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:2px;padding:9px 13px;box-sizing:border-box;">
+                <div style="font-size:12px;font-weight:400;line-height:16px;color:var(--grey-3);">Przeprac. czas</div>
+                <input class="z-input" type="text" inputMode="decimal" value="{{ row.czas }}" onChange="{{ row.setCzas }}" onFocus="{{ selectOnFocus }}" onKeyDown="{{ commitOnEnter }}">
               </div>
             </label>
             <!-- Cena netto (edytowalne) -->
@@ -332,7 +339,7 @@
       <!-- TOWAR LIST -->
       <div style="display:flex;flex-direction:column;gap:8px;">
         <sc-for list="{{ towars }}" as="row" hint-placeholder-count="1">
-          <div style="{{ rowGridStyle }}">
+          <div style="{{ towGridStyle }}">
             <!-- Towar (nazwa — edytowalne, tri-state z DS) -->
             <label class="z-input-cell z-tri-cell {{ row.nameCellClass }}" style="display:flex;align-items:stretch;height:56px;box-sizing:border-box;background:#fff;border:1px solid var(--grey-3);border-radius:10px;cursor:text;">
               <div class="z-tri-body">
@@ -340,11 +347,18 @@
                 <input class="z-input z-tri-value" type="text" value="{{ row.name }}" onChange="{{ row.setName }}" onKeyDown="{{ commitOnEnter }}">
               </div>
             </label>
-            <!-- Indeks/producent (edytowalne, tri-state z DS) -->
+            <!-- Indeks (edytowalne, tri-state z DS) -->
             <label class="z-input-cell z-tri-cell {{ row.indeksCellClass }}" style="display:flex;align-items:stretch;height:56px;box-sizing:border-box;background:#fff;border:1px solid var(--grey-3);border-radius:10px;cursor:text;">
               <div class="z-tri-body">
-                <div class="z-tri-label">Indeks/producent</div>
+                <div class="z-tri-label">Indeks</div>
                 <input class="z-input z-tri-value" type="text" value="{{ row.indeks }}" onChange="{{ row.setIndeks }}" onKeyDown="{{ commitOnEnter }}">
+              </div>
+            </label>
+            <!-- Producent (edytowalne, tri-state z DS) -->
+            <label class="z-input-cell z-tri-cell {{ row.producentCellClass }}" style="display:flex;align-items:stretch;height:56px;box-sizing:border-box;background:#fff;border:1px solid var(--grey-3);border-radius:10px;cursor:text;">
+              <div class="z-tri-body">
+                <div class="z-tri-label">Producent</div>
+                <input class="z-input z-tri-value" type="text" value="{{ row.producent }}" onChange="{{ row.setProducent }}" onKeyDown="{{ commitOnEnter }}">
               </div>
             </label>
             <!-- Jednostka select -->
@@ -383,6 +397,13 @@
               <div style="flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:2px;padding:9px 13px;box-sizing:border-box;">
                 <div style="font-size:12px;font-weight:400;line-height:16px;color:var(--grey-3);">Cena netto</div>
                 <input class="z-input" type="text" inputMode="decimal" value="{{ row.cena }}" onChange="{{ row.setCena }}" onFocus="{{ selectOnFocus }}" onKeyDown="{{ commitOnEnter }}">
+              </div>
+            </label>
+            <!-- Koszt (cena zakupu — informacyjne, nie wpływa na wyliczenia) -->
+            <label class="z-input-cell" style="display:flex;align-items:stretch;height:56px;box-sizing:border-box;background:#fff;border:1px solid var(--grey-3);border-radius:10px;cursor:text;">
+              <div style="flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:2px;padding:9px 13px;box-sizing:border-box;">
+                <div style="font-size:12px;font-weight:400;line-height:16px;color:var(--grey-3);">Cena zakupu</div>
+                <input class="z-input" type="text" inputMode="decimal" value="{{ row.koszt }}" onChange="{{ row.setKoszt }}" onFocus="{{ selectOnFocus }}" onKeyDown="{{ commitOnEnter }}">
               </div>
             </label>
             <!-- VAT select -->
@@ -526,10 +547,10 @@
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1920,&quot;height&quot;:1200}}">
 class Component extends DCLogic {
   static mkRobocizna(id) {
-    return { id, osoba: null, name: '', qty: '1', cena: '0,00', rabat: '0', unit: 'Sztuka', vat: '23', bruttoEditing: null, openField: null };
+    return { id, osoba: null, name: '', qty: '1', czas: '0', cena: '0,00', rabat: '0', unit: 'Sztuka', vat: '23', bruttoEditing: null, openField: null };
   }
   static mkTowar(id) {
-    return { id, name: '', indeks: '', qty: '1', cena: '0,00', rabat: '0', unit: 'Sztuka', vat: '23', bruttoEditing: null, openField: null };
+    return { id, name: '', indeks: '', producent: '', qty: '1', cena: '0,00', koszt: '0,00', rabat: '0', unit: 'Sztuka', vat: '23', bruttoEditing: null, openField: null };
   }
   static parseNum(v) {
     if (v == null || v === '') return 0;
@@ -584,6 +605,7 @@ class Component extends DCLogic {
     'Filip Domański',
     'Aleksander Wójcik',
   ];
+  // Model rozliczenia pracownika (cecha pracownika). Godzinowy → domyślna jednostka „Godzina".
 
   // Drag&drop state — trzymamy poza React state, żeby nie triggerować re-renderów w trakcie dragowania
   _draggingRow = null;
@@ -662,11 +684,17 @@ class Component extends DCLogic {
       // Edytowalne pola
       name: r.name || '',
       indeks: r.indeks || '',
+      producent: r.producent || '',
+      czas: r.czas != null ? r.czas : '0',
+      koszt: r.koszt != null ? r.koszt : '0,00',
       qty: r.qty,
       cena: r.cena,
       rabat: r.rabat,
       setName:   set('name'),
       setIndeks: set('indeks'),
+      setProducent: set('producent'),
+      setCzas: set('czas'),
+      setKoszt: set('koszt'),
       setQty:    set('qty'),
       setCena:   set('cena'),
       setRabat:  set('rabat'),
@@ -685,6 +713,7 @@ class Component extends DCLogic {
       // Klasy dla tri-state (default / filled)
       nameCellClass:   r.name   ? 'is-filled' : '',
       indeksCellClass: r.indeks ? 'is-filled' : '',
+      producentCellClass: r.producent ? 'is-filled' : '',
 
       unit: r.unit,
       unitOpen,
@@ -694,7 +723,7 @@ class Component extends DCLogic {
         value: u,
         isSelected: r.unit === u,
         selectedBg: bg(r.unit === u),
-        select: () => this._patchRow(collection, r.id, { unit: u, openField: null }),
+        select: () => this._patchRow(collection, r.id, { unit: u, openField: null, unitManual: true }),
       })),
 
       vat: r.vat,
@@ -759,9 +788,15 @@ class Component extends DCLogic {
 
     // Grid template dla wierszy — z / bez kolumny Rabat (%)
     // [drag 16 | label 2fr | osoba/indeks 1.3fr | jednostka 1.15fr | ilość 92 | cena 1fr | vat 1fr | (rabat 92)? | suma/wartość netto 1fr | suma/wartość brutto 1fr | trash 30]
-    const rowGridStyle =
-      'display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1.3fr) minmax(0,1.15fr) 92px minmax(0,1fr) minmax(0,1fr)' +
-      (showRabat ? ' 92px' : '') +
+    // Robocizna: name | osoba | jednostka | ilość | przeprac.czas | cena | vat | (rabat)? | wNetto | wBrutto | trash
+    const robGridStyle =
+      'display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr) 110px 80px 120px minmax(0,1fr) minmax(0,0.9fr)' +
+      (showRabat ? ' 84px' : '') +
+      ' minmax(0,1fr) minmax(0,1fr) 30px;gap:8px;align-items:center;';
+    // Towar: name | indeks | producent | jednostka | ilość | cena | koszt | vat | (rabat)? | wNetto | wBrutto | trash
+    const towGridStyle =
+      'display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1.05fr) minmax(0,1.05fr) 110px 76px minmax(0,1fr) minmax(0,1fr) minmax(0,0.9fr)' +
+      (showRabat ? ' 76px' : '') +
       ' minmax(0,1fr) minmax(0,1fr) 30px;gap:8px;align-items:center;';
 
     const robociznas = this.state.robociznas.map((r) =>
@@ -805,7 +840,8 @@ class Component extends DCLogic {
       robociznas,
       towars,
       rootClass: this.state.mode === 'preview' ? 'z-preview' : '',
-      rowGridStyle,
+      robGridStyle,
+      towGridStyle,
       showRabat,
       allFields,
       showFieldMenu: this.state.showFieldMenu,
@@ -855,6 +891,36 @@ class Component extends DCLogic {
 (function () {
   var dirty = false;
   var isPreview = /(?:^|[#&])preview=1(?:&|$)/.test(location.hash);
+  // Dane pojazdu/klienta z wizyty (przekazane w hash #car=…) → wypełnij statyczne pola „Pojazd i klient".
+  (function fillCar(){
+    var m = (location.hash || '').match(/car=([^&]+)/); if (!m) return;
+    var car; try { car = JSON.parse(decodeURIComponent(m[1])); } catch (e) { return; }
+    function want(k){
+      if (k === 'phone') return car.phone || null;
+      if (k === 'marka') return car.name || null;
+      if (k === 'engine') return car.engine || null;
+      if (k === 'year') return car.year || null;
+      if (k === 'markaYear') return car.name ? (car.name + (car.year ? ', ' + car.year : '')) : null;
+      return null;
+    }
+    function apply(){
+      var els = document.querySelectorAll('[data-car]'); if (!els.length) return false;
+      els.forEach(function(el){
+        var w = want(el.getAttribute('data-car'));
+        if (w && el.textContent.trim() !== w) { el.textContent = w; if (el.tagName === 'A') el.setAttribute('href', 'tel:' + String(w).replace(/\s/g,'')); }
+      });
+      return true;
+    }
+    var tries = 0;
+    (function go(){
+      if (apply()) {
+        // Sekcja „Pojazd i klient" jest w drzewie React (re-render resetuje statyczne węzły) → re-aplikuj przy mutacjach.
+        try { new MutationObserver(function(){ apply(); }).observe(document.body, { childList: true, subtree: true, characterData: true }); } catch (e) {}
+        return;
+      }
+      if (tries++ < 25) setTimeout(go, 100);
+    })();
+  })();
   (function(){ try { var st=document.createElement('style'); st.textContent='.z-preview .wyc-hdr-actions{display:none !important;} body.z-dirty .z-preview .wyc-hdr-actions{display:flex !important;}'; document.head.appendChild(st); } catch(e){} })();
   function md() { dirty = true; if (isPreview) { try { document.body.classList.add('z-dirty'); } catch (e) {} } }
   function post(kind, extra) { try { parent.postMessage(Object.assign({ __wyc: kind, dirty: dirty }, extra || {}), '*'); } catch (_) {} }
@@ -866,6 +932,7 @@ class Component extends DCLogic {
     var hb = t.closest('header button');
     if (hb) {
       var tx = (hb.textContent || '').replace(/\s+/g, ' ').trim();
+      if (tx.indexOf('Podgląd') === 0) { e.preventDefault(); post('preview', { items: (window.__wycData || []), state: (window.__wycState || null) }); return; }
       if (tx.indexOf('Zapisz koszt') === 0) { e.preventDefault(); post('save', { items: (window.__wycData || []), state: (window.__wycState || null) }); return; }
       if (tx.indexOf('Wyślij ofert') === 0 || tx.indexOf('Wyslij ofert') === 0) { e.preventDefault(); post('save', { send: true, items: (window.__wycData || []), state: (window.__wycState || null) }); return; }
       return;  // inne przyciski w headerze (np. X już obsłużony) — nie liczą się jako zmiana
