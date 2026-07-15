@@ -8644,7 +8644,7 @@ window.ZiloStore = (function () {
               </label>
               <div>Usługi</div>
               <div>Osoby przypisane</div>
-              <div>Przeprac. czas</div>
+              <div class="wyceny-th-czas">Przeprac. czas</div>
               <div class="wyceny-table__price">Wartość brutto</div>
             </div>
             <label class="wyceny-row">
@@ -8801,6 +8801,12 @@ window.ZiloStore = (function () {
       '#pane-wyceny.ut-collapsed .towary-tbl, #pane-wyceny.ut-collapsed .wyceny-footer { display:none; }' +
       // Indykator zrealizowanych zadań „0/N" (ten sam pill co count historii)
       '.ut-count { display:inline-flex; align-items:center; justify-content:center; min-width:22px; height:22px; padding:0 6px; border-radius:999px; background:#ECEDF8; color:#222693; font-size:12px; font-weight:600; }' +
+      // Kolumna „Przeprac. czas" ukryta, gdy żadna pozycja nie ma wpisanego czasu (przeliczone siatki)
+      '.wyceny-table--no-czas .wyceny-th-czas, .wyceny-table--no-czas .wyceny-row__czas, .wyceny-table--no-czas .wyceny-sum-czas { display:none; }' +
+      '.wyceny-table--no-czas .wyceny-table__head, .wyceny-table--no-czas .wyceny-row { grid-template-columns: 20px 1fr 190px 120px; }' +
+      '.wyceny-table--no-czas .wyceny-table__head > div:nth-of-type(4) { grid-column: 4 / 5; }' +
+      '.wyceny-table--ut.wyceny-table--no-czas .wyceny-table__head, .wyceny-table--ut.wyceny-table--no-czas .wyceny-row, .wyceny-table--ut.wyceny-table--no-czas .wyceny-sum-row { grid-template-columns: 20px minmax(0,1fr) 190px 140px 140px; }' +
+      '.wyceny-table--grouped.wyceny-table--no-czas .wyceny-table__head, .wyceny-table--grouped.wyceny-table--no-czas .wyceny-row { grid-template-columns: 20px minmax(0,1fr) 190px 108px 116px 116px; }' +
       // Hover na klikalnych polach (otwierają konfigurator z fokusem)
       '.wyceny-row__name, .wyceny-row__price { border-radius: 6px; }' +
       '.wyceny-row__name:hover, .wyceny-row__price:hover { background: #F0F1F5; }' +
@@ -8893,7 +8899,7 @@ window.ZiloStore = (function () {
     if (addU) { addU.innerHTML = KO_PLUS + ' Dodaj usługę'; addU.className = 'ko-add-btn'; addU.style.cssText = ''; }
     const uSum = document.createElement('div'); uSum.className = 'wyceny-sum-row';
     uSum.innerHTML = '<span class="wyceny-sum-row__btn"></span>' +
-      '<span class="wyceny-sum-row__val">' + (uC > 0 ? (money0(uC).replace(',00', '') + ' h') : '—') + '</span>' +
+      '<span class="wyceny-sum-row__val wyceny-sum-czas">' + (uC > 0 ? (money0(uC).replace(',00', '') + ' h') : '—') + '</span>' +
       '<span class="wyceny-sum-row__val">' + money0(uN) + ' zł</span>' +
       '<span class="wyceny-sum-row__val">' + money0(uB) + ' zł</span>';
     if (addU) uSum.querySelector('.wyceny-sum-row__btn').appendChild(addU);
@@ -8977,14 +8983,14 @@ window.ZiloStore = (function () {
     if (head && grouped) {
       head.innerHTML =
         '<label class="wyceny-check wyceny-check--master"><input type="checkbox" id="wyceny-master"/><span class="wyceny-check__box"></span></label>' +
-        '<div>Usługi</div><div>Osoby przypisane</div><div>Przeprac. czas</div>' +
+        '<div>Usługi</div><div>Osoby przypisane</div><div class="wyceny-th-czas">Przeprac. czas</div>' +
         '<div class="wyceny-table__price">Wartość usług</div>' +
         '<div class="wyceny-table__price">Wartość towarów</div>' +
         '<div class="wyceny-table__price">Razem</div>';
     } else if (head && ut) {
       head.innerHTML =
         '<label class="wyceny-check wyceny-check--master"><input type="checkbox" id="wyceny-master"/><span class="wyceny-check__box"></span></label>' +
-        '<div>Usługi</div><div>Osoby przypisane</div><div>Przeprac. czas</div>' +
+        '<div>Usługi</div><div>Osoby przypisane</div><div class="wyceny-th-czas">Przeprac. czas</div>' +
         '<div class="wyceny-table__price">Wartość netto</div>' +
         '<div class="wyceny-table__price">Wartość brutto</div>';
     }
@@ -8992,6 +8998,9 @@ window.ZiloStore = (function () {
     const robFor = (idx) => Array.isArray(st && st.groups) ? (st.groups[idx] && st.groups[idx].robocizna) : (st && st.robociznas && st.robociznas[idx]);
     const czasFor = (idx) => { const r = robFor(idx); return r ? (r.czas || '') : ''; };
     const nettoFor = (idx) => { const r = robFor(idx); if (!r) return '0,00'; const net = num2(r.qty)*num2(r.cena)*(1 - num2(r.rabat)/100); return money0(net); };
+    // Kolumna „Przeprac. czas" tylko gdy ≥1 pozycja ma wpisany czas.
+    const hasCzas = items.some((it, idx) => num2(czasFor(idx)) > 0);
+    table.classList.toggle('wyceny-table--no-czas', !hasCzas);
     table.querySelectorAll('.wyceny-row').forEach(r => r.remove());
     items.forEach((it, idx) => table.insertAdjacentHTML('beforeend', rowHTML(it, grouped, idx, czasFor(idx), ut ? nettoFor(idx) : undefined)));
     const pText = panel.querySelector('.wyceny-progress__text');
