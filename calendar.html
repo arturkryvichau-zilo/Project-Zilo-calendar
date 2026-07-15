@@ -6554,6 +6554,14 @@ window.ZiloStore = (function () {
 
   if (!scope) { dbgLog("ERROR: #visit-details-scope NOT FOUND in DOM"); return; }
 
+  // Zwijanie sekcji „Pojazd i klient" (i innych .panel-section) — klik w nagłówek/strzałkę.
+  scope.addEventListener('click', function (e) {
+    const head = e.target.closest('.panel-section__head');
+    if (!head || !scope.contains(head)) return;
+    const sec = head.closest('.panel-section');
+    if (sec) sec.classList.toggle('is-collapsed');
+  });
+
   // Count visit cards present right now
   const counts = {
     wk:    document.querySelectorAll(".wk-appt").length,
@@ -8312,7 +8320,7 @@ window.ZiloStore = (function () {
   border-bottom: 1px solid var(--grey-5, #E9ECF1); }
 .wyceny-table__head > div:nth-of-type(1) { grid-column: 2 / 3; }
 .wyceny-table__head > div:nth-of-type(2) { grid-column: 3 / 4; }
-.wyceny-table__head > div:nth-of-type(3) { grid-column: 4 / 5; }
+.wyceny-table__head > div:nth-of-type(3) { grid-column: 4 / 5; text-align: right; }
 .wyceny-table__head > div:nth-of-type(4) { grid-column: 5 / 6; text-align: right; }
 .wyceny-check--master {
   grid-column: 1 / 2;
@@ -8345,7 +8353,7 @@ window.ZiloStore = (function () {
   color: var(--grey-3, #979DB0);
   text-decoration: line-through;
   text-decoration-color: var(--grey-3, #979DB0); }
-.wyceny-row__czas { font-size: 14px; color: var(--grey-1, #242629); font-variant-numeric: tabular-nums; }
+.wyceny-row__czas { font-size: 14px; color: var(--grey-1, #242629); font-variant-numeric: tabular-nums; text-align: right; }
 .wyceny-row.is-done .osoby-chip__avatar {
   opacity: 0.55; }
 .wyceny-row__name { font-size: 15px; color: var(--grey-1, #242629); }
@@ -8413,9 +8421,11 @@ window.ZiloStore = (function () {
   color: var(--grey-1, #242629); }
 .historia__icon { color: #000; display: inline-flex; }
 .historia__title { font-size: 16px; font-weight: 500; text-align: left; }
-.historia__count { display: inline-flex; align-items: center; justify-content: center; min-width: 22px; height: 22px; padding: 0 6px; border-radius: 999px; background: #ECEDF8; color: #222693; font-size: 12px; font-weight: 600; margin-right: auto; }
-.historia__chevron { color: var(--grey-2, #6B707D); display: inline-flex; transition: transform 200ms; }
-.historia__head[aria-expanded="false"] .historia__chevron { transform: rotate(180deg); }
+.historia__count { display: inline-flex; align-items: center; justify-content: center; min-width: 22px; height: 22px; padding: 0 6px; border-radius: 999px; background: #ECEDF8; color: #222693; font-size: 12px; font-weight: 600; margin-right: 6px; }
+.historia__chevron { color: var(--grey-2, #6B707D); display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 6px; transition: background 140ms; }
+.historia__chevron:hover { background: #EEF0F5; }
+.historia__chevron svg { transition: transform 200ms; }
+.historia__head[aria-expanded="true"] .historia__chevron svg { transform: rotate(180deg); }
 .historia__body[hidden] { display: none; }
 .historia-table {
   border: 1px solid var(--grey-5, #E9ECF1);
@@ -8634,7 +8644,7 @@ window.ZiloStore = (function () {
               </label>
               <div>Usługi</div>
               <div>Osoby przypisane</div>
-              <div>Czas przepracowany</div>
+              <div>Przeprac. czas</div>
               <div class="wyceny-table__price">Wartość brutto</div>
             </div>
             <label class="wyceny-row">
@@ -8694,7 +8704,7 @@ window.ZiloStore = (function () {
             <span class="historia__title">Historia wysłanych ofert</span>
             <span class="historia__count" id="historia-count">0</span>
             <span class="historia__chevron">
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M6.29 12.77a.75.75 0 010-1.06L10 8l3.71 3.71a.75.75 0 11-1.06 1.06L10 10.12l-2.65 2.65a.75.75 0 01-1.06 0z" fill="currentColor"/></svg>
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M5 7.5 10 12.5 15 7.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </span>
           </button>
           <div class="historia__body" id="historia-body">
@@ -8755,6 +8765,42 @@ window.ZiloStore = (function () {
       '.wyceny-person-select { font-family: \'Rubik\', sans-serif; font-size: 14px; color: #242629; border: 1px solid #DCE0E6; border-radius: 8px; padding: 6px 28px 6px 10px; background: #fff; cursor: pointer; max-width: 100%; min-width: 0; height: 34px; }' +
       '.wyceny-person-select:hover { border-color: #B7BECC; }' +
       '.wyceny-person-select:focus { outline: none; border-color: #222693; box-shadow: 0 0 0 2px rgba(34,38,147,0.12); }' +
+      // Tabela towarów (widok „Usługi i towary" — d20)
+      '.towary-tbl { border: 1px solid #E9ECF1; border-radius: 10px; background: #FFF; overflow: hidden; }' +
+      '.towary-head { display:grid; grid-template-columns: 1fr 140px 140px; gap:12px; padding:12px 16px; font-size:13px; color:#6B707D; border-bottom:1px solid #E9ECF1; }' +
+      '.towary-head > div:nth-child(2), .towary-head > div:nth-child(3) { text-align:right; }' +
+      '.towary-row { display:grid; grid-template-columns: 1fr 140px 140px; gap:12px; padding:14px 16px; border-bottom:1px solid #E9ECF1; align-items:center; cursor:pointer; }' +
+      '.towary-row:last-child { border-bottom:none; }' +
+      '.towary-row:hover { background:#FBFBFB; }' +
+      '.towary-row__name { font-size:15px; color:#242629; }' +
+      '.towary-row__price { font-size:15px; color:#242629; text-align:right; font-variant-numeric:tabular-nums; }' +
+      '.towary-empty { padding:14px 16px; font-size:14px; color:#979DB0; }' +
+      // Widok „Usługi i towary" (d20): kolumna Wartość netto w usługach
+      '.wyceny-table--ut .wyceny-table__head, .wyceny-table--ut .wyceny-row { grid-template-columns: 20px minmax(0,1fr) 190px 130px 140px 140px; }' +
+      '.wyceny-table--ut .wyceny-table__head > div { grid-column: auto; }' +
+      '.wyceny-table--ut .wyceny-table__head > div:nth-of-type(3), .wyceny-table--ut .wyceny-table__head > div:nth-of-type(4), .wyceny-table--ut .wyceny-table__head > div:nth-of-type(5) { text-align: right; }' +
+      // Przyciski „Dodaj…" jako tertiary (białe tło)
+      '.ko-add-btn { display:inline-flex; align-items:center; gap:6px; background:#fff; border:0; border-radius:8px; color:#222693; font-family:\'Rubik\',sans-serif; font-size:14px; font-weight:400; padding:8px 12px; cursor:pointer; }' +
+      '.ko-add-btn:hover { background:#F7F8FA; }' +
+      // Wiersze podsumowań (usługi / towary)
+      '.wyceny-sum-row { display:grid; grid-template-columns: 20px minmax(0,1fr) 190px 130px 140px 140px; gap:12px; padding:12px 16px; align-items:center; border-top:1px solid #E9ECF1; }' +
+      '.wyceny-sum-row__btn { grid-column: 1 / 4; justify-self:start; }' +
+      '.wyceny-sum-row__val { text-align:right; font-size:14px; color:#242629; font-variant-numeric:tabular-nums; }' +
+      '.towary-sum { display:grid; grid-template-columns: 1fr 140px 140px; gap:12px; padding:12px 16px; align-items:center; border-top:1px solid #E9ECF1; }' +
+      '.towary-sum__btn { justify-self:start; }' +
+      '.towary-sum .towary-row__price { color:#242629; }' +
+      // Podsumowanie całości (dół)
+      '.wyceny-foot-sum { display:flex; justify-content:flex-end; gap:32px; font-size:15px; color:#242629; width:100%; }' +
+      '.wyceny-foot-sum b { font-weight:600; }' +
+      '.wyceny-foot-sum__brut { color:#222693; }' +
+      // Zwijanie sekcji towarów + podsumowania (usługi zostają)
+      '.ut-toggle { border:0; background:transparent; cursor:pointer; color:#6B707D; display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:6px; }' +
+      '.ut-toggle:hover { background:#EEF0F5; }' +
+      '.ut-toggle svg { transition: transform 160ms; }' +
+      '.ut-toggle[aria-expanded="true"] svg { transform: rotate(180deg); }' +
+      '#pane-wyceny.ut-collapsed .towary-tbl, #pane-wyceny.ut-collapsed .wyceny-footer { display:none; }' +
+      // Indykator zrealizowanych zadań „0/N" (ten sam pill co count historii)
+      '.ut-count { display:inline-flex; align-items:center; justify-content:center; min-width:22px; height:22px; padding:0 6px; border-radius:999px; background:#ECEDF8; color:#222693; font-size:12px; font-weight:600; }' +
       // Hover na klikalnych polach (otwierają konfigurator z fokusem)
       '.wyceny-row__name, .wyceny-row__price { border-radius: 6px; }' +
       '.wyceny-row__name:hover, .wyceny-row__price:hover { background: #F0F1F5; }' +
@@ -8774,6 +8820,108 @@ window.ZiloStore = (function () {
     const idx = Array.isArray(st.groups) ? (st.groups.length - 1) : (st.robociznas.length - 1);
     if (window.openWycConfig) window.openWycConfig(currentVisitId, { index: idx, field: 'name' });
   }
+  // „Dodaj towar" → otwórz konfigurator z nowym (pustym) towarem.
+  function addTowarViaConfig(){
+    if (!currentVisitId) return;
+    const st = koEnsureState();
+    if (!Array.isArray(st.towars)) st.towars = [];
+    const id = st.nextTowarId || (st.towars.length + 1); st.nextTowarId = id + 1;
+    st.towars.push({ id, name:'', indeks:'', producent:'', qty:'1', cena:'0,00', koszt:'0,00', rabat:'0', unit:'Sztuka', vat:'23', bruttoEditing:null, openField:null });
+    savedQuotes.set(currentVisitId, true);
+    const idx = st.towars.length - 1;
+    if (window.openWycConfig) window.openWycConfig(currentVisitId, { index: idx, field: 'towar' });
+  }
+
+  // ─── Układ „Usługi i towary" — TYLKO wizyta myjni Fiat 500 (d20) ───────────────
+  const KO_PLUS = '<svg width="18" height="18" viewBox="0 0 20 20" fill="none" style="flex:none"><path d="M10 4V16M4 10H16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
+  let _utCollapsed = false;   // stan zwinięcia towarów + podsumowania (widok d20)
+  // Widok „Usługi i towary": na produkcji dla WSZYSTKICH wizyt; lokalnie tylko dla Fiat 500 / mycie (d20).
+  function koUtEnabled(){
+    const h = (typeof location !== 'undefined' && location.hostname) || '';
+    const isLocal = h === 'localhost' || h === '127.0.0.1' || h === '0.0.0.0' || h === '';
+    return isLocal ? (currentVisitId === 'd20') : true;
+  }
+  function towarCalc(t){ const q=num2(t.qty), c=num2(t.cena), rb=num2(t.rabat), v=num2(t.vat); const net=q*c*(1-rb/100); return { netto:net, brutto:net*(1+v/100) }; }
+  function applyFiatLayout(panel){
+    const pane = panel.querySelector('#pane-wyceny');
+    // 1) Tytuł sekcji
+    const title = panel.querySelector('.wyceny-header__title span'); if (title) title.textContent = 'Usługi i towary';
+    // Strzałka zwijania (zamiast „0/N wykonano") + indykator zrealizowanych zadań „0/N".
+    // Kolejność w nagłówku: [strzałka] [indykator] [nazwa sekcji].
+    const titleWrap = panel.querySelector('.wyceny-header__title');
+    const titleSpan = titleWrap ? titleWrap.querySelector('span') : null;
+    const progress = panel.querySelector('#wyceny-progress');
+    if (progress && titleWrap) {
+      const tgl = document.createElement('button');
+      tgl.type = 'button'; tgl.className = 'ut-toggle'; tgl.setAttribute('aria-expanded', String(!_utCollapsed)); tgl.setAttribute('aria-label', 'Zwiń / rozwiń towary');
+      tgl.innerHTML = '<svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M5 7.5 10 12.5 15 7.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+      const items0 = (currentVisitId && savedItems.get(currentVisitId)) || [];
+      const done0 = items0.filter(it => it.done).length;
+      const badge = document.createElement('span'); badge.className = 'ut-count'; badge.id = 'ut-count'; badge.textContent = done0 + '/' + items0.length;
+      // Kolejność: [nazwa] [indykator] [strzałka po prawej]
+      progress.replaceWith(badge);      // nazwa | indykator
+      titleWrap.appendChild(tgl);       // nazwa | indykator | strzałka
+      tgl.addEventListener('click', () => {
+        _utCollapsed = !_utCollapsed;
+        tgl.setAttribute('aria-expanded', String(!_utCollapsed));
+        if (pane) pane.classList.toggle('ut-collapsed', _utCollapsed);
+      });
+    }
+    // 2) „Edytuj kosztorys" → „Edytuj" (zachowaj ikonę)
+    const edit = panel.querySelector('.wyceny-a-filled');
+    if (edit) { const svg = edit.querySelector('svg'); edit.innerHTML = (svg ? svg.outerHTML : '') + ' Edytuj'; }
+    // 3) „Wyślij ofertę do klienta" → do nagłówka, po lewej od „Edytuj"
+    const actions = panel.querySelector('.wyceny-header__actions');
+    const wyslij = panel.querySelector('#wyslij-klient-btn');
+    if (actions && wyslij && edit) actions.insertBefore(wyslij, edit);
+    // 4) Ukryj „Wystaw"
+    const wystaw = panel.querySelector('.wystaw-wrap'); if (wystaw) wystaw.style.display = 'none';
+    const filled = panel.querySelector('.wyceny-filled');
+    const uslTable = panel.querySelector('.wyceny-table');
+    const footer = panel.querySelector('.wyceny-footer');
+    if (!filled || !uslTable || !footer) return;
+    const st = savedState.get(currentVisitId) || {};
+    const robs = Array.isArray(st.robociznas) ? st.robociznas : [];
+    const tows = Array.isArray(st.towars) ? st.towars : [];
+    // Sumy usług + towarów
+    let uN = 0, uB = 0, uC = 0;
+    robs.forEach(r => { const net = num2(r.qty) * num2(r.cena) * (1 - num2(r.rabat) / 100); uN += net; uB += net * (1 + num2(r.vat) / 100); uC += num2(r.czas); });
+    let tN = 0, tB = 0;
+    tows.forEach(t => { const c = towarCalc(t); tN += c.netto; tB += c.brutto; });
+    // 5) Podsumowanie usług (w karcie tabeli) + „Dodaj usługę" jako tertiary (białe tło)
+    const addU = panel.querySelector('#wyceny-add-usluga-btn');
+    if (addU) { addU.innerHTML = KO_PLUS + ' Dodaj usługę'; addU.className = 'ko-add-btn'; addU.style.cssText = ''; }
+    const uSum = document.createElement('div'); uSum.className = 'wyceny-sum-row';
+    uSum.innerHTML = '<span class="wyceny-sum-row__btn"></span>' +
+      '<span class="wyceny-sum-row__val">' + (uC > 0 ? (money0(uC).replace(',00', '') + ' h') : '—') + '</span>' +
+      '<span class="wyceny-sum-row__val">' + money0(uN) + ' zł</span>' +
+      '<span class="wyceny-sum-row__val">' + money0(uB) + ' zł</span>';
+    if (addU) uSum.querySelector('.wyceny-sum-row__btn').appendChild(addU);
+    uslTable.appendChild(uSum);
+    // 6) Tabela towarów (nazwa + wartość netto + brutto) + podsumowanie + „Dodaj towar" tertiary
+    const towTbl = document.createElement('div'); towTbl.className = 'towary-tbl';
+    let rows = tows.map((t, i) => {
+      const c = towarCalc(t);
+      const nm = (t.name && t.name.trim()) ? esc(t.name) : DASH;
+      return '<div class="towary-row" data-tidx="' + i + '"><span class="towary-row__name">' + nm + '</span>' +
+             '<span class="towary-row__price">' + money0(c.netto) + ' zł</span>' +
+             '<span class="towary-row__price">' + money0(c.brutto) + ' zł</span></div>';
+    }).join('');
+    if (!rows) rows = '<div class="towary-empty">Brak towarów — dodaj pierwszy</div>';
+    towTbl.innerHTML = '<div class="towary-head"><div>Towary</div><div>Wartość netto</div><div>Wartość brutto</div></div>' + rows +
+      '<div class="towary-sum"><span class="towary-sum__btn"><button type="button" id="wyceny-add-towar-btn" class="ko-add-btn">' + KO_PLUS + ' Dodaj towar</button></span>' +
+      '<span class="towary-row__price">' + money0(tN) + ' zł</span>' +
+      '<span class="towary-row__price">' + money0(tB) + ' zł</span></div>';
+    filled.insertBefore(towTbl, footer);
+    // 7) Podsumowanie całości (dół): suma netto + suma brutto
+    footer.innerHTML = '<div class="wyceny-foot-sum"><span>Suma netto: <b>' + money0(uN + tN) + ' zł</b></span>' +
+      '<span class="wyceny-foot-sum__brut">Suma brutto: <b>' + money0(uB + tB) + ' zł</b></span></div>';
+    // Wiring
+    towTbl.querySelector('#wyceny-add-towar-btn').addEventListener('click', () => addTowarViaConfig());
+    towTbl.querySelectorAll('.towary-row').forEach(r => r.addEventListener('click', () => { if (window.openWycConfig) window.openWycConfig(currentVisitId); }));
+    // Zastosuj bieżący stan zwinięcia (utrzymywany między renderami)
+    if (pane) pane.classList.toggle('ut-collapsed', _utCollapsed);
+  }
 
   function esc(s){ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
   function personInitials(name){
@@ -8792,7 +8940,7 @@ window.ZiloStore = (function () {
     return '<select class="wyceny-person-select" data-idx="' + idx + '">' + opts + '</select>';
   }
   // grouped = wycena z konfiguratora „usługi i towary razem" (v1) → 3 kolumny cen.
-  function rowHTML(it, grouped, idx, czas){
+  function rowHTML(it, grouped, idx, czas, netto){
     const nameHTML = (it.name && it.name.trim()) ? esc(it.name) : DASH;
     const personCell = personSelectHTML(idx, it.person || '');
     const czHTML = (num2(czas) > 0) ? esc(String(czas).replace('.', ',') + ' h') : DASH;
@@ -8803,15 +8951,16 @@ window.ZiloStore = (function () {
         priceCell(it.brutto);
     } else {
       const bruEmpty = (!it.brutto || it.brutto === '---' || it.brutto === '');
-      prices = '<span class="wyceny-row__price" data-field="brutto">' + (bruEmpty ? DASH : esc(it.brutto + ' zł')) + '</span>';
+      const nettoCell = (netto != null) ? '<span class="wyceny-row__price wyceny-row__netto">' + esc(netto + ' zł') + '</span>' : '';
+      prices = nettoCell + '<span class="wyceny-row__price" data-field="brutto">' + (bruEmpty ? DASH : esc(it.brutto + ' zł')) + '</span>';
     }
-    return '<label class="wyceny-row' + (it.done ? ' is-done' : '') + '">' +
+    return '<div class="wyceny-row' + (it.done ? ' is-done' : '') + '">' +
       '<span class="wyceny-check"><input type="checkbox"' + (it.done ? ' checked' : '') + '/><span class="wyceny-check__box"></span></span>' +
       '<span class="wyceny-row__name" data-field="name">' + nameHTML + '</span>' +
       '<span class="wyceny-row__person">' + personCell + '</span>' +
       '<span class="wyceny-row__czas">' + czHTML + '</span>' +
       prices +
-    '</label>';
+    '</div>';
   }
   // Replace the template's static rows with the real line items entered in the configurator.
   function rebuildRows(panel){
@@ -8821,24 +8970,30 @@ window.ZiloStore = (function () {
     if (!table) return;
     // Konfigurator „usługi i towary razem" (v1) dostarcza wartość usług/towarów osobno.
     const grouped = items.some(it => it.serviceBrutto != null);
+    const ut = koUtEnabled() && !grouped;   // widok „Usługi i towary" — kolumna Wartość netto
     table.classList.toggle('wyceny-table--grouped', grouped);
+    table.classList.toggle('wyceny-table--ut', ut);
     const head = table.querySelector('.wyceny-table__head');
     if (head && grouped) {
       head.innerHTML =
         '<label class="wyceny-check wyceny-check--master"><input type="checkbox" id="wyceny-master"/><span class="wyceny-check__box"></span></label>' +
-        '<div>Usługi</div><div>Osoby przypisane</div><div>Czas przepracowany</div>' +
+        '<div>Usługi</div><div>Osoby przypisane</div><div>Przeprac. czas</div>' +
         '<div class="wyceny-table__price">Wartość usług</div>' +
         '<div class="wyceny-table__price">Wartość towarów</div>' +
         '<div class="wyceny-table__price">Razem</div>';
+    } else if (head && ut) {
+      head.innerHTML =
+        '<label class="wyceny-check wyceny-check--master"><input type="checkbox" id="wyceny-master"/><span class="wyceny-check__box"></span></label>' +
+        '<div>Usługi</div><div>Osoby przypisane</div><div>Przeprac. czas</div>' +
+        '<div class="wyceny-table__price">Wartość netto</div>' +
+        '<div class="wyceny-table__price">Wartość brutto</div>';
     }
     const st = savedState.get(currentVisitId);
-    const czasFor = (idx) => {
-      if (!st) return '';
-      const r = Array.isArray(st.groups) ? (st.groups[idx] && st.groups[idx].robocizna) : (st.robociznas && st.robociznas[idx]);
-      return r ? (r.czas || '') : '';
-    };
+    const robFor = (idx) => Array.isArray(st && st.groups) ? (st.groups[idx] && st.groups[idx].robocizna) : (st && st.robociznas && st.robociznas[idx]);
+    const czasFor = (idx) => { const r = robFor(idx); return r ? (r.czas || '') : ''; };
+    const nettoFor = (idx) => { const r = robFor(idx); if (!r) return '0,00'; const net = num2(r.qty)*num2(r.cena)*(1 - num2(r.rabat)/100); return money0(net); };
     table.querySelectorAll('.wyceny-row').forEach(r => r.remove());
-    items.forEach((it, idx) => table.insertAdjacentHTML('beforeend', rowHTML(it, grouped, idx, czasFor(idx))));
+    items.forEach((it, idx) => table.insertAdjacentHTML('beforeend', rowHTML(it, grouped, idx, czasFor(idx), ut ? nettoFor(idx) : undefined)));
     const pText = panel.querySelector('.wyceny-progress__text');
     const pFill = panel.querySelector('.wyceny-progress__fill');
     if (pText) pText.textContent = '0/' + items.length + ' wykonano';
@@ -8966,6 +9121,16 @@ window.ZiloStore = (function () {
     panel.innerHTML = WYCENY_HTML.replace('__STATE__', state);
     if (state === 'filled') { rebuildRows(panel); renderHistoria(panel); }
     wireWyceny(panel);
+    // Układ „Usługi i towary": prod → wszystkie wizyty, lokalnie → tylko Fiat 500 / mycie (d20).
+    const _items = (currentVisitId && savedItems.get(currentVisitId)) || [];
+    const _grouped = _items.some(it => it.serviceBrutto != null);
+    if (koUtEnabled() && !_grouped) {
+      // Nazwa sekcji „Kosztorys" → „Usługi i towary"
+      const ts = panel.querySelector('.wyceny-header__title span'); if (ts) ts.textContent = 'Usługi i towary';
+      // Empty state: ukryj „Wgraj kosztorys"
+      const wgraj = panel.querySelector('#pane-wyceny .wyceny-a-empty:not(#wyceny-create-btn)'); if (wgraj) wgraj.style.display = 'none';
+      if (state === 'filled') applyFiatLayout(panel);
+    }
   }
 
   function wireWyceny(panel){
@@ -8978,21 +9143,24 @@ window.ZiloStore = (function () {
     const emptyBox = panel.querySelector('.wyceny-empty-box');
     if (emptyBox) { emptyBox.style.cursor = 'pointer'; emptyBox.addEventListener('click', openConfig); }
 
-    // Klik w usługę / wartość brutto → konfigurator kosztorysu z fokusem na klikniętym polu.
-    // (BEZ edycji inline w widoku szczegółów wizyty.)
-    // preventDefault, bo wiersz to <label> — bez tego klik przełączyłby checkbox.
+    // Klik w CAŁY wiersz → konfigurator kosztorysu (edycja). Konkretne pola dają fokus na nie.
+    // Zaznaczenie „wykonano" wyłącznie przez checkbox (stopPropagation na checkboxie).
     panel.querySelectorAll('#pane-wyceny .wyceny-row').forEach((row, idx) => {
+      const openField = (field) => { if (window.openWycConfig) window.openWycConfig(currentVisitId, { index: idx, field: field }); };
       const wire = (el, field) => {
         if (!el) return;
         el.style.cursor = 'pointer';
-        el.addEventListener('click', (e) => {
-          e.preventDefault(); e.stopPropagation();
-          if (window.openWycConfig) window.openWycConfig(currentVisitId, { index: idx, field: field });
-        });
+        el.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); openField(field); });
       };
       wire(row.querySelector('.wyceny-row__name'), 'name');
       wire(row.querySelector('.wyceny-row__czas'), 'czas');
       row.querySelectorAll('.wyceny-row__price').forEach(el => wire(el, 'brutto'));
+      // Checkbox — tylko oznacza wykonanie, nie otwiera konfiguratora.
+      const chk = row.querySelector('.wyceny-check');
+      if (chk) chk.addEventListener('click', (e) => e.stopPropagation());
+      // Klik w pozostałą część wiersza → edycja w konfiguratorze (fokus na usłudze).
+      row.style.cursor = 'pointer';
+      row.addEventListener('click', () => openField('name'));
     });
 
     // Przypisanie osoby przez natywny select (jedna lub żadna) — nie przełącza checkboxa / nie otwiera edycji.
@@ -9017,6 +9185,7 @@ window.ZiloStore = (function () {
       const total = rows.length;
       if (pText) pText.textContent = done + '/' + total + ' wykonano';
       if (pFill) pFill.style.width = total ? ((done/total)*100) + '%' : '0%';
+      const utc = panel.querySelector('#ut-count'); if (utc) utc.textContent = done + '/' + total;
       if (master) { master.checked = done === total && total > 0; master.indeterminate = done > 0 && done < total; }
     }
     rows.forEach(row => { const cb = row.querySelector('input[type="checkbox"]'); if (cb) cb.addEventListener('change', updateProg); });

@@ -15,6 +15,11 @@
     html, body { margin: 0; background: #fff; }
     a { color: var(--zilo-blue-1); text-decoration: none; }
     a:hover { color: var(--zilo-blue-2); text-decoration: underline; }
+    /* Ikona „i" w polu „Przeprac. czas" + tooltip (hover tylko na ikonę) */
+    .z-czas-info { position:absolute; right:11px; top:50%; transform:translateY(-50%); width:18px; height:18px; display:inline-flex; align-items:center; justify-content:center; color:var(--grey-3); cursor:help; z-index:5; }
+    .z-czas-info:hover { color:var(--zilo-blue-1); }
+    .z-czas-info__tip { position:absolute; bottom:calc(100% + 8px); right:-4px; width:230px; background:var(--grey-1); color:#fff; font-size:12px; line-height:16px; font-weight:400; padding:9px 11px; border-radius:8px; box-shadow:0 10px 28px rgba(10,11,41,0.20); opacity:0; visibility:hidden; transition:opacity 120ms var(--ease-standard); pointer-events:none; z-index:40; white-space:normal; text-align:left; }
+    .z-czas-info:hover .z-czas-info__tip { opacity:1; visibility:visible; }
     @keyframes caret-blink { 50% { opacity: 0; } }
     /* Editable cell — pokazuje focus przez granatowy inset (bez skoków layoutu) */
     .z-input-cell { transition: box-shadow 200ms var(--ease-standard); }
@@ -191,7 +196,7 @@
 
         <!-- Osoba (select) — Robocizna: pracownik przypisany -->
         <div style="position:relative;">
-          <div data-wyc-field="person" onClick="{{ group.toggleOsoba }}" style="display:flex;align-items:stretch;height:56px;box-sizing:border-box;background:#fff;border:1px solid var(--grey-3);border-radius:10px;cursor:pointer;">
+          <div data-wyc-field="person" onClick="{{ group.toggleOsoba }}" style="display:flex;align-items:stretch;height:56px;box-sizing:border-box;background:#fff;border:1px solid var(--grey-3);border-radius:10px;cursor:pointer;{{ group.osobaOpenStyle }}">
             <!-- Empty state: label 16px w środku -->
             <sc-if value="{{ group.noOsoba }}" hint-placeholder-val="{{ true }}">
               <div style="flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;padding:20px 13px;box-sizing:border-box;">
@@ -223,19 +228,23 @@
           </sc-if>
         </div>
 
-        <!-- Przeprac. czas (informacyjne — nie wpływa na wyliczenia) -->
-        <label class="z-input-cell" style="display:flex;align-items:stretch;height:56px;box-sizing:border-box;background:#fff;border:1px solid var(--grey-3);border-radius:10px;cursor:text;">
-          <div style="flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:2px;padding:9px 13px;box-sizing:border-box;">
-            <div style="font-size:12px;font-weight:400;line-height:16px;color:var(--grey-3);">Przeprac. czas</div>
-            <div style="display:flex;align-items:baseline;gap:3px;">
-              <input data-wyc-field="czas" class="z-input" type="text" inputMode="decimal" value="{{ group.rCzas }}" onChange="{{ group.setRCzas }}" onFocus="{{ selectOnFocus }}" onKeyDown="{{ commitOnEnter }}" style="flex:1;min-width:0;">
-              <span style="font-size:16px;line-height:20px;color:var(--grey-3);flex-shrink:0;">h</span>
+        <!-- Przeprac. czas (tri-state: domyślnie etykieta; po fokusie/uzupełnieniu pole + „h" obok liczby) -->
+        <label class="z-input-cell z-tri-cell {{ group.rCzasCellClass }}" style="display:flex;align-items:stretch;height:56px;box-sizing:border-box;background:#fff;border:1px solid var(--grey-3);border-radius:10px;cursor:text;position:relative;">
+          <div class="z-tri-body">
+            <div class="z-tri-label">Przeprac. czas</div>
+            <div class="z-tri-value" style="display:flex;align-items:baseline;gap:2px;">
+              <input data-wyc-field="czas" class="z-input" type="text" inputMode="decimal" value="{{ group.rCzas }}" onChange="{{ group.setRCzas }}" onFocus="{{ selectOnFocus }}" onKeyDown="{{ commitOnEnter }}" style="field-sizing:content;width:auto;min-width:1ch;max-width:6ch;">
+              <span style="font-size:16px;line-height:20px;color:var(--grey-1);flex-shrink:0;">h</span>
             </div>
           </div>
+          <span class="z-czas-info" aria-label="Informacja">
+            <svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="10" cy="10" r="7.4" stroke="currentColor" stroke-width="1.4"></circle><rect x="9.1" y="8.7" width="1.8" height="5.2" rx="0.9" fill="currentColor"></rect><circle cx="10" cy="6.3" r="1.05" fill="currentColor"></circle></svg>
+            <span class="z-czas-info__tip">Nie wpływa na ceny w kosztorysie. Służy do rozliczenia czasu pracy osoby w Raportach</span>
+          </span>
         </label>
         <!-- Jednostka (select) — Robocizna: Sztuka / Godzina -->
         <div style="position:relative;">
-          <div onClick="{{ group.toggleRobociznaUnit }}" style="display:flex;align-items:stretch;height:56px;box-sizing:border-box;background:#fff;border:1px solid var(--grey-3);border-radius:10px;cursor:pointer;">
+          <div onClick="{{ group.toggleRobociznaUnit }}" style="display:flex;align-items:stretch;height:56px;box-sizing:border-box;background:#fff;border:1px solid var(--grey-3);border-radius:10px;cursor:pointer;{{ group.robociznaOpenStyle }}">
             <div style="flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:2px;padding:9px 13px;box-sizing:border-box;">
               <div style="font-size:12px;font-weight:400;line-height:16px;color:var(--grey-3);">Jednostka</div>
               <div style="font-size:16px;font-weight:400;line-height:20px;color:var(--grey-1);">{{ group.robociznaUnit }}</div>
@@ -276,7 +285,7 @@
 
         <!-- VAT (%) select — Robocizna -->
         <div style="position:relative;">
-          <div onClick="{{ group.toggleRobociznaVat }}" style="display:flex;align-items:stretch;height:56px;box-sizing:border-box;background:#fff;border:1px solid var(--grey-3);border-radius:10px;cursor:pointer;">
+          <div onClick="{{ group.toggleRobociznaVat }}" style="display:flex;align-items:stretch;height:56px;box-sizing:border-box;background:#fff;border:1px solid var(--grey-3);border-radius:10px;cursor:pointer;{{ group.robociznaVatOpenStyle }}">
             <div style="flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:2px;padding:9px 13px;box-sizing:border-box;">
               <div style="font-size:12px;font-weight:400;line-height:16px;color:var(--grey-3);">VAT (%)</div>
               <div style="font-size:16px;font-weight:400;line-height:20px;color:var(--grey-1);">{{ group.robociznaVat }}</div>
@@ -382,7 +391,7 @@
 
         <!-- Jednostka (select) — Towar: Sztuka / Gramy / Litry -->
         <div style="position:relative;">
-          <div onClick="{{ towar.toggleUnit }}" style="display:flex;align-items:stretch;height:56px;box-sizing:border-box;background:#fff;border:1px solid var(--grey-3);border-radius:10px;cursor:pointer;">
+          <div onClick="{{ towar.toggleUnit }}" style="display:flex;align-items:stretch;height:56px;box-sizing:border-box;background:#fff;border:1px solid var(--grey-3);border-radius:10px;cursor:pointer;{{ towar.unitOpenStyle }}">
             <div style="flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:2px;padding:9px 13px;box-sizing:border-box;">
               <div style="font-size:12px;font-weight:400;line-height:16px;color:var(--grey-3);">Jednostka</div>
               <div style="font-size:16px;font-weight:400;line-height:20px;color:var(--grey-1);">{{ towar.unit }}</div>
@@ -431,7 +440,7 @@
 
         <!-- VAT (%) select — Towar -->
         <div style="position:relative;">
-          <div onClick="{{ towar.toggleVat }}" style="display:flex;align-items:stretch;height:56px;box-sizing:border-box;background:#fff;border:1px solid var(--grey-3);border-radius:10px;cursor:pointer;">
+          <div onClick="{{ towar.toggleVat }}" style="display:flex;align-items:stretch;height:56px;box-sizing:border-box;background:#fff;border:1px solid var(--grey-3);border-radius:10px;cursor:pointer;{{ towar.vatOpenStyle }}">
             <div style="flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:2px;padding:9px 13px;box-sizing:border-box;">
               <div style="font-size:12px;font-weight:400;line-height:16px;color:var(--grey-3);">VAT (%)</div>
               <div style="font-size:16px;font-weight:400;line-height:20px;color:var(--grey-1);">{{ towar.vat }}</div>
@@ -708,6 +717,7 @@
   renderVals() {
     const activeSet = new Set(this.state.extraFields);
     const showRabat = activeSet.has('rabat');
+    const obord = (open) => (open ? 'border-color:var(--zilo-blue-1);box-shadow:inset 0 0 0 1px var(--zilo-blue-1);' : '');
 
     const mkOption = (val, label, currentValue, onSelect) => ({
       value: val,
@@ -769,6 +779,7 @@
           unit: t.unit,
           unitOpen,
           chevronRotation: unitOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+          unitOpenStyle: obord(unitOpen),
           toggleUnit: () => this._patchGroup(g.id, (x) => ({
             ...x,
             openUnit: x.openUnit === i ? null : i,
@@ -784,6 +795,7 @@
           vat: t.vat,
           vatOpen,
           vatChevronRotation: vatOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+          vatOpenStyle: obord(vatOpen),
           toggleVat: () => this._patchGroup(g.id, (x) => ({
             ...x,
             openVat: x.openVat === i ? null : i,
@@ -832,6 +844,7 @@
         setRBruttoInput: (e) => this._updRob(g.id, 'bruttoEditing', e.target.value),
         commitRBrutto:   () => this._commitRobBrutto(g.id),
         rNameCellClass:  rob.name ? 'is-filled' : '',
+        rCzasCellClass:  (rob.czas != null && String(rob.czas).trim() !== '' && Component.parseNum(rob.czas) > 0) ? 'is-filled' : '',
         rBruttoValue:    rob.bruttoEditing != null ? rob.bruttoEditing : Component.fmt(robCompute.brutto),
 
         // Group totals
@@ -845,6 +858,7 @@
         robociznaUnit: rob.unit,
         robociznaOpen,
         robociznaChevronRotation: robociznaOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+        robociznaOpenStyle: obord(robociznaOpen),
         toggleRobociznaUnit: () => this._patchGroup(g.id, (x) => ({
           ...x,
           openUnit: x.openUnit === 'robocizna' ? null : 'robocizna',
@@ -861,6 +875,7 @@
         noOsoba: !osobaHasValue,
         osobaOpen,
         osobaChevronRotation: osobaOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+        osobaOpenStyle: obord(osobaOpen),
         toggleOsoba: () => this._patchGroup(g.id, (x) => ({
           ...x,
           openOsoba: !x.openOsoba,
@@ -884,6 +899,7 @@
         robociznaVat: rob.vat,
         robociznaVatOpen,
         robociznaVatChevronRotation: robociznaVatOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+        robociznaVatOpenStyle: obord(robociznaVatOpen),
         toggleRobociznaVat: () => this._patchGroup(g.id, (x) => ({
           ...x,
           openVat: x.openVat === 'robocizna' ? null : 'robocizna',
@@ -929,7 +945,7 @@
     const tailCols = 'minmax(0,1fr) minmax(0,1fr) 30px';
     // Robocizna: name | osoba | jednostka | ilość | przeprac.czas | cena | vat | (rabat)? | netto | brutto | trash
     const robGridStyle =
-      `display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr) 120px 110px 80px minmax(0,1fr) minmax(0,0.9fr)${showRabat ? ' 84px' : ''} ${tailCols};gap:8px;align-items:center;`;
+      `display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1.6fr) 168px 110px 80px minmax(0,1fr) minmax(0,0.9fr)${showRabat ? ' 84px' : ''} ${tailCols};gap:8px;align-items:center;`;
     // Towar: name | indeks | producent | jednostka | ilość | cena | koszt | vat | (rabat)? | netto | brutto | trash
     const towGridStyle =
       `display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1.05fr) minmax(0,1.05fr) 110px 76px minmax(0,1fr) minmax(0,1fr) minmax(0,0.9fr)${showRabat ? ' 76px' : ''} ${tailCols};gap:8px;align-items:center;`;
