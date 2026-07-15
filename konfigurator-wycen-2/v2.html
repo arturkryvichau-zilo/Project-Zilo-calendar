@@ -212,6 +212,16 @@
                 </div>
               </sc-if>
             </div>
+            <!-- Przeprac. czas (informacyjne — nie wpływa na wyliczenia) -->
+            <label class="z-input-cell" style="display:flex;align-items:stretch;height:56px;box-sizing:border-box;background:#fff;border:1px solid var(--grey-3);border-radius:10px;cursor:text;">
+              <div style="flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:2px;padding:9px 13px;box-sizing:border-box;">
+                <div style="font-size:12px;font-weight:400;line-height:16px;color:var(--grey-3);">Przeprac. czas</div>
+                <div style="display:flex;align-items:baseline;gap:3px;">
+                  <input data-wyc-field="czas" class="z-input" type="text" inputMode="decimal" value="{{ row.czas }}" onChange="{{ row.setCzas }}" onFocus="{{ selectOnFocus }}" onKeyDown="{{ commitOnEnter }}" style="flex:1;min-width:0;">
+                  <span style="font-size:16px;line-height:20px;color:var(--grey-3);flex-shrink:0;">h</span>
+                </div>
+              </div>
+            </label>
             <!-- Jednostka select -->
             <div style="position:relative;">
               <div onClick="{{ row.toggleUnit }}" style="display:flex;align-items:stretch;height:56px;box-sizing:border-box;background:#fff;border:1px solid var(--grey-3);border-radius:10px;cursor:pointer;">
@@ -241,13 +251,6 @@
               <div style="flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:2px;padding:9px 13px;box-sizing:border-box;">
                 <div style="font-size:12px;font-weight:400;line-height:16px;color:var(--grey-3);">Ilość</div>
                 <input class="z-input" type="text" inputMode="decimal" value="{{ row.qty }}" onChange="{{ row.setQty }}" onFocus="{{ selectOnFocus }}" onKeyDown="{{ commitOnEnter }}">
-              </div>
-            </label>
-            <!-- Przeprac. czas (informacyjne — nie wpływa na wyliczenia) -->
-            <label class="z-input-cell" style="display:flex;align-items:stretch;height:56px;box-sizing:border-box;background:#fff;border:1px solid var(--grey-3);border-radius:10px;cursor:text;">
-              <div style="flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:2px;padding:9px 13px;box-sizing:border-box;">
-                <div style="font-size:12px;font-weight:400;line-height:16px;color:var(--grey-3);">Przeprac. czas</div>
-                <input class="z-input" type="text" inputMode="decimal" value="{{ row.czas }}" onChange="{{ row.setCzas }}" onFocus="{{ selectOnFocus }}" onKeyDown="{{ commitOnEnter }}">
               </div>
             </label>
             <!-- Cena netto (edytowalne) -->
@@ -790,7 +793,7 @@ class Component extends DCLogic {
     // [drag 16 | label 2fr | osoba/indeks 1.3fr | jednostka 1.15fr | ilość 92 | cena 1fr | vat 1fr | (rabat 92)? | suma/wartość netto 1fr | suma/wartość brutto 1fr | trash 30]
     // Robocizna: name | osoba | jednostka | ilość | przeprac.czas | cena | vat | (rabat)? | wNetto | wBrutto | trash
     const robGridStyle =
-      'display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr) 110px 80px 120px minmax(0,1fr) minmax(0,0.9fr)' +
+      'display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr) 120px 110px 80px minmax(0,1fr) minmax(0,0.9fr)' +
       (showRabat ? ' 84px' : '') +
       ' minmax(0,1fr) minmax(0,1fr) 30px;gap:8px;align-items:center;';
     // Towar: name | indeks | producent | jednostka | ilość | cena | koszt | vat | (rabat)? | wNetto | wBrutto | trash

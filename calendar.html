@@ -8302,7 +8302,7 @@ window.ZiloStore = (function () {
   overflow: hidden; }
 .wyceny-table__head {
   display: grid;
-  grid-template-columns: 20px 1fr 220px 120px;
+  grid-template-columns: 20px 1fr 190px 150px 120px;
   gap: 8px;
   gap: 12px;
   padding: 12px 16px;
@@ -8312,7 +8312,8 @@ window.ZiloStore = (function () {
   border-bottom: 1px solid var(--grey-5, #E9ECF1); }
 .wyceny-table__head > div:nth-of-type(1) { grid-column: 2 / 3; }
 .wyceny-table__head > div:nth-of-type(2) { grid-column: 3 / 4; }
-.wyceny-table__head > div:nth-of-type(3) { grid-column: 4 / 5; text-align: right; }
+.wyceny-table__head > div:nth-of-type(3) { grid-column: 4 / 5; }
+.wyceny-table__head > div:nth-of-type(4) { grid-column: 5 / 6; text-align: right; }
 .wyceny-check--master {
   grid-column: 1 / 2;
   width: 20px;
@@ -8329,7 +8330,7 @@ window.ZiloStore = (function () {
 .wyceny-table__price { text-align: right; }
 .wyceny-row {
   display: grid;
-  grid-template-columns: 20px 1fr 220px 120px;
+  grid-template-columns: 20px 1fr 190px 150px 120px;
   gap: 8px;
   align-items: center;
   padding: 14px 16px;
@@ -8339,10 +8340,12 @@ window.ZiloStore = (function () {
 .wyceny-row:hover { background: var(--grey-7, #FBFBFB); }
 .wyceny-row.is-done .wyceny-row__name,
 .wyceny-row.is-done .wyceny-row__person,
+.wyceny-row.is-done .wyceny-row__czas,
 .wyceny-row.is-done .wyceny-row__price {
   color: var(--grey-3, #979DB0);
   text-decoration: line-through;
   text-decoration-color: var(--grey-3, #979DB0); }
+.wyceny-row__czas { font-size: 14px; color: var(--grey-1, #242629); font-variant-numeric: tabular-nums; }
 .wyceny-row.is-done .osoby-chip__avatar {
   opacity: 0.55; }
 .wyceny-row__name { font-size: 15px; color: var(--grey-1, #242629); }
@@ -8631,6 +8634,7 @@ window.ZiloStore = (function () {
               </label>
               <div>Usługi</div>
               <div>Osoby przypisane</div>
+              <div>Czas przepracowany</div>
               <div class="wyceny-table__price">Wartość brutto</div>
             </div>
             <label class="wyceny-row">
@@ -8659,6 +8663,7 @@ window.ZiloStore = (function () {
             </label>
           </div>
           <div class="wyceny-footer">
+            <button class="btn btn--ghost" id="wyceny-add-usluga-btn" type="button" style="font-weight: 400">Dodaj usługę</button>
             <button class="btn btn--ghost" id="wyslij-klient-btn" type="button" style="font-weight: 400">Wyślij ofertę do klienta</button>
             <div class="wystaw-wrap">
               <button class="btn btn--ghost" id="wystaw-btn" type="button" aria-expanded="false" style="font-weight: 400">
@@ -8743,7 +8748,7 @@ window.ZiloStore = (function () {
     const st = document.createElement('style'); st.id = 'wyceny-grouped-css';
     st.textContent =
       '.wyceny-table--grouped .wyceny-table__head,' +
-      '.wyceny-table--grouped .wyceny-row { grid-template-columns: 20px minmax(0,1fr) 190px 108px 116px 116px; }' +
+      '.wyceny-table--grouped .wyceny-row { grid-template-columns: 20px minmax(0,1fr) 170px 130px 100px 108px 108px; }' +
       '.wyceny-table--grouped .wyceny-table__head > div { grid-column: auto; }' +
       '.wyceny-table--grouped .wyceny-table__head .wyceny-table__price,' +
       '.wyceny-table--grouped .wyceny-row__price { text-align: right; justify-self: end; }' +
@@ -8760,6 +8765,15 @@ window.ZiloStore = (function () {
   })();
 
   function openConfig(){ if (window.openWycConfig) window.openWycConfig(currentVisitId); }
+  // „Dodaj usługę" → otwórz konfigurator z nową (pustą) robocizną i fokusem na polu usługi.
+  function addUslugaViaConfig(){
+    if (!currentVisitId) return;
+    const st = koEnsureState();
+    koPushRow(st, '', null);   // pusta robocizna
+    savedQuotes.set(currentVisitId, true);
+    const idx = Array.isArray(st.groups) ? (st.groups.length - 1) : (st.robociznas.length - 1);
+    if (window.openWycConfig) window.openWycConfig(currentVisitId, { index: idx, field: 'name' });
+  }
 
   function esc(s){ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
   function personInitials(name){
@@ -8778,9 +8792,10 @@ window.ZiloStore = (function () {
     return '<select class="wyceny-person-select" data-idx="' + idx + '">' + opts + '</select>';
   }
   // grouped = wycena z konfiguratora „usługi i towary razem" (v1) → 3 kolumny cen.
-  function rowHTML(it, grouped, idx){
+  function rowHTML(it, grouped, idx, czas){
     const nameHTML = (it.name && it.name.trim()) ? esc(it.name) : DASH;
     const personCell = personSelectHTML(idx, it.person || '');
+    const czHTML = (num2(czas) > 0) ? esc(String(czas).replace('.', ',') + ' h') : DASH;
     let prices;
     if (grouped) {
       prices = priceCell(it.serviceBrutto) +
@@ -8794,6 +8809,7 @@ window.ZiloStore = (function () {
       '<span class="wyceny-check"><input type="checkbox"' + (it.done ? ' checked' : '') + '/><span class="wyceny-check__box"></span></span>' +
       '<span class="wyceny-row__name" data-field="name">' + nameHTML + '</span>' +
       '<span class="wyceny-row__person">' + personCell + '</span>' +
+      '<span class="wyceny-row__czas">' + czHTML + '</span>' +
       prices +
     '</label>';
   }
@@ -8810,13 +8826,19 @@ window.ZiloStore = (function () {
     if (head && grouped) {
       head.innerHTML =
         '<label class="wyceny-check wyceny-check--master"><input type="checkbox" id="wyceny-master"/><span class="wyceny-check__box"></span></label>' +
-        '<div>Usługi</div><div>Osoby przypisane</div>' +
+        '<div>Usługi</div><div>Osoby przypisane</div><div>Czas przepracowany</div>' +
         '<div class="wyceny-table__price">Wartość usług</div>' +
         '<div class="wyceny-table__price">Wartość towarów</div>' +
         '<div class="wyceny-table__price">Razem</div>';
     }
+    const st = savedState.get(currentVisitId);
+    const czasFor = (idx) => {
+      if (!st) return '';
+      const r = Array.isArray(st.groups) ? (st.groups[idx] && st.groups[idx].robocizna) : (st.robociznas && st.robociznas[idx]);
+      return r ? (r.czas || '') : '';
+    };
     table.querySelectorAll('.wyceny-row').forEach(r => r.remove());
-    items.forEach((it, idx) => table.insertAdjacentHTML('beforeend', rowHTML(it, grouped, idx)));
+    items.forEach((it, idx) => table.insertAdjacentHTML('beforeend', rowHTML(it, grouped, idx, czasFor(idx))));
     const pText = panel.querySelector('.wyceny-progress__text');
     const pFill = panel.querySelector('.wyceny-progress__fill');
     if (pText) pText.textContent = '0/' + items.length + ' wykonano';
@@ -8969,6 +8991,7 @@ window.ZiloStore = (function () {
         });
       };
       wire(row.querySelector('.wyceny-row__name'), 'name');
+      wire(row.querySelector('.wyceny-row__czas'), 'czas');
       row.querySelectorAll('.wyceny-row__price').forEach(el => wire(el, 'brutto'));
     });
 
@@ -9009,6 +9032,8 @@ window.ZiloStore = (function () {
     }
 
     // Historia wysłanych ofert — „Wyślij do klienta" dopisuje bieżącą wycenę jako ofertę.
+    const addUslugaBtn = panel.querySelector('#wyceny-add-usluga-btn');
+    if (addUslugaBtn) addUslugaBtn.addEventListener('click', () => addUslugaViaConfig());
     const wyslijBtn = panel.querySelector('#wyslij-klient-btn');
     if (wyslijBtn) wyslijBtn.addEventListener('click', () => openOfferSend());
     const htoggle = panel.querySelector('#historia-toggle'); const hbody = panel.querySelector('#historia-body');
@@ -9238,10 +9263,6 @@ window.ZiloStore = (function () {
             '<div class="ofr-hr"></div>'+
             '<div class="ofr-send-row"><button class="ofr-switch ofr-switch--on" type="button" id="ofr-email-tgl" aria-pressed="true"><span class="ofr-switch__knob"></span></button>'+
               '<div class="ofr-send-txt"><div class="ofr-send-h">E-mail</div><div class="ofr-send-d">Klient otrzyma wiadomość z odnośnikiem do wyceny na skrzynkę e-mail przypisaną do zlecenia</div></div></div>'+
-            '<div id="ofr-email-fields">'+
-              '<label class="ofr-cell"><div class="ofr-cell__body"><span class="ofr-cell__label">Tytuł wiadomości</span><input class="ofr-cell__in" type="text" id="ofr-title"></div></label>'+
-              '<label class="ofr-cell ofr-cell--area"><div class="ofr-cell__body"><span class="ofr-cell__label">Wiadomość</span><textarea class="ofr-cell__in" id="ofr-msg" rows="3"></textarea></div></label>'+
-            '</div>'+
           '</div>'+
         '</section>'+
         '<section class="ofr-config">'+
@@ -9278,11 +9299,9 @@ window.ZiloStore = (function () {
     ofrOv.querySelector('#ofr-close').addEventListener('click', ofrClose);
     ofrOv.querySelector('#ofr-send').addEventListener('click', ofrSend);
     const tgl = ofrOv.querySelector('#ofr-email-tgl');
-    tgl.addEventListener('click', ()=>{ OS.email=!OS.email; tgl.setAttribute('aria-pressed', String(OS.email)); tgl.classList.toggle('ofr-switch--on', OS.email); ofrOv.querySelector('#ofr-email-fields').style.display = OS.email ? '' : 'none'; });
+    tgl.addEventListener('click', ()=>{ OS.email=!OS.email; tgl.setAttribute('aria-pressed', String(OS.email)); tgl.classList.toggle('ofr-switch--on', OS.email); });
     const bind=(id,key)=>{ const e=ofrOv.querySelector(id); if(e) e.addEventListener('input', ()=>{ OS.client[key]=e.value; }); };
     bind('#ofr-phone','phone'); bind('#ofr-name','name'); bind('#ofr-email','email');
-    ofrOv.querySelector('#ofr-title').addEventListener('input', e=>{ OS.title=e.target.value; });
-    ofrOv.querySelector('#ofr-msg').addEventListener('input', e=>{ OS.message=e.target.value; });
     ofrOv.querySelector('#ofr-notatka').addEventListener('input', e=>{ OS.notatka=e.target.value; });
     ofrOv.querySelector('#ofr-komentarz').addEventListener('input', e=>{ OS.komentarz=e.target.value; });
     // Dodatkowe pola — dropdown
@@ -9319,11 +9338,9 @@ window.ZiloStore = (function () {
     ofrOv.querySelector('#ofr-phone').value = OS.client.phone;
     ofrOv.querySelector('#ofr-name').value  = OS.client.name;
     ofrOv.querySelector('#ofr-email').value = OS.client.email;
-    ofrOv.querySelector('#ofr-title').value = OS.title;
-    ofrOv.querySelector('#ofr-msg').value   = OS.message;
     ofrOv.querySelector('#ofr-notatka').value = '';
     ofrOv.querySelector('#ofr-komentarz').value = '';
-    const tgl=ofrOv.querySelector('#ofr-email-tgl'); tgl.setAttribute('aria-pressed','true'); tgl.classList.add('ofr-switch--on'); ofrOv.querySelector('#ofr-email-fields').style.display='';
+    const tgl=ofrOv.querySelector('#ofr-email-tgl'); tgl.setAttribute('aria-pressed','true'); tgl.classList.add('ofr-switch--on');
     ofrOv.querySelector('#ofr-fields-menu').hidden = true;
     ofrSyncFieldsMenu();
     ofrRenderRows();
@@ -9392,7 +9409,6 @@ window.ZiloStore = (function () {
     '.ofr-switch--on{background:#222693;}'+
     '.ofr-switch--on .ofr-switch__knob{transform:translateX(16px);}'+
     '.ofr-switch--locked{background:#AEB4E8;cursor:not-allowed;}'+
-    '#ofr-email-fields{display:flex;flex-direction:column;gap:12px;margin-top:14px;}'+
     '.ofr-config{background:#F0F1F5;border:1px solid #DCE0E6;border-radius:12px;padding:24px;display:flex;flex-direction:column;gap:16px;box-sizing:border-box;}'+
     '.ofr-config__head{display:flex;justify-content:flex-end;align-items:center;position:relative;}'+
     '.ofr-fields-btn{font-family:inherit;font-weight:400;font-size:14px;line-height:20px;border:0;background:transparent;color:#222693;cursor:pointer;display:inline-flex;align-items:center;gap:6px;padding:6px 8px;border-radius:6px;height:34px;}'+

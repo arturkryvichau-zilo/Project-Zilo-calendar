@@ -223,6 +223,16 @@
           </sc-if>
         </div>
 
+        <!-- Przeprac. czas (informacyjne — nie wpływa na wyliczenia) -->
+        <label class="z-input-cell" style="display:flex;align-items:stretch;height:56px;box-sizing:border-box;background:#fff;border:1px solid var(--grey-3);border-radius:10px;cursor:text;">
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:2px;padding:9px 13px;box-sizing:border-box;">
+            <div style="font-size:12px;font-weight:400;line-height:16px;color:var(--grey-3);">Przeprac. czas</div>
+            <div style="display:flex;align-items:baseline;gap:3px;">
+              <input data-wyc-field="czas" class="z-input" type="text" inputMode="decimal" value="{{ group.rCzas }}" onChange="{{ group.setRCzas }}" onFocus="{{ selectOnFocus }}" onKeyDown="{{ commitOnEnter }}" style="flex:1;min-width:0;">
+              <span style="font-size:16px;line-height:20px;color:var(--grey-3);flex-shrink:0;">h</span>
+            </div>
+          </div>
+        </label>
         <!-- Jednostka (select) — Robocizna: Sztuka / Godzina -->
         <div style="position:relative;">
           <div onClick="{{ group.toggleRobociznaUnit }}" style="display:flex;align-items:stretch;height:56px;box-sizing:border-box;background:#fff;border:1px solid var(--grey-3);border-radius:10px;cursor:pointer;">
@@ -253,14 +263,6 @@
           <div style="flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:2px;padding:9px 13px;box-sizing:border-box;">
             <div style="font-size:12px;font-weight:400;line-height:16px;color:var(--grey-3);">Ilość</div>
             <input class="z-input" type="text" inputMode="decimal" value="{{ group.rQty }}" onChange="{{ group.setRQty }}" onFocus="{{ selectOnFocus }}" onKeyDown="{{ commitOnEnter }}">
-          </div>
-        </label>
-
-        <!-- Przeprac. czas (informacyjne — nie wpływa na wyliczenia) -->
-        <label class="z-input-cell" style="display:flex;align-items:stretch;height:56px;box-sizing:border-box;background:#fff;border:1px solid var(--grey-3);border-radius:10px;cursor:text;">
-          <div style="flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:2px;padding:9px 13px;box-sizing:border-box;">
-            <div style="font-size:12px;font-weight:400;line-height:16px;color:var(--grey-3);">Przeprac. czas</div>
-            <input class="z-input" type="text" inputMode="decimal" value="{{ group.rCzas }}" onChange="{{ group.setRCzas }}" onFocus="{{ selectOnFocus }}" onKeyDown="{{ commitOnEnter }}">
           </div>
         </label>
 
@@ -927,7 +929,7 @@
     const tailCols = 'minmax(0,1fr) minmax(0,1fr) 30px';
     // Robocizna: name | osoba | jednostka | ilość | przeprac.czas | cena | vat | (rabat)? | netto | brutto | trash
     const robGridStyle =
-      `display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr) 110px 80px 120px minmax(0,1fr) minmax(0,0.9fr)${showRabat ? ' 84px' : ''} ${tailCols};gap:8px;align-items:center;`;
+      `display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr) 120px 110px 80px minmax(0,1fr) minmax(0,0.9fr)${showRabat ? ' 84px' : ''} ${tailCols};gap:8px;align-items:center;`;
     // Towar: name | indeks | producent | jednostka | ilość | cena | koszt | vat | (rabat)? | netto | brutto | trash
     const towGridStyle =
       `display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1.05fr) minmax(0,1.05fr) 110px 76px minmax(0,1fr) minmax(0,1fr) minmax(0,0.9fr)${showRabat ? ' 76px' : ''} ${tailCols};gap:8px;align-items:center;`;
