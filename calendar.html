@@ -5048,7 +5048,12 @@ window.ZiloStore = (function () {
     });
   }
 
-  let APPOINTMENTS = enforceTestScenario([...DEMO_APPOINTMENTS]);
+  // Produkcja: ukryj wybrane wizyty demo (Audi A4 9:00 / Audi A1 10:00); lokalnie zostają.
+  function __isProdHost(){ const h = (typeof location !== 'undefined' && location.hostname) || ''; return !(h === 'localhost' || h === '127.0.0.1' || h === '0.0.0.0' || h === ''); }
+  const PROD_HIDDEN_IDS = ['d9', 'd9b'];
+  function prodHideVisits(list){ return __isProdHost() ? list.filter(a => PROD_HIDDEN_IDS.indexOf(a.id) === -1) : list; }
+
+  let APPOINTMENTS = prodHideVisits(enforceTestScenario([...DEMO_APPOINTMENTS]));
   window.APPOINTMENTS = APPOINTMENTS; // expose for visit-details modal lookup
 
   async function initSupabase() {
@@ -5062,7 +5067,7 @@ window.ZiloStore = (function () {
       clientsLoading = false;
       // Merge: keep demo entries, add real Supabase visits
       const realIds = new Set(visits.map(v => v.id));
-      APPOINTMENTS = enforceTestScenario([...DEMO_APPOINTMENTS.filter(d => !realIds.has(d.id)), ...visits]);
+      APPOINTMENTS = prodHideVisits(enforceTestScenario([...DEMO_APPOINTMENTS.filter(d => !realIds.has(d.id)), ...visits]));
       window.APPOINTMENTS = APPOINTMENTS; // keep modal lookup in sync after Supabase load
       if (currentView === 'day') renderDayView();
       else if (currentView === 'week') renderWeekView();
