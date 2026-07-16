@@ -1060,7 +1060,8 @@
       babelLoading = new Promise((res, rej) => {
         const s = document.createElement("script");
         s.src = BABEL_URL;
-        s.integrity = BABEL_SRI;
+        // Bez SRI — patrz komentarz w loadScript (blokada przy mirrorze/proxy).
+        void BABEL_SRI;
         s.crossOrigin = "anonymous";
         s.onload = () => res();
         s.onerror = rej;
@@ -1605,7 +1606,11 @@
       //! nosemgrep: create-script-element
       const s = document.createElement("script");
       s.src = src;
-      s.integrity = integrity;
+      // Bez SRI (integrity): gdy host mirroruje/proxuje zasób (np. Useberry
+      // przepisuje unpkg → *.p.useberry.com), hash SRI nie pasuje i przeglądarka
+      // BLOKUJE React → konfigurator się nie uruchamia (biały ekran). `integrity`
+      // celowo nieużywane.
+      void integrity;
       s.crossOrigin = "anonymous";
       s.async = false;
       s.onload = () => resolve2();
