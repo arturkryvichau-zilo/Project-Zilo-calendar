@@ -6508,7 +6508,7 @@ window.ZiloStore = (function () {
       </div>
 
       <!-- Szacowana cena — display + Edytuj button (mirrors Opis pattern) -->
-      <div class="detail-row" style="padding: 16px 4px; gap: 8px">
+      <div class="detail-row" id="estimated-price-row" style="padding: 16px 4px; gap: 8px">
         <div class="detail-row__head">
           <div class="detail-row__title">Szacowana cena:</div>
           <button class="btn btn--ghost" id="estimated-price-edit-btn" type="button" style="font-weight: 400">
@@ -7245,6 +7245,10 @@ window.ZiloStore = (function () {
     span.hidden = false;
   }
   function wireEstimatedPriceInput() {
+    // Na produkcji „Szacowana cena" jest ukryta.
+    const __h = (typeof location !== 'undefined' && location.hostname) || '';
+    const __isProd = !(__h === 'localhost' || __h === '127.0.0.1' || __h === '0.0.0.0' || __h === '');
+    if (__isProd) { const row = document.getElementById('estimated-price-row'); if (row) row.style.display = 'none'; return; }
     const editBtn = document.getElementById('estimated-price-edit-btn');
     const span = document.getElementById('estimated-price-display');
     const input = document.getElementById('estimated-price-input');
