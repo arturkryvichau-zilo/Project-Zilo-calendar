@@ -12406,7 +12406,19 @@ ReactDOM.createRoot(document.getElementById('zespol-react-root')).render(<ZApp /
       var car = { name: _a.name || '', phone: _a.phone || '', year: _veh.year || '', engine: _veh.engine || '', service: _a.desc || '', opis: _a.opis || '' };
       src += (src.indexOf('#') >= 0 ? '&' : '#') + 'car=' + encodeURIComponent(JSON.stringify(car));
     } catch (e) {}
-    try { frame.contentWindow.location.replace(src); } catch (e) { frame.src = src; }
+    // W osadzeniu (np. Useberry) iframe startuje jako about:blank i URL względny
+    // potrafi rozwiązać się do złej bazy → pusty (biały) konfigurator. Budujemy
+    // URL bezwzględny i ustawiamy atrybut src (działa też w sandboxie / cross-origin,
+    // w przeciwieństwie do contentWindow.location).
+    // Gdy stronę osadzono/re-hostowano poza naszym wdrożeniem (obcy host), pliki
+    // v1/v2 + _ds_bundle.js pod location.href by nie istniały — używamy wtedy
+    // kanonicznego adresu wdrożenia. Komunikacja i tak idzie przez postMessage('*').
+    var CANON = 'https://project-zilo-calendar-wersja-20.vercel.app/';
+    var host = location.hostname || '';
+    var onOwnHost = /(^|\.)vercel\.app$/.test(host) || host === 'localhost' || host === '127.0.0.1' || host === '0.0.0.0' || location.protocol === 'file:';
+    var base = onOwnHost ? location.href : CANON;
+    var absSrc; try { absSrc = new URL(src, base).href; } catch (e) { absSrc = src; }
+    try { frame.src = absSrc; } catch (e) { try { frame.contentWindow.location.replace(absSrc); } catch (e2) {} }
     ov.classList.add('is-open');
     // Parent-side ESC only needs to dismiss the confirm dialog (which lives here);
     // ESC inside the configurator is handled there and posted to us.
