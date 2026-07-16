@@ -2437,7 +2437,7 @@ window.ZiloStore = (function () {
       <button class="filter-chip active" data-station="all">Wszystkie stanowiska</button>
       <button class="filter-chip" data-station="Opony i wulkanizacja">Opony i wulkanizacja</button>
       <button class="filter-chip" data-station="Mechanika ogólna">Mechanika ogólna</button>
-      <button class="filter-chip" data-station="Klimatyzacja">Klimatyzacja</button>
+      <button class="filter-chip" data-station="Olej">Olej</button>
       <button class="filter-chip" data-station="Myjnia">Myjnia</button>
     </div>
     <div class="cal-main">
@@ -2462,9 +2462,9 @@ window.ZiloStore = (function () {
               <span class="badge-count" id="qty-badge-2">0/6</span>
             </div>
           </div>
-          <!-- Temporal: Klimatyzacja -->
+          <!-- Temporal: Olej -->
           <div class="col-header" id="col-hdr-3">
-            <div class="col-header__name">Klimatyzacja</div>
+            <div class="col-header__name">Olej</div>
             <div class="col-header__meta">
               <span class="badge-live"><svg viewBox="0 0 16 11" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="8" cy="5.5" r="1.5" fill="#3bb08f"/><path d="M5.2 2.7a4 4 0 0 0 0 5.6" stroke="#3bb08f" stroke-width="1.4" stroke-linecap="round"/><path d="M10.8 2.7a4 4 0 0 1 0 5.6" stroke="#3bb08f" stroke-width="1.4" stroke-linecap="round"/><path d="M2.4.5a8 8 0 0 0 0 10" stroke="#3bb08f" stroke-width="1.4" stroke-linecap="round"/><path d="M13.6.5a8 8 0 0 1 0 10" stroke="#3bb08f" stroke-width="1.4" stroke-linecap="round"/></svg></span>
               <span class="badge-hours">8:00 – 16:00</span>
@@ -2557,7 +2557,7 @@ window.ZiloStore = (function () {
             </div>
             <!-- Col 2: Mechanika ogólna (quantity) -->
             <div class="cal-col col--quantity" id="cal-col-2"></div>
-            <!-- Col 3: Klimatyzacja (temporal) -->
+            <!-- Col 3: Olej (temporal) -->
             <div class="cal-col col--temporal" id="cal-col-3">
               <div class="col-line col-line--major"></div><div class="col-line"></div>
               <div class="col-line col-line--major"></div><div class="col-line"></div>
@@ -4887,7 +4887,7 @@ window.ZiloStore = (function () {
   const STATION_META = {
     'Opony i wulkanizacja': { type:'temporal',  hours:'8:00 – 16:30', capacity: null },
     'Mechanika ogólna':     { type:'quantity',  hours:'8:00 – 17:00', capacity: 6 },
-    'Klimatyzacja':         { type:'temporal',  hours:'8:00 – 16:00', capacity: null },
+    'Olej':         { type:'temporal',  hours:'8:00 – 16:00', capacity: null },
     'Myjnia':               { type:'temporal',  hours:'8:00 – 17:00', capacity: null },
   };
   window.STATION_META = STATION_META; // exposed for the visit-details modal (separate IIFE)
@@ -4896,7 +4896,7 @@ window.ZiloStore = (function () {
   const STANOWISKA = [
     'Opony i wulkanizacja',
     'Mechanika ogólna',
-    'Klimatyzacja',
+    'Olej',
     'Myjnia',
   ];
   let selectedStation = STANOWISKA[0];
@@ -4905,7 +4905,7 @@ window.ZiloStore = (function () {
   const STATION_COL = {
     'Opony i wulkanizacja':       'cal-col-1',
     'Mechanika ogólna':           'cal-col-2',
-    'Klimatyzacja':               'cal-col-3',
+    'Olej':               'cal-col-3',
     'Myjnia':                     'cal-col-4',
     // Legacy aliases — map old station names to new columns for any pre-existing data
     'Mechanika i usterki':        'cal-col-2',
@@ -5016,14 +5016,15 @@ window.ZiloStore = (function () {
     { id:'d12',date: __today(), start:'13:00', end:'14:00', name:'BMW 520i',         phone:'+48 516 000 012', desc:'Mycie auta',                          stanowisko:'Myjnia',               status:'umowione', assignee: null, estimatedPriceBrutto: null, veh:{ year:'2019', engine:'2.0 benzyna' } },
     { id:'d10',date: __wd(0), start:'11:30', end:'12:30', name:'Mazda CX-5',       phone:'+48 516 000 010', desc:'Wymiana opon – felga aluminiowa 18″', stanowisko:'Opony i wulkanizacja', status:'umowione', assignee: null, estimatedPriceBrutto: null },
     { id:'d2', date: __wd(1), start:'10:00', end:'11:30', name:'Toyota Corolla',   phone:'+48 516 000 002', desc:'Wymiana oleju silnikowego i filtrów', stanowisko:'Mechanika ogólna',     status:'umowione', assignee:'PN',   estimatedPriceBrutto: 350 },
-    { id:'d11',date: __wd(1), start:'13:00', end:'14:00', name:'Hyundai Tucson',   phone:'+48 516 000 011', desc:'Serwis klimatyzacji R1234yf',         stanowisko:'Klimatyzacja',         status:'umowione', assignee:'FD',   estimatedPriceBrutto: 450 },
+    { id:'d11',date: __wd(1), start:'13:00', end:'14:00', name:'Hyundai Tucson',   phone:'+48 516 000 011', desc:'Serwis klimatyzacji R1234yf',         stanowisko:'Olej',         status:'umowione', assignee:'FD',   estimatedPriceBrutto: 450 },
     { id:'d3', date: __wd(2), start:'8:00',  end:'9:30',  name:'Volkswagen Passat',phone:'+48 516 000 003', desc:'Wymiana opon – felga aluminiowa 17″', stanowisko:'Opony i wulkanizacja', status:'umowione', assignee:'AK',   estimatedPriceBrutto: 250 },
-    { id:'d4', date: __wd(2), start:'11:00', end:'12:00', name:'Skoda Octavia',    phone:'+48 516 000 004', desc:'Serwis klimatyzacji R134a',           stanowisko:'Klimatyzacja',         status:'umowione', assignee: null, estimatedPriceBrutto: null },
+    { id:'d4', date: __wd(2), start:'11:00', end:'12:00', name:'Skoda Octavia',    phone:'+48 516 000 004', desc:'Serwis klimatyzacji R134a',           stanowisko:'Olej',         status:'umowione', assignee: null, estimatedPriceBrutto: null },
     { id:'d6', date: __wd(3), start:'13:00', end:'14:00', name:'Ford Focus',       phone:'+48 516 000 006', desc:'Naprawa układu kierowniczego',        stanowisko:'Mechanika ogólna',     status:'umowione', assignee: null, estimatedPriceBrutto: null },
     { id:'d7', date: __wd(4), start:'8:30',  end:'9:30',  name:'Opel Astra',       phone:'+48 516 000 007', desc:'Wymiana opon – felga stalowa 15″',    stanowisko:'Opony i wulkanizacja', status:'umowione', assignee: null, estimatedPriceBrutto: null },
-    { id:'d8', date: __wd(5), start:'10:00', end:'11:00', name:'Renault Megane',   phone:'+48 516 000 008', desc:'Uzupełnienie czynnika chłodniczego',  stanowisko:'Klimatyzacja',         status:'umowione', assignee:'AW',   estimatedPriceBrutto: 280 },
+    { id:'d8', date: __wd(5), start:'10:00', end:'11:00', name:'Renault Megane',   phone:'+48 516 000 008', desc:'Uzupełnienie czynnika chłodniczego',  stanowisko:'Olej',         status:'umowione', assignee:'AW',   estimatedPriceBrutto: 280 },
     // Prosta wizyta testowa — pusty kosztorys + brak przypisanych osób (do testu synchronizacji lewy panel ↔ kosztorys).
     { id:'d20',date: __today(), start:'9:00',  end:'10:00', name:'Fiat 500',        phone:'+48 500 100 200', desc:'Mycie auta',                          stanowisko:'Myjnia',               status:'umowione', assignee: null, estimatedPriceBrutto: null, veh:{ year:'2021', engine:'1.2 benzyna' }, opis:'Mycie zewnętrzne i wewnętrzne pojazdu.' },
+    { id:'d21',date: __today(), start:'7:00',  end:'8:00',  name:'Volkswagen Passat B8', phone:'+48 500 200 300', desc:'Wymiana oleju z filtrem',          stanowisko:'Olej',                 status:'umowione', assignee: null, estimatedPriceBrutto: null, veh:{ year:'2019', engine:'2.0 TDI' } },
   ];
 
   // ── Scenariusz testowy: wizyty priorytetowe (Audi/Wymiana rozrządu, BMW/Mycie auta) ──
@@ -5393,7 +5394,7 @@ window.ZiloStore = (function () {
   const STATION_COLORS = {
     'Opony i wulkanizacja':     'niebieski',
     'Mechanika ogólna':         'zolty',
-    'Klimatyzacja':             'turkusowy',
+    'Olej':             'turkusowy',
     'Myjnia':                   'fioletowy',
     // Legacy aliases
     'Mechanika i usterki':      'zolty',
@@ -8209,8 +8210,7 @@ window.ZiloStore = (function () {
       robociznas: [
         R(1, 'Paweł Nowak',       'Wymiana paska rozrządu', '700,00'),
         R(2, 'Paweł Nowak',       'Wymiana pompy wody', '220,00'),
-        R(3, 'Paweł Nowak',       'Uzupełnienie i odpowietrzenie układu chłodniczego', '220,00'),
-        R(4, 'Aleksander Wójcik', 'Robocizna bez towarów', '162,60')
+        R(3, 'Paweł Nowak',       'Uzupełnienie i odpowietrzenie układu chłodniczego', '220,00')
       ],
       towars: [
         T(1, 'Pasek rozrządu', 'Contitech', '700,00'),
@@ -8222,8 +8222,7 @@ window.ZiloStore = (function () {
     savedItems.set('d9c', [
       { name:'Wymiana paska rozrządu',                            person:'Paweł Nowak',      brutto:'861,00' },
       { name:'Wymiana pompy wody',                                person:'Paweł Nowak',      brutto:'270,60' },
-      { name:'Uzupełnienie i odpowietrzenie układu chłodniczego', person:'Paweł Nowak',      brutto:'270,60' },
-      { name:'Robocizna bez towarów',                             person:'Aleksander Wójcik',brutto:'200,00' }
+      { name:'Uzupełnienie i odpowietrzenie układu chłodniczego', person:'Paweł Nowak',      brutto:'270,60' }
     ]);
     savedQuotes.set('d9c', true);
   })();
@@ -8669,12 +8668,6 @@ window.ZiloStore = (function () {
               <span class="wyceny-row__name">Uzupełnienie i odpowietrzenie układu…</span>
               <span class="wyceny-row__person"><span class="osoby-chip__avatar" style="color: var(--zilo-primary); background-color: var(--zilo-blue-4)">PN</span>Paweł Nowak</span>
               <span class="wyceny-row__price">270,60 zł</span>
-            </label>
-            <label class="wyceny-row">
-              <span class="wyceny-check"><input type="checkbox"/><span class="wyceny-check__box"></span></span>
-              <span class="wyceny-row__name">Robocizna bez towarów</span>
-              <span class="wyceny-row__person"><span class="osoby-chip__avatar" style="color: var(--zilo-primary); background-color: var(--zilo-blue-4)">AW</span>Aleksander Wójcik</span>
-              <span class="wyceny-row__price">200,00 zł</span>
             </label>
           </div>
           <div class="wyceny-footer">
