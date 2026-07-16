@@ -5011,7 +5011,7 @@ window.ZiloStore = (function () {
     // Bliźniacza wizyta — identyczna z d9, tylko pojazd Audi A1 (konfigurator wyceny v2). Kolejny slot na tym samym stanowisku, by nie kolidowała z d9.
     { id:'d9b',date: __today(), start:'10:00', end:'11:00', name:'Audi A1',          phone:'+48 516 000 009', desc:'Wymiana rozrządu',                  stanowisko:'Mechanika ogólna',     status:'umowione', assignee: null, estimatedPriceBrutto: 2200, veh:{ year:'2019', engine:'2.0 TDI' }, opis:'Do wykonania wymiana kompletu rozrządu z pompą wody. Przy okazji sprawdzić stan paska osprzętu, rolek i napinaczy. Jeżeli podczas demontażu wyjdą dodatkowe elementy wymagające wymiany, proszę skontaktować się z klientem przed montażem. Po zakończeniu prac sprawdzić szczelność.' },
     // Kopia Audi A1 — status „W trakcie" (niebieski) + gotowa, zapisana wycena rozrządu (seed w module Wyceny). Kolejny slot na tym samym stanowisku.
-    { id:'d9c',date: __today(), start:'11:00', end:'12:00', name:'Audi A1',          phone:'+48 516 000 009', desc:'Wymiana rozrządu',                  stanowisko:'Mechanika ogólna',     status:'w-trakcie',assignee:'PN',  estimatedPriceBrutto: 2200, veh:{ year:'2019', engine:'2.0 TDI' }, opis:'Do wykonania wymiana kompletu rozrządu z pompą wody. Przy okazji sprawdzić stan paska osprzętu, rolek i napinaczy. Jeżeli podczas demontażu wyjdą dodatkowe elementy wymagające wymiany, proszę skontaktować się z klientem przed montażem. Po zakończeniu prac sprawdzić szczelność.' },
+    { id:'d9c',date: __today(), start:'11:00', end:'12:00', name:'Audi A4',          phone:'+48 516 000 009', desc:'Wymiana rozrządu',                  stanowisko:'Mechanika ogólna',     status:'w-trakcie',assignee:'PN',  estimatedPriceBrutto: 2200, veh:{ year:'2019', engine:'2.0 TDI' }, opis:'Do wykonania wymiana kompletu rozrządu z pompą wody. Przy okazji sprawdzić stan paska osprzętu, rolek i napinaczy. Jeżeli podczas demontażu wyjdą dodatkowe elementy wymagające wymiany, proszę skontaktować się z klientem przed montażem. Po zakończeniu prac sprawdzić szczelność.' },
     { id:'d12',date: __today(), start:'13:00', end:'14:00', name:'BMW 520i',         phone:'+48 516 000 012', desc:'Mycie auta',                          stanowisko:'Myjnia',               status:'umowione', assignee: null, estimatedPriceBrutto: null, veh:{ year:'2019', engine:'2.0 benzyna' } },
     { id:'d10',date: __wd(0), start:'11:30', end:'12:30', name:'Mazda CX-5',       phone:'+48 516 000 010', desc:'Wymiana opon – felga aluminiowa 18″', stanowisko:'Opony i wulkanizacja', status:'umowione', assignee: null, estimatedPriceBrutto: null },
     { id:'d2', date: __wd(1), start:'10:00', end:'11:30', name:'Toyota Corolla',   phone:'+48 516 000 002', desc:'Wymiana oleju silnikowego i filtrów', stanowisko:'Mechanika ogólna',     status:'umowione', assignee:'PN',   estimatedPriceBrutto: 350 },
@@ -5050,7 +5050,7 @@ window.ZiloStore = (function () {
 
   // Produkcja: ukryj wybrane wizyty demo (Audi A4 9:00 / Audi A1 10:00); lokalnie zostają.
   function __isProdHost(){ const h = (typeof location !== 'undefined' && location.hostname) || ''; return !(h === 'localhost' || h === '127.0.0.1' || h === '0.0.0.0' || h === ''); }
-  const PROD_HIDDEN_IDS = ['d9', 'd9b'];
+  const PROD_HIDDEN_IDS = ['d9', 'd9b', 'd12', 'd20'];
   function prodHideVisits(list){ return __isProdHost() ? list.filter(a => PROD_HIDDEN_IDS.indexOf(a.id) === -1) : list; }
 
   let APPOINTMENTS = prodHideVisits(enforceTestScenario([...DEMO_APPOINTMENTS]));
@@ -8224,6 +8224,21 @@ window.ZiloStore = (function () {
       { name:'Uzupełnienie i odpowietrzenie układu chłodniczego', person:'Paweł Nowak',      brutto:'270,60' }
     ]);
     savedQuotes.set('d9c', true);
+    // Historia: jedna wysłana oferta, już zaakceptowana przez klienta.
+    (function(){
+      const st = savedState.get('d9c');
+      const calc = r => { const q=num2(r.qty), c=num2(r.cena), rb=num2(r.rabat), v=num2(r.vat); const net=q*c*(1-rb/100); return net*(1+v/100); };
+      let uB=0, tB=0;
+      (st.robociznas||[]).forEach(r => { uB += calc(r); });
+      (st.towars||[]).forEach(t => { tB += calc(t); });
+      const d2 = new Date(Date.now() - 2*86400000);
+      const stamp = d2.getDate() + ' ' + MONTHS_PL[d2.getMonth()] + ', ' + String(d2.getHours()).padStart(2,'0') + ':' + String(d2.getMinutes()).padStart(2,'0');
+      sentOffers.set('d9c', [{
+        date: stamp, status: 'accepted',
+        uslugi: money0(uB) + ' zł', towary: money0(tB) + ' zł', amount: money0(uB + tB) + ' zł',
+        items: _clone(savedItems.get('d9c')), state: _clone(savedState.get('d9c'))
+      }]);
+    })();
   })();
 
   const WYCENY_CSS = `/* Tooltip — DS style, JS-positioned (fixed) so it escapes clipping ancestors */
@@ -12384,7 +12399,7 @@ ReactDOM.createRoot(document.getElementById('zespol-react-root')).render(<ZApp /
       // Dane pojazdu/klienta z wizyty → „Pojazd i klient" w konfiguratorze.
       var _a = (window.APPOINTMENTS || []).find(function (x) { return x.id === visitId; }) || {};
       var _veh = _a.veh || {};
-      var car = { name: _a.name || '', phone: _a.phone || '', year: _veh.year || '', engine: _veh.engine || '' };
+      var car = { name: _a.name || '', phone: _a.phone || '', year: _veh.year || '', engine: _veh.engine || '', service: _a.desc || '', opis: _a.opis || '' };
       src += (src.indexOf('#') >= 0 ? '&' : '#') + 'car=' + encodeURIComponent(JSON.stringify(car));
     } catch (e) {}
     try { frame.contentWindow.location.replace(src); } catch (e) { frame.src = src; }
